@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── NextAuth 필수 모델 ───────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── 서비스 모델 ──────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  avatarUrl     String?
+  bio           String?
+  slackUserId   String?
+  password      String?
+  role          Role      @default(MEMBER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts        Account[]
+  sessions        Session[]
+  manitoOf        ManitoPair[] @relation("Manito")
+  manitoTarget    ManitoPair[] @relation("Target")
+  sentPraises     Praise[]     @relation("Sender")
+  receivedPraises Praise[]     @relation("Receiver")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model Sprint {
+  id        String       @id @default(cuid())
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  status    SprintStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+
+  pairs   ManitoPair[]
+  praises Praise[]
+}
+
+enum SprintStatus {
+  PENDING
+  ACTIVE
+  REVEALED
+  CLOSED
+}
+
+model ManitoPair {
+  id       String @id @default(cuid())
+  sprintId String
+  manitoId String
+  targetId String
+
+  sprint Sprint @relation(fields: [sprintId], references: [id])
+  manito User   @relation("Manito", fields: [manitoId], references: [id])
+  target User   @relation("Target", fields: [targetId], references: [id])
+
+  @@unique([sprintId, manitoId])
+  @@unique([sprintId, targetId])
+}
+
+model Praise {
+  id         String   @id @default(cuid())
+  sprintId   String
+  fromUserId String
+  toUserId   String
+  content    String   @db.Text
+  categories String[]
+  createdAt  DateTime @default(now())
+
+  sprint   Sprint @relation(fields: [sprintId], references: [id])
+  sender   User   @relation("Sender", fields: [fromUserId], references: [id])
+  receiver User   @relation("Receiver", fields: [toUserId], references: [id])
+}
