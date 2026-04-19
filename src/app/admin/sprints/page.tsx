@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
-import { Plus, Eye, Loader2 } from 'lucide-react'
+import { Plus, Eye, Loader2, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -51,11 +52,14 @@ interface Sprint {
 export default function AdminSprintsPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const { data: session } = useSession()
+  const isLeader = session?.user.role === 'LEADER'
   const [sprints, setSprints] = useState<Sprint[]>([])
   const [teams, setTeams] = useState<Team[]>([])
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [revealing, setRevealing] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -73,7 +77,16 @@ export default function AdminSprintsPage() {
     setTeams(Array.isArray(data) ? data : [])
   }
 
-  useEffect(() => { load(); loadTeams() }, [])
+  useEffect(() => {
+    load()
+    loadTeams()
+  }, [])
+
+  useEffect(() => {
+    if (isLeader && session?.user.teamId) {
+      setValue('teamId', session.user.teamId)
+    }
+  }, [isLeader, session?.user.teamId, setValue])
 
   const onCreate = async (data: FormData) => {
     setSubmitting(true)
@@ -95,6 +108,21 @@ export default function AdminSprintsPage() {
       toast({ variant: 'destructive', title: '오류', description: (e as Error).message })
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const onDelete = async (sprintId: string, sprintName: string) => {
+    if (!confirm(`"${sprintName}" 스프린트를 삭제할까요? 관련 칭찬 데이터도 모두 삭제됩니다.`)) return
+    setDeleting(sprintId)
+    try {
+      const res = await fetch(`/api/admin/sprints/${sprintId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('삭제에 실패했습니다')
+      toast({ title: '스프린트가 삭제되었습니다' })
+      load()
+    } catch (e) {
+      toast({ variant: 'destructive', title: '오류', description: (e as Error).message })
+    } finally {
+      setDeleting(null)
     }
   }
 
@@ -132,20 +160,22 @@ export default function AdminSprintsPage() {
               <DialogTitle>새 스프린트 생성</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(onCreate)} className="space-y-4 mt-2">
-              <div className="space-y-2">
-                <Label>팀 선택 <span className="text-destructive">*</span></Label>
-                <Select onValueChange={(v) => setValue('teamId', v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="팀을 선택해주세요" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {teams.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.teamId && <p className="text-xs text-destructive">{errors.teamId.message}</p>}
-              </div>
+              {!isLeader && (
+                <div className="space-y-2">
+                  <Label>팀 선택 <span className="text-destructive">*</span></Label>
+                  <Select onValueChange={(v) => setValue('teamId', v)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="팀을 선택해주세요" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teams.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.teamId && <p className="text-xs text-destructive">{errors.teamId.message}</p>}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label>스프린트 이름</Label>
                 <Input placeholder="2024 Sprint 5" {...register('name')} />
@@ -221,6 +251,17 @@ export default function AdminSprintsPage() {
                       🎉 공개하기
                     </Button>
                   )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="gap-1 text-destructive hover:text-destructive"
+                    onClick={() => onDelete(sprint.id, sprint.name)}
+                    disabled={deleting === sprint.id}
+                  >
+                    {deleting === sprint.id
+                      ? <Loader2 className="h-3 w-3 animate-spin" />
+                      : <Trash2 className="h-3 w-3" />}
+                  </Button>
                 </div>
               </div>
             </CardContent>

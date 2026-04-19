@@ -28,6 +28,7 @@ export function Nav() {
 
   const allNavItems = [
     ...mainNavItems,
+    ...(session?.user.role === 'LEADER' ? [adminNavItems[1]] : []),
     ...(session?.user.role === 'ADMIN' ? adminNavItems : []),
   ]
 

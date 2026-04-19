@@ -54,6 +54,7 @@ model Team {
   createdAt DateTime @default(now())
 
   members User[]
+  sprints Sprint[]
 }
 
 model User {
@@ -101,11 +102,13 @@ model InviteToken {
 model Sprint {
   id        String       @id @default(cuid())
   name      String
+  teamId    String?
   startDate DateTime
   endDate   DateTime
   status    SprintStatus @default(PENDING)
   createdAt DateTime     @default(now())
 
+  team    Team?        @relation(fields: [teamId], references: [id])
   pairs   ManitoPair[]
   praises Praise[]
 }

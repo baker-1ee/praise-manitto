@@ -6,7 +6,7 @@ import { Nav } from '@/components/nav'
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
-  if (session.user.role !== 'ADMIN') redirect('/')
+  if (!['ADMIN', 'LEADER'].includes(session.user.role)) redirect('/')
 
   return (
     <div className="min-h-screen bg-background">

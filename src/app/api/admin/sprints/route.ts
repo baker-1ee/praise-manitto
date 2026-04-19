@@ -14,11 +14,16 @@ const schema = z.object({
 
 export async function GET() {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || !['ADMIN', 'LEADER'].includes(session.user.role)) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 
+  const where = session.user.role === 'LEADER'
+    ? { teamId: session.user.teamId ?? '' }
+    : {}
+
   const sprints = await prisma.sprint.findMany({
+    where,
     orderBy: { createdAt: 'desc' },
     include: { _count: { select: { pairs: true, praises: true } } },
   })
@@ -28,7 +33,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || !['ADMIN', 'LEADER'].includes(session.user.role)) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 
@@ -55,6 +60,7 @@ export async function POST(req: NextRequest) {
   const sprint = await prisma.sprint.create({
     data: {
       name: parsed.data.name,
+      teamId: parsed.data.teamId,
       startDate: new Date(parsed.data.startDate),
       endDate: new Date(parsed.data.endDate),
       status: 'ACTIVE',

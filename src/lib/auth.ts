@@ -34,6 +34,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
+          teamId: user.teamId,
           mustChangePassword: user.mustChangePassword,
         }
       },
@@ -44,6 +45,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.role = user.role
+        token.teamId = user.teamId
         token.mustChangePassword = user.mustChangePassword
       }
       return token
@@ -52,6 +54,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id
         session.user.role = token.role
+        session.user.teamId = token.teamId
         session.user.mustChangePassword = token.mustChangePassword
       }
       return session

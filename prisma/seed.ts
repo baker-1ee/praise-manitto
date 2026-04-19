@@ -18,24 +18,6 @@ async function main() {
   })
 
   console.log('Admin user created:', admin.email)
-
-  // 테스트 팀원 생성
-  const members = [
-    { name: '김민준', email: 'minjun@example.com' },
-    { name: '이서연', email: 'seoyeon@example.com' },
-    { name: '박지호', email: 'jiho@example.com' },
-    { name: '최유나', email: 'yuna@example.com' },
-  ]
-
-  for (const m of members) {
-    const pw = await bcrypt.hash('member123!', 10)
-    await prisma.user.upsert({
-      where: { email: m.email },
-      update: {},
-      create: { ...m, password: pw, role: Role.MEMBER },
-    })
-  }
-
   console.log('Seed completed!')
 }
 
