@@ -38,36 +38,36 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
     >
       <div
         className={cn(
-          'relative h-64 transform-style-3d transition-transform duration-700',
+          'relative h-44 transform-style-3d transition-transform duration-700',
           flipped && 'rotate-y-180',
         )}
       >
         {/* 앞면 */}
-        <div className="absolute inset-0 backface-hidden rounded-xl border-2 border-primary/30 bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col items-center justify-center gap-4 p-6">
-          <div className="relative">
-            <Heart className="h-16 w-16 text-primary/20" />
-            <span className="absolute inset-0 flex items-center justify-center text-2xl">🎁</span>
+        <div className="absolute inset-0 backface-hidden rounded-xl border-2 border-primary/30 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center gap-5 px-6">
+          <div className="relative shrink-0">
+            <Heart className="h-12 w-12 text-primary/20" />
+            <span className="absolute inset-0 flex items-center justify-center text-xl">🎁</span>
           </div>
-          <div className="text-center">
-            <Badge variant="secondary" className="mb-2">{sprintName}</Badge>
-            <p className="font-semibold text-lg">마니또가 배정되었어요!</p>
-            <p className="text-sm text-muted-foreground mt-1">클릭해서 확인하세요</p>
+          <div>
+            <Badge variant="secondary" className="mb-1.5">{sprintName}</Badge>
+            <p className="font-semibold">마니또가 배정되었어요!</p>
+            <p className="text-sm text-muted-foreground mt-0.5">탭해서 확인하세요</p>
           </div>
         </div>
 
         {/* 뒷면 */}
-        <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 border-primary bg-gradient-to-br from-indigo-50 to-blue-100 flex flex-col items-center justify-center gap-4 p-6">
-          <Avatar className="h-20 w-20 text-2xl border-4 border-primary/30">
-            <AvatarFallback className="text-xl bg-primary/10 text-primary">
+        <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 border-primary bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center gap-5 px-6">
+          <Avatar className="h-16 w-16 shrink-0 border-4 border-primary/30">
+            <AvatarFallback className="text-lg bg-primary/10 text-primary">
               {getInitials(target.name)}
             </AvatarFallback>
           </Avatar>
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-1">이번 스프린트 마니또 대상</p>
-            <p className="font-bold text-2xl text-primary">{target.name}</p>
-            {target.bio && <p className="text-sm text-muted-foreground mt-2">{target.bio}</p>}
+          <div>
+            <p className="text-xs text-muted-foreground mb-0.5">이번 스프린트 마니또 대상</p>
+            <p className="font-bold text-xl text-primary">{target.name}</p>
+            {target.bio && <p className="text-sm text-muted-foreground mt-1">{target.bio}</p>}
+            <Badge className="mt-2">나만 알 수 있어요 🤫</Badge>
           </div>
-          <Badge className="mt-1">나만 알 수 있어요 🤫</Badge>
         </div>
       </div>
     </div>

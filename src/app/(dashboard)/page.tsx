@@ -34,7 +34,7 @@ export default async function HomePage() {
   ])
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">안녕하세요, {session.user.name}님 👋</h1>
         <p className="text-muted-foreground mt-1 text-sm">오늘도 팀원을 칭찬해보세요!</p>

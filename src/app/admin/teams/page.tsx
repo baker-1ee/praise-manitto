@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Copy, Check, RefreshCw, Users, Loader2, Link2, KeyRound } from 'lucide-react'
+import { Plus, Copy, Check, RefreshCw, Users, Loader2, Link2, KeyRound, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -133,6 +133,22 @@ export default function AdminTeamsPage() {
     setCopiedId(member.id)
     setTimeout(() => setCopiedId(null), 2000)
     toast({ title: '초대링크 복사됨', description: `${member.name}님의 링크가 클립보드에 복사되었습니다` })
+  }
+
+  const removeMember = async (teamId: string, userId: string, memberName: string | null) => {
+    if (!confirm(`${memberName ?? '이 팀원'}을 팀에서 제거할까요?`)) return
+    const res = await fetch(`/api/admin/teams/${teamId}/members`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    })
+    if (res.ok) {
+      toast({ title: '팀원이 제거되었습니다' })
+      loadTeams()
+    } else {
+      const err = await res.json()
+      toast({ variant: 'destructive', title: '오류', description: err.error })
+    }
   }
 
   const resetPassword = async (teamId: string, userId: string, memberName: string | null) => {
@@ -332,6 +348,15 @@ export default function AdminTeamsPage() {
                               <KeyRound className="h-4 w-4" />
                             </Button>
                           )}
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => removeMember(team.id, member.id, member.name)}
+                            title="팀에서 제거"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
 
