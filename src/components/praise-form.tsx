@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Send } from 'lucide-react'
+import { Send, MessageSquare } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -25,6 +26,7 @@ interface PraiseFormProps {
 export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
+  const router = useRouter()
 
   const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -81,6 +83,16 @@ export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
       <Button type="submit" className="w-full gap-2" disabled={isSubmitting}>
         <Send className="h-4 w-4" />
         {isSubmitting ? '전송 중...' : '익명으로 칭찬 보내기'}
+      </Button>
+
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full gap-2"
+        onClick={() => router.push('/praises/sent')}
+      >
+        <MessageSquare className="h-4 w-4" />
+        보낸 칭찬 보기
       </Button>
     </form>
   )
