@@ -128,15 +128,7 @@ export default async function HomePage() {
         </>
       ) : (
         <div className="space-y-4">
-          <Card className="text-center py-12">
-            <CardContent>
-              <p className="text-4xl mb-4">😴</p>
-              <p className="text-lg font-semibold">현재 진행 중인 스프린트가 없어요</p>
-              <p className="text-muted-foreground text-sm mt-2">팀장님이 새 스프린트를 시작하면 알려드릴게요!</p>
-            </CardContent>
-          </Card>
-
-          {revealedSprint && (
+          {revealedSprint ? (
             <Link href={`/reveal/${revealedSprint.id}`}>
               <Card className="border-yellow-300 bg-yellow-50 hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="pt-6 flex items-center gap-4">
@@ -148,6 +140,14 @@ export default async function HomePage() {
                 </CardContent>
               </Card>
             </Link>
+          ) : (
+            <Card className="text-center py-12">
+              <CardContent>
+                <p className="text-4xl mb-4">😴</p>
+                <p className="text-lg font-semibold">현재 진행 중인 스프린트가 없어요</p>
+                <p className="text-muted-foreground text-sm mt-2">팀장님이 새 스프린트를 시작하면 알려드릴게요!</p>
+              </CardContent>
+            </Card>
           )}
         </div>
       )}
