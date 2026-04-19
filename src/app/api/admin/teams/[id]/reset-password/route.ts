@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || !['ADMIN', 'LEADER'].includes(session.user.role)) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 

@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Copy, Check, RefreshCw, Users, Loader2, Link2, KeyRound, Trash2 } from 'lucide-react'
+import { Plus, Copy, Check, RefreshCw, Users, Loader2, KeyRound, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -181,16 +181,6 @@ export default function AdminTeamsPage() {
     }
   }
 
-  const regenerateToken = async (teamId: string, userId: string) => {
-    await fetch(`/api/admin/teams/${teamId}/invite`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId }),
-    })
-    toast({ title: '초대링크가 재생성되었습니다' })
-    loadTeams()
-  }
-
   return (
     <div className="space-y-6">
       <div className="space-y-3">
@@ -357,17 +347,6 @@ export default function AdminTeamsPage() {
                               <Copy className="h-4 w-4" />
                             )}
                           </Button>
-                          {member.inviteToken && !member.inviteToken.usedAt && (
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8"
-                              onClick={() => regenerateToken(team.id, member.id)}
-                              title="초대링크 재생성"
-                            >
-                              <Link2 className="h-4 w-4" />
-                            </Button>
-                          )}
                           {(!member.inviteToken || member.inviteToken.usedAt) && (
                             <Button
                               size="icon"
