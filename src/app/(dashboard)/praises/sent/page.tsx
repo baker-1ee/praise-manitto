@@ -45,7 +45,7 @@ export default async function SentPraisesPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-medium text-muted-foreground">
-                      {praise.sprint.status === 'REVEALED' ? `${praise.receiver.name}님에게` : '익명의 대상에게'}
+                      {praise.receiver.name}님에게
                     </span>
                     <span className="text-muted-foreground text-xs">•</span>
                     <span className="text-xs text-muted-foreground">{formatDate(praise.createdAt)}</span>
