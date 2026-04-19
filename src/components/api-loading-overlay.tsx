@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 
-const QUOTES = [
+export const LOADING_QUOTES = [
   '칭찬은 고래도 춤추게 한다 🐳',
   '오늘의 칭찬 한 마디가 누군가의 하루를 바꿉니다 🌟',
   '작은 칭찬이 큰 용기가 됩니다 💪',
@@ -13,6 +13,16 @@ const QUOTES = [
   '진심은 반드시 전해집니다 ❤️',
   '함께 성장하는 팀을 만들어요 🌱',
   '오늘도 서로를 빛나게 해주세요 ✨',
+  '칭찬은 사람을 춤추게 하고 팀을 날게 한다 🦋',
+  '말 한마디로 천냥 빚을 갚는다 💬',
+  '인정받은 사람이 더 멀리 간다 🏃',
+  '따뜻한 말 한마디, 오늘의 에너지가 됩니다 ☀️',
+  '칭찬은 최고의 동기부여입니다 🎯',
+  '서로 응원하는 팀이 가장 강하다 🤝',
+  '좋은 팀원이 좋은 팀을 만든다 🏆',
+  '당신의 노력을 누군가는 보고 있어요 👀',
+  '칭찬은 나눌수록 커집니다 🎁',
+  '오늘 보낸 칭찬이 내일의 힘이 됩니다 💫',
 ]
 
 const LoadingContext = createContext({ pending: 0, inc: () => {}, dec: () => {} })
@@ -50,7 +60,7 @@ export function ApiLoadingProvider({ children }: { children: React.ReactNode }) 
 }
 
 function LoadingOverlay() {
-  const quoteRef = useRef(QUOTES[Math.floor(Math.random() * QUOTES.length)])
+  const quoteRef = useRef(LOADING_QUOTES[Math.floor(Math.random() * LOADING_QUOTES.length)])
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
