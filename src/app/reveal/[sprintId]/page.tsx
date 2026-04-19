@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { formatDate, formatDateTime, getInitials } from '@/lib/utils'
+import { celebrate } from '@/lib/celebration'
 
 interface Praise {
   content: string
@@ -86,7 +87,10 @@ export default function RevealPage() {
             <Card
               key={member.id}
               className="cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => setExpandedId(isExpanded ? null : member.id)}
+              onClick={() => {
+                if (!isExpanded) celebrate()
+                setExpandedId(isExpanded ? null : member.id)
+              }}
             >
               <CardContent className="pt-4 pb-4">
                 {/* 헤더: 아바타 + 이름 + 토글 */}
