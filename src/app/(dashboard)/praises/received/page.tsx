@@ -52,14 +52,6 @@ export default async function ReceivedPraisesPage() {
                   <Badge variant="outline" className="shrink-0 text-xs">{praise.sprint.name}</Badge>
                 </div>
 
-                {praise.categories.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {praise.categories.map((cat) => (
-                      <Badge key={cat} variant="secondary" className="text-xs">{cat}</Badge>
-                    ))}
-                  </div>
-                )}
-
                 <p className="text-sm leading-relaxed">{praise.content}</p>
               </CardContent>
             </Card>

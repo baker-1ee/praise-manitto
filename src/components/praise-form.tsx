@@ -8,11 +8,8 @@ import { Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/components/ui/use-toast'
 import { cn } from '@/lib/utils'
-
-const CATEGORIES = ['기술력', '협업', '커뮤니케이션', '리더십', '성장', '기타']
 
 const schema = z.object({
   content: z.string().min(10, '10자 이상 작성해주세요').max(500, '500자 이하로 작성해주세요'),
@@ -26,23 +23,14 @@ interface PraiseFormProps {
 }
 
 export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { toast } = useToast()
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    watch,
-    formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) })
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  })
 
   const contentLength = watch('content')?.length ?? 0
-
-  const toggleCategory = (cat: string) => {
-    setSelectedCategories((prev) => (prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]))
-  }
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true)
@@ -50,7 +38,7 @@ export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
       const res = await fetch('/api/praises', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: data.content, categories: selectedCategories }),
+        body: JSON.stringify({ content: data.content, categories: [] }),
       })
 
       if (!res.ok) {
@@ -60,7 +48,6 @@ export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
 
       toast({ title: '칭찬을 보냈어요! 💌', description: `${targetName}님에게 익명으로 전달됩니다.` })
       reset()
-      setSelectedCategories([])
       onSuccess?.()
     } catch (e) {
       toast({ variant: 'destructive', title: '오류', description: (e as Error).message })
@@ -70,23 +57,7 @@ export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="space-y-2">
-        <Label>칭찬 카테고리 (선택)</Label>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => (
-            <button type="button" key={cat} onClick={() => toggleCategory(cat)}>
-              <Badge
-                variant={selectedCategories.includes(cat) ? 'default' : 'outline'}
-                className="cursor-pointer transition-colors"
-              >
-                {cat}
-              </Badge>
-            </button>
-          ))}
-        </div>
-      </div>
-
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="content">
           칭찬 내용 <span className="text-destructive">*</span>
