@@ -25,7 +25,7 @@ export async function PUT(_req: NextRequest, { params }: { params: { id: string 
     data: { status: 'REVEALED' },
   })
 
-  const appUrl = process.env.NEXTAUTH_URL ?? ''
+  const appUrl = process.env.APP_URL ?? process.env.NEXTAUTH_URL ?? ''
   const webhookUrl = process.env.SLACK_WEBHOOK_URL ?? ''
   sendRevealNotification(webhookUrl, sprint.name, `${appUrl}/reveal/${sprint.id}`).catch(console.error)
 
