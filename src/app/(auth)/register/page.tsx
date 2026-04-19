@@ -169,10 +169,14 @@ function RegisterForm() {
                 </p>
               </div>
 
+              <Button className="w-full" onClick={() => router.push('/')}>
+                바로 시작하기 →
+              </Button>
+
               {slackInviteUrl && (
                 <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 space-y-3">
                   <p className="text-sm font-medium text-blue-800">
-                    💬 칭찬 알림을 받으려면 Slack 워크스페이스에 참여해주세요
+                    💬 칭찬 알림 받으려면
                   </p>
                   <Button asChild className="w-full bg-[#4A154B] hover:bg-[#3d1040] text-white">
                     <a href={slackInviteUrl} target="_blank" rel="noopener noreferrer" className="gap-2">
@@ -182,10 +186,6 @@ function RegisterForm() {
                   </Button>
                 </div>
               )}
-
-              <Button variant="outline" className="w-full" onClick={() => router.push('/')}>
-                서비스 시작하기 →
-              </Button>
             </div>
           )}
         </CardContent>
