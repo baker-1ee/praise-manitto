@@ -37,14 +37,17 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  // Slack 알림 (비동기, 실패해도 응답 영향 없음)
   const appUrl = process.env.NEXTAUTH_URL ?? ''
-  sendPraiseNotification(
-    myPair.target.slackUserId,
-    parsed.data.categories,
-    parsed.data.content,
-    appUrl,
-  ).catch(console.error)
+  try {
+    await sendPraiseNotification(
+      myPair.target.slackUserId,
+      parsed.data.categories,
+      parsed.data.content,
+      appUrl,
+    )
+  } catch (e) {
+    console.error('Slack 알림 실패:', e)
+  }
 
   return NextResponse.json(praise, { status: 201 })
 }
