@@ -11,6 +11,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+
+const AUTO_LOGIN_KEY = 'manitto_autologin'
 
 const schema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
@@ -28,11 +31,34 @@ function LoginForm() {
   const prefillName = searchParams.get('name') ?? ''
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [autoLogin, setAutoLogin] = useState(true)
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { name: prefillName },
   })
+
+  useEffect(() => {
+    if (prefillName) { setValue('name', prefillName); return }
+
+    const saved = localStorage.getItem(AUTO_LOGIN_KEY)
+    if (!saved) return
+    try {
+      const { name, password } = JSON.parse(saved)
+      setLoading(true)
+      signIn('credentials', { name, password, redirect: false }).then((result) => {
+        if (result?.error) {
+          localStorage.removeItem(AUTO_LOGIN_KEY)
+          setLoading(false)
+        } else {
+          router.push('/')
+          router.refresh()
+        }
+      })
+    } catch {
+      localStorage.removeItem(AUTO_LOGIN_KEY)
+    }
+  }, [])
 
   useEffect(() => {
     if (prefillName) setValue('name', prefillName)
@@ -50,6 +76,11 @@ function LoginForm() {
     if (result?.error) {
       setError('이름 또는 비밀번호가 올바르지 않습니다.')
     } else {
+      if (autoLogin) {
+        localStorage.setItem(AUTO_LOGIN_KEY, JSON.stringify({ name: data.name, password: data.password }))
+      } else {
+        localStorage.removeItem(AUTO_LOGIN_KEY)
+      }
       router.push('/')
       router.refresh()
     }
@@ -68,27 +99,46 @@ function LoginForm() {
           <CardDescription>팀원에게 익명으로 칭찬을 전해보세요 💌</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">이름</Label>
-              <Input id="name" type="text" placeholder="홍길동" {...register('name')} />
-              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+          {loading ? (
+            <div className="flex flex-col items-center py-8 gap-3 text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <p className="text-sm">자동 로그인 중...</p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">비밀번호</Label>
-              <Input id="password" type="password" placeholder="••••••••" {...register('password')} />
-              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-            </div>
-            {error && (
-              <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {error}
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">이름</Label>
+                <Input id="name" type="text" placeholder="홍길동" {...register('name')} />
+                {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
               </div>
-            )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              로그인
-            </Button>
-          </form>
+              <div className="space-y-2">
+                <Label htmlFor="password">비밀번호</Label>
+                <Input id="password" type="password" placeholder="••••••••" {...register('password')} />
+                {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <Checkbox
+                  id="autoLogin"
+                  checked={autoLogin}
+                  onCheckedChange={(v) => setAutoLogin(!!v)}
+                />
+                <Label htmlFor="autoLogin" className="text-sm font-normal cursor-pointer text-muted-foreground">
+                  다음부터 자동으로 로그인하기
+                </Label>
+              </div>
+
+              {error && (
+                <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                로그인
+              </Button>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
