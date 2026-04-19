@@ -88,7 +88,7 @@ export default function RevealPage() {
               key={member.id}
               className="cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => {
-                if (!isExpanded) celebrate()
+                if (!isExpanded) celebrate(member.name)
                 setExpandedId(isExpanded ? null : member.id)
               }}
             >

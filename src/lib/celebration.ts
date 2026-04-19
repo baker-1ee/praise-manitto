@@ -116,7 +116,34 @@ export function playApplause() {
   }
 }
 
-export function celebrate() {
+export function celebrate(name?: string | null) {
   fireConfetti()
   playApplause()
+
+  if (name && typeof speechSynthesis !== 'undefined') {
+    const speak = () => {
+      const msg = new SpeechSynthesisUtterance(`${name}!!!`)
+      msg.lang = 'ko-KR'
+      msg.rate = 0.6
+      msg.pitch = 1.4
+      msg.volume = 1.0
+
+      const voices = speechSynthesis.getVoices()
+      // 남성 음성 우선 (Kyunghoon 등), 없으면 ko-KR 아무거나
+      const maleVoice =
+        voices.find(v => v.lang.startsWith('ko') && /kyunghoon|male|남성|man/i.test(v.name)) ??
+        voices.find(v => v.lang.startsWith('ko'))
+      if (maleVoice) msg.voice = maleVoice
+
+      speechSynthesis.cancel()
+      speechSynthesis.speak(msg)
+    }
+
+    // getVoices()는 비동기 로딩 — 이미 로드됐으면 바로, 아니면 이벤트 대기
+    if (speechSynthesis.getVoices().length > 0) {
+      speak()
+    } else {
+      speechSynthesis.addEventListener('voiceschanged', speak, { once: true })
+    }
+  }
 }
