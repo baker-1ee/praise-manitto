@@ -10,14 +10,31 @@ export default async function SentPraisesPage() {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
+  const activeSprint = await prisma.sprint.findFirst({
+    where: { status: 'ACTIVE' },
+  })
+
+  const myPair = activeSprint
+    ? await prisma.manitoPair.findUnique({
+        where: { sprintId_manitoId: { sprintId: activeSprint.id, manitoId: session.user.id } },
+        include: { target: { select: { name: true } } },
+      })
+    : null
+
+  const where = activeSprint && myPair
+    ? { fromUserId: session.user.id, sprintId: activeSprint.id }
+    : { fromUserId: session.user.id }
+
   const praises = await prisma.praise.findMany({
-    where: { fromUserId: session.user.id },
+    where,
     orderBy: { createdAt: 'desc' },
     include: {
       sprint: { select: { name: true, status: true } },
       receiver: { select: { name: true } },
     },
   })
+
+  const isFiltered = !!(activeSprint && myPair)
 
   return (
     <div className="space-y-6">
@@ -26,7 +43,13 @@ export default async function SentPraisesPage() {
           <SendHorizontal className="h-6 w-6 text-blue-500" />
           보낸 칭찬
         </h1>
-        <p className="text-muted-foreground mt-1">총 {praises.length}개의 칭찬을 보냈어요 💌</p>
+        {isFiltered ? (
+          <p className="text-muted-foreground mt-1">
+            {activeSprint.name} · {myPair!.target.name}님에게 보낸 칭찬 {praises.length}개 💌
+          </p>
+        ) : (
+          <p className="text-muted-foreground mt-1">총 {praises.length}개의 칭찬을 보냈어요 💌</p>
+        )}
       </div>
 
       {praises.length === 0 ? (
@@ -50,7 +73,9 @@ export default async function SentPraisesPage() {
                     <span className="text-muted-foreground text-xs">•</span>
                     <span className="text-xs text-muted-foreground">{formatDate(praise.createdAt)}</span>
                   </div>
-                  <Badge variant="outline" className="shrink-0 text-xs">{praise.sprint.name}</Badge>
+                  {!isFiltered && (
+                    <Badge variant="outline" className="shrink-0 text-xs">{praise.sprint.name}</Badge>
+                  )}
                 </div>
 
                 <p className="text-sm leading-relaxed">{praise.content}</p>
