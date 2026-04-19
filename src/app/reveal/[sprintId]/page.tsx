@@ -147,7 +147,7 @@ export default function RevealPage() {
                     ) : (
                       pair.praises.map((praise, i) => (
                         <div key={i} className="bg-muted/40 rounded-lg px-4 py-3 space-y-1">
-                          <p className="text-sm leading-relaxed">"{praise.content}"</p>
+                          <p className="text-sm leading-relaxed">&ldquo;{praise.content}&rdquo;</p>
                           <p className="text-xs text-muted-foreground">{formatDateTime(praise.createdAt)}</p>
                         </div>
                       ))
