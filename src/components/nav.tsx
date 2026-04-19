@@ -69,7 +69,10 @@ export function Nav() {
               variant="ghost"
               size="icon"
               className="h-8 w-8"
-              onClick={() => signOut({ callbackUrl: '/login' })}
+              onClick={() => {
+                localStorage.removeItem('manitto_autologin')
+                signOut({ callbackUrl: '/login' })
+              }}
             >
               <LogOut className="h-4 w-4" />
             </Button>
