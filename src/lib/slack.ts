@@ -1,19 +1,23 @@
-const WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL
-
 export async function sendSlackDM(slackUserId: string, message: string): Promise<void> {
-  if (!WEBHOOK_URL) {
-    console.warn('SLACK_WEBHOOK_URL이 설정되지 않았습니다.')
+  const token = process.env.SLACK_BOT_TOKEN
+  if (!token) {
+    console.warn('SLACK_BOT_TOKEN이 설정되지 않았습니다.')
     return
   }
 
-  await fetch(WEBHOOK_URL, {
+  const res = await fetch('https://slack.com/api/chat.postMessage', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      channel: slackUserId,
-      text: message,
-    }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ channel: slackUserId, text: message }),
   })
+
+  const data = await res.json()
+  if (!data.ok) {
+    console.error('Slack DM 발송 실패:', data.error)
+  }
 }
 
 export async function sendPraiseNotification(
