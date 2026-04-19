@@ -3,24 +3,9 @@ import { NextRequest } from 'next/server'
 
 export const runtime = 'edge'
 
-async function loadNotoSansKR(): Promise<ArrayBuffer> {
-  // Old IE UA returns TTF format which Satori supports
-  const css = await fetch(
-    'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700',
-    { headers: { 'User-Agent': 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)' } },
-  ).then((r) => r.text())
-
-  const match = css.match(/url\(([^)]+)\) format\('truetype'\)/)
-  if (!match) throw new Error('Font URL not found')
-
-  return fetch(match[1]).then((r) => r.arrayBuffer())
-}
-
 export async function GET(req: NextRequest) {
   const name = req.nextUrl.searchParams.get('name') ?? ''
   const givenName = name.length >= 3 ? name.slice(1) : name
-
-  const fontData = await loadNotoSansKR()
 
   return new ImageResponse(
     (
@@ -35,7 +20,6 @@ export async function GET(req: NextRequest) {
           justifyContent: 'center',
           gap: 24,
           padding: 60,
-          fontFamily: 'Noto Sans KR',
         }}
       >
         <div
@@ -80,15 +64,11 @@ export async function GET(req: NextRequest) {
               marginTop: 4,
             }}
           >
-            팀원에게 익명으로 칭찬을 전해보세요
+            팀원에게 익명으로 칭찬을 전해보세요 🎉
           </div>
         </div>
       </div>
     ),
-    {
-      width: 1200,
-      height: 630,
-      fonts: [{ name: 'Noto Sans KR', data: fontData, weight: 700 }],
-    },
+    { width: 1200, height: 630 }
   )
 }
