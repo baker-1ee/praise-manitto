@@ -43,10 +43,13 @@
 - JWT 세션 (NextAuth.js Credentials Provider)
 - 세션에 `id`, `role`, `teamId`, `mustChangePassword` 포함
 - 초기 비밀번호 `0000` → 첫 로그인 후 변경 배너 표시
-- 자동 로그인 체크박스 (localStorage 기반)
+- 자동 로그인 체크박스 (localStorage 기반, 기본 체크) — localStorage 우선 시도 후 prefillName 처리
+- **카카오톡 인앱 브라우저 감지**: UA에 `KAKAOTALK` 포함 시 외부 브라우저 유도 배너 표시
+  - Android: Chrome intent URL(`intent://...#Intent;scheme=https;package=com.android.chrome;end`)로 자동 이동
+  - iOS: 하단 메뉴 → "기본 브라우저로 열기" 안내 텍스트 표시
 
 #### 화면
-- `/login` — 로그인 페이지
+- `/login` — 로그인 페이지 (placeholder 없음)
 - `/register?token={초대토큰}` — 초대 링크로만 가입
 - `/change-password` — 비밀번호 변경
 
@@ -88,6 +91,7 @@
 - `/` (홈) — 현재 스프린트 정보 + 내 마니또 대상 카드
   - 카드 앞면: "이번 스프린트 마니또가 배정되었어요!"
   - 카드 클릭 시 뒤집기 애니메이션으로 대상 공개
+  - 진행 중 스프린트 없을 때: 직전 공개 스프린트가 있으면 "마니또가 공개됐어요!" 카드 표시, 없으면 "스프린트 없음" 안내
 
 ---
 
@@ -115,8 +119,10 @@ Praise {
 ```
 
 #### 화면
-- `/praise/write` — 칭찬 작성 폼 (내 마니또 대상 자동 지정)
+- `/praise/write` — 칭찬 작성 폼 (내 마니또 대상 자동 지정), 전송 완료 후 보낸 칭찬 목록으로 자동 이동
 - `/praises/sent` — 내가 작성한 칭찬 목록 (발신 내역)
+  - 진행 중 스프린트 + 마니또 배정 상태: 해당 스프린트에서 해당 마니또 대상에게 보낸 칭찬만 표시
+  - 그 외(스프린트 없음, 미배정): 전체 발신 내역 표시
 
 ---
 
@@ -164,17 +170,30 @@ Praise {
 #### 구현 완료
 - ADMIN: 팀 생성/삭제, 전체 팀 조회
 - LEADER/ADMIN: 소속 팀 멤버 추가/삭제, 역할(LEADER/MEMBER) 지정
+  - LEADER는 자신의 팀(`session.user.teamId === params.id`)에만 멤버 추가 가능
 - 멤버 추가 시 초대 토큰 자동 생성 → 초대 링크 복사 버튼
 - 멤버 상태 표시: `미가입` (비밀번호 없음) / `가입 완료`
 - 관리자가 멤버 비밀번호를 `0000`으로 초기화 가능
 - 초대 링크 재발급 가능
+- 모바일 다이얼로그: 키보드 노출 시 상단 정렬(`top-[5%]`)로 입력 필드 가림 방지
 
 #### 화면
 - `/admin/teams` — 팀 목록, 멤버 관리, Slack 연동
 
 ---
 
-### 3.8 스프린트 공개 (LEADER/ADMIN 전용)
+### 3.8 OpenGraph 썸네일
+
+#### 구현 완료
+- **루트 페이지 OG** (`/src/app/opengraph-image.tsx`): purple-pink 그라디언트 카드, 💌, "칭찬 마니또" — 카카오톡 링크 공유 시 기본 썸네일
+- **초대 링크 개인화 OG**: `/register?token={초대토큰}` 공유 시 수신자 이름이 포함된 썸네일
+  - `/src/app/api/og/route.tsx` (edge runtime): `?name=홍길동` → "길동님을 초대합니다!" 렌더링 (`name.length >= 3 ? name.slice(1) : name`)
+  - `page.tsx` `generateMetadata`에서 토큰으로 DB 조회 → 절대 URL(`https://manitto.jinung.com/api/og?name=...`)로 OG 이미지 지정
+  - 토큰 없음/만료 시 기본 OG(`/api/og`) 폴백
+
+---
+
+### 3.9 스프린트 공개 (LEADER/ADMIN 전용)
 
 #### 구현 완료
 - LEADER/ADMIN이 "공개" 버튼 클릭 → 스프린트 상태 `REVEALED`
@@ -182,11 +201,11 @@ Praise {
 - 공개 시 Slack 채널 알림 자동 발송 (`3.6` 참조)
 
 #### 화면
-- `/reveal/{sprintId}` — 스프린트 공개 결과 (상세 3.9)
+- `/reveal/{sprintId}` — 스프린트 공개 결과 (상세 3.10)
 
 ---
 
-### 3.9 공개 결과 화면 (하이라이트 기능)
+### 3.10 공개 결과 화면 (하이라이트 기능)
 
 #### 구현 완료
 ```
@@ -205,6 +224,7 @@ Praise {
 #### 관련 파일
 - `/src/components/relation-graph.tsx` — 커스텀 SVG 관계도
 - `/src/lib/celebration.ts` — Confetti + Web Audio + Speech Synthesis
+- `/reveal/{sprintId}` — 비로그인 상태에서도 접근 가능 (auth 불필요)
 
 ---
 
@@ -392,15 +412,21 @@ model Praise {
 - [x] 팀/멤버 관리 — 팀 CRUD, 초대 토큰, 비밀번호 초기화
 - [x] 스프린트 생성 + 마니또 자동 배정 (Fisher-Yates)
 - [x] 내 마니또 확인 화면 (플립 카드 애니메이션)
-- [x] 칭찬 작성 (10~500자, 카테고리 태그)
-- [x] 받은 칭찬 / 보낸 칭찬 목록
-- [x] 스프린트 공개 + 커스텀 SVG 관계도 시각화
+- [x] 칭찬 작성 (10~500자), 전송 후 보낸 칭찬 목록으로 자동 이동
+- [x] 받은 칭찬 / 보낸 칭찬 목록 (진행 중 스프린트 기준 필터링)
+- [x] 스프린트 공개 + 커스텀 SVG 관계도 시각화 (비로그인 접근 허용)
 - [x] 공개 화면 축하 이벤트 (Confetti + 음향 + TTS)
 
-### 완료 (Phase 2 — 알림)
+### 완료 (Phase 2 — 알림 & UX)
 - [x] Slack DM 알림 (칭찬 수신 시)
 - [x] Slack 채널 알림 (스프린트 공개 시)
 - [x] 관리자 패널에서 Slack 유저 연동
+- [x] 자동 로그인 (localStorage, 기본 체크)
+- [x] 카카오톡 인앱 브라우저 감지 → 외부 브라우저 유도 배너
+- [x] OpenGraph 썸네일 — 루트 페이지 기본 OG + 초대 링크 개인화 OG
+- [x] LEADER 권한으로 소속 팀 멤버 추가 가능
+- [x] 홈 화면 — 직전 공개 스프린트 카드 표시 (진행 중 스프린트 없을 때)
+- [x] 모바일 다이얼로그 키보드 UX 개선
 
 ### 미구현 (Phase 3 — 개선)
 - [ ] 공개 화면 통계 카드 UI (API는 구현됨, 화면 미표시)
