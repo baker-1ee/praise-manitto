@@ -63,7 +63,7 @@ export default function ChangePasswordPage() {
             <KeyRound className="h-8 w-8 text-orange-500" />
           </div>
           <CardTitle>비밀번호 변경</CardTitle>
-          <CardDescription>관리자가 임시 비밀번호(0000)로 초기화했습니다. 새 비밀번호를 설정해주세요.</CardDescription>
+          <CardDescription>임시 비밀번호(0000)로 초기화되었습니다. 새 비밀번호를 설정해주세요.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

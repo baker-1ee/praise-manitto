@@ -14,7 +14,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const schema = z
   .object({
-    email: z.string().email('올바른 이메일을 입력해주세요'),
     password: z.string().min(1, '비밀번호를 입력해주세요'),
     confirm: z.string().min(1, '비밀번호를 한 번 더 입력해주세요'),
   })
@@ -40,7 +39,7 @@ function RegisterForm() {
   const token = searchParams.get('token') ?? ''
 
   const [step, setStep] = useState<Step>('loading')
-  const [userInfo, setUserInfo] = useState<{ name: string; email: string } | null>(null)
+  const [userInfo, setUserInfo] = useState<{ name: string } | null>(null)
   const [errorMsg, setErrorMsg] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -68,14 +67,14 @@ function RegisterForm() {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, email: data.email, password: data.password }),
+        body: JSON.stringify({ token, password: data.password }),
       })
       const result = await res.json()
       if (!res.ok) throw new Error(result.error)
 
       // 자동 로그인
       await signIn('credentials', {
-        email: result.email,
+        name: result.name,
         password: data.password,
         redirect: false,
       })
@@ -126,11 +125,6 @@ function RegisterForm() {
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">이메일 <span className="text-destructive">*</span></Label>
-                  <Input id="email" type="email" placeholder="hong@company.com" {...register('email')} />
-                  {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">비밀번호 설정 <span className="text-destructive">*</span></Label>
                   <Input id="password" type="password" placeholder="사용할 비밀번호" {...register('password')} />

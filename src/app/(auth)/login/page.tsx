@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 const schema = z.object({
-  email: z.string().email('올바른 이메일을 입력해주세요'),
+  name: z.string().min(1, '이름을 입력해주세요'),
   password: z.string().min(1, '비밀번호를 입력해주세요'),
 })
 type FormData = z.infer<typeof schema>
@@ -31,13 +31,13 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
     const result = await signIn('credentials', {
-      email: data.email,
+      name: data.name,
       password: data.password,
       redirect: false,
     })
     setLoading(false)
     if (result?.error) {
-      setError('이메일 또는 비밀번호가 올바르지 않습니다.')
+      setError('이름 또는 비밀번호가 올바르지 않습니다.')
     } else {
       router.push('/')
       router.refresh()
@@ -59,9 +59,9 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">이메일</Label>
-              <Input id="email" type="email" placeholder="you@company.com" {...register('email')} />
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+              <Label htmlFor="name">이름</Label>
+              <Input id="name" type="text" placeholder="홍길동" {...register('name')} />
+              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">비밀번호</Label>
