@@ -51,6 +51,7 @@ export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
       toast({ title: '칭찬을 보냈어요! 💌', description: `${targetName}님에게 익명으로 전달됩니다.` })
       reset()
       onSuccess?.()
+      router.push('/praises/sent')
     } catch (e) {
       toast({ variant: 'destructive', title: '오류', description: (e as Error).message })
     } finally {
