@@ -23,13 +23,21 @@ export async function GET() {
     orderBy: { createdAt: 'desc' },
     include: {
       members: {
-        select: { id: true, name: true, email: true, role: true, avatarUrl: true, slackUserId: true, inviteToken: { select: { token: true, usedAt: true } } },
+        select: { id: true, name: true, email: true, role: true, avatarUrl: true, slackUserId: true, password: true, inviteToken: { select: { token: true, usedAt: true } } },
         orderBy: [{ role: 'asc' }, { name: 'asc' }],
       },
     },
   })
 
-  return NextResponse.json(teams)
+  const result = teams.map((team) => ({
+    ...team,
+    members: team.members.map(({ password, ...m }) => ({
+      ...m,
+      hasPassword: !!password,
+    })),
+  }))
+
+  return NextResponse.json(result)
 }
 
 export async function POST(req: NextRequest) {

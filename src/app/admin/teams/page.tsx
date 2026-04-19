@@ -19,7 +19,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { getInitials } from '@/lib/utils'
 
 interface SlackMember { id: string; name: string; displayName: string; email: string; avatar: string }
-interface Member { id: string; name: string | null; email: string; role: string; avatarUrl: string | null; slackUserId: string | null; inviteToken?: { token: string; usedAt: string | null } | null }
+interface Member { id: string; name: string | null; email: string; role: string; avatarUrl: string | null; hasPassword: boolean; slackUserId: string | null; inviteToken?: { token: string; usedAt: string | null } | null }
 interface Team { id: string; name: string; members: Member[] }
 
 const teamSchema = z.object({ name: z.string().min(1, '팀 이름을 입력해주세요') })
@@ -317,7 +317,7 @@ export default function AdminTeamsPage() {
                             <Badge variant={member.role === 'LEADER' ? 'default' : 'secondary'} className="text-xs">
                               {ROLE_LABEL[member.role]}
                             </Badge>
-                            {!member.inviteToken || member.inviteToken.usedAt ? (
+                            {member.hasPassword ? (
                               <Badge variant="outline" className="text-xs text-green-600 border-green-300">가입 완료</Badge>
                             ) : (
                               <Badge variant="outline" className="text-xs text-orange-500 border-orange-300">미가입</Badge>
@@ -347,7 +347,7 @@ export default function AdminTeamsPage() {
                               <Copy className="h-4 w-4" />
                             )}
                           </Button>
-                          {(!member.inviteToken || member.inviteToken.usedAt) && (
+                          {member.hasPassword && (
                             <Button
                               size="icon"
                               variant="ghost"
