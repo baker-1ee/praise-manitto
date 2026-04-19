@@ -79,34 +79,34 @@ export default async function HomePage() {
       {activeSprint ? (
         <>
           <Card className="border-primary/30 bg-primary/5">
-            <CardHeader className="pb-2">
+            <CardHeader className="py-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-primary" />
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-primary" />
                   {activeSprint.name}
                 </CardTitle>
                 <Badge variant="secondary">진행 중</Badge>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 {formatDate(activeSprint.startDate)} ~ {formatDate(activeSprint.endDate)}
               </p>
             </CardHeader>
           </Card>
 
           <div>
-            <h2 className="text-xl font-semibold mb-2">이번 스프린트 내 마니또</h2>
+            <h2 className="text-lg font-semibold mb-2">이번 스프린트 내 마니또</h2>
             <ManitoCard
               target={myPair?.target ?? null}
               sprintName={activeSprint.name}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <Card className="text-center">
-              <CardContent className="pt-6">
-                <div className="text-4xl font-bold text-primary">{sentCount}</div>
-                <div className="text-sm text-muted-foreground mt-1">내가 보낸 칭찬</div>
-                <Link href="/praise/write" className="mt-4 block">
+              <CardContent className="pt-4 pb-4">
+                <div className="text-3xl font-bold text-primary">{sentCount}</div>
+                <div className="text-sm text-muted-foreground mt-0.5">내가 보낸 칭찬</div>
+                <Link href="/praise/write" className="mt-3 block">
                   <Button size="sm" className="w-full gap-2">
                     <Send className="h-4 w-4" /> 칭찬 쓰기
                   </Button>
@@ -114,10 +114,10 @@ export default async function HomePage() {
               </CardContent>
             </Card>
             <Card className="text-center">
-              <CardContent className="pt-6">
-                <div className="text-4xl font-bold text-pink-500">{receivedCount}</div>
-                <div className="text-sm text-muted-foreground mt-1">내가 받은 칭찬</div>
-                <Link href="/praises/received" className="mt-4 block">
+              <CardContent className="pt-4 pb-4">
+                <div className="text-3xl font-bold text-pink-500">{receivedCount}</div>
+                <div className="text-sm text-muted-foreground mt-0.5">내가 받은 칭찬</div>
+                <Link href="/praises/received" className="mt-3 block">
                   <Button size="sm" variant="outline" className="w-full gap-2">
                     <Inbox className="h-4 w-4" /> 확인하기
                   </Button>

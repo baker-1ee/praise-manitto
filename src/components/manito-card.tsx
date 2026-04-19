@@ -39,7 +39,7 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
     >
       <div
         className={cn(
-          'relative h-44 transform-style-3d transition-transform duration-700',
+          'relative h-36 transform-style-3d transition-transform duration-700',
           flipped && 'rotate-y-180',
         )}
       >
@@ -58,7 +58,7 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
 
         {/* 뒷면 */}
         <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 border-primary bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center gap-5 px-6">
-          <Avatar className="h-16 w-16 shrink-0 border-4 border-primary/30">
+          <Avatar className="h-12 w-12 shrink-0 border-4 border-primary/30">
             {target.avatarUrl && <AvatarImage src={target.avatarUrl} />}
             <AvatarFallback className="text-lg bg-primary/10 text-primary">
               {getInitials(target.name)}

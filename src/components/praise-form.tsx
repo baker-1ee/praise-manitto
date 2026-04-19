@@ -68,7 +68,7 @@ export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
           id="content"
           {...register('content')}
           placeholder={`${targetName ?? '마니또 대상'}님에게 전하고 싶은 칭찬을 적어주세요.\n익명으로 전달됩니다. 😊`}
-          className="min-h-[150px] resize-none"
+          className="min-h-[120px] resize-none"
         />
         <div className="flex justify-between text-xs text-muted-foreground">
           {errors.content ? (

@@ -37,38 +37,38 @@ export default async function PraiseWritePage() {
   }
 
   return (
-    <div className="space-y-6 max-w-lg mx-auto">
+    <div className="space-y-3 max-w-lg mx-auto">
       <div>
-        <h1 className="text-2xl font-bold">칭찬 보내기</h1>
-        <p className="text-muted-foreground mt-1">마니또 대상에게 익명으로 전달됩니다</p>
+        <h1 className="text-xl font-bold">칭찬 보내기</h1>
+        <p className="text-muted-foreground text-sm">마니또 대상에게 익명으로 전달됩니다</p>
       </div>
 
       <Card className="border-primary/30 bg-primary/5">
-        <CardContent className="pt-6 flex items-center gap-4">
-          <Avatar className="h-14 w-14">
+        <CardContent className="py-3 flex items-center gap-3">
+          <Avatar className="h-11 w-11 shrink-0">
             {myPair.target.avatarUrl && <AvatarImage src={myPair.target.avatarUrl} />}
-            <AvatarFallback className="text-lg bg-primary/10 text-primary">
+            <AvatarFallback className="text-base bg-primary/10 text-primary">
               {getInitials(myPair.target.name)}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <p className="text-xs text-muted-foreground mb-1">칭찬 대상</p>
-            <p className="font-bold text-xl">{myPair.target.name}</p>
-            {myPair.target.bio && <p className="text-sm text-muted-foreground">{myPair.target.bio}</p>}
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">칭찬 대상</p>
+            <p className="font-bold text-lg leading-tight">{myPair.target.name}</p>
+            {myPair.target.bio && <p className="text-xs text-muted-foreground truncate">{myPair.target.bio}</p>}
           </div>
-          <Badge className="ml-auto">익명 전달</Badge>
+          <Badge className="ml-auto shrink-0">익명 전달</Badge>
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>칭찬 작성</CardTitle>
-          <CardDescription>
+        <CardHeader className="pb-2 pt-4 px-4">
+          <CardTitle className="text-base">칭찬 작성</CardTitle>
+          <CardDescription className="text-xs">
             {myPair.target.name}님에게 전하고 싶은 칭찬을 작성해주세요.
             발신자는 스프린트 공개 전까지 알 수 없어요.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4 pt-0">
           <PraiseForm targetName={myPair.target.name} />
         </CardContent>
       </Card>
