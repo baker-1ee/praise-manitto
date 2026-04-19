@@ -22,7 +22,7 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
 
   if (!target) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 rounded-xl border-2 border-dashed text-muted-foreground gap-3">
+      <div className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed text-muted-foreground gap-3">
         <User className="h-12 w-12 opacity-30" />
         <p className="text-sm">아직 마니또가 배정되지 않았어요</p>
       </div>
