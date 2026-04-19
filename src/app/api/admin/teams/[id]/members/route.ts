@@ -40,9 +40,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json(user)
   }
 
-  // 팀원 추가/삭제 등 나머지 액션은 ADMIN 전용
-  if (session.user.role !== 'ADMIN') {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  // LEADER는 자신의 팀만 팀원 추가 가능
+  if (session.user.role === 'LEADER' && session.user.teamId !== params.id) {
+    return NextResponse.json({ error: '자신의 팀만 수정할 수 있습니다' }, { status: 403 })
   }
 
   // 팀원 추가
