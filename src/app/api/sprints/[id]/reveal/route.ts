@@ -22,7 +22,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     }),
     prisma.user.findMany({
       where: { role: { not: 'ADMIN' } },
-      select: { id: true, name: true },
+      select: { id: true, name: true, avatarUrl: true },
     }),
   ])
 
