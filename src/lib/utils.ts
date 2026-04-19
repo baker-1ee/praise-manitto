@@ -18,6 +18,11 @@ export function getInitials(name: string | null | undefined): string {
   return name.slice(0, 2)
 }
 
+export function getRandomAvatarUrl(): string {
+  const seed = Math.floor(Math.random() * 30)
+  return `https://api.dicebear.com/9.x/personas/svg?seed=${seed}`
+}
+
 export function addDays(date: Date, days: number): Date {
   const result = new Date(date)
   result.setDate(result.getDate() + days)

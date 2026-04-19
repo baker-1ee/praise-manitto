@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
@@ -19,7 +19,7 @@ import { useToast } from '@/components/ui/use-toast'
 import { getInitials } from '@/lib/utils'
 
 interface SlackMember { id: string; name: string; displayName: string; email: string; avatar: string }
-interface Member { id: string; name: string | null; email: string; role: string; slackUserId: string | null; inviteToken?: { token: string; usedAt: string | null } | null }
+interface Member { id: string; name: string | null; email: string; role: string; avatarUrl: string | null; slackUserId: string | null; inviteToken?: { token: string; usedAt: string | null } | null }
 interface Team { id: string; name: string; members: Member[] }
 
 const teamSchema = z.object({ name: z.string().min(1, '팀 이름을 입력해주세요') })
@@ -315,6 +315,7 @@ export default function AdminTeamsPage() {
                       {/* 상단 행: 아바타 + 정보 + 액션 버튼 */}
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9 shrink-0">
+                          {member.avatarUrl && <AvatarImage src={member.avatarUrl} />}
                           <AvatarFallback className="text-sm bg-primary/10 text-primary">
                             {getInitials(member.name)}
                           </AvatarFallback>

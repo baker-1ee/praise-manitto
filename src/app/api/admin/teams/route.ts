@@ -23,7 +23,7 @@ export async function GET() {
     orderBy: { createdAt: 'desc' },
     include: {
       members: {
-        select: { id: true, name: true, email: true, role: true, slackUserId: true, inviteToken: { select: { token: true, usedAt: true } } },
+        select: { id: true, name: true, email: true, role: true, avatarUrl: true, slackUserId: true, inviteToken: { select: { token: true, usedAt: true } } },
         orderBy: [{ role: 'asc' }, { name: 'asc' }],
       },
     },

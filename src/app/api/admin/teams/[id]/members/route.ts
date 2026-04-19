@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
-import { addDays } from '@/lib/utils'
+import { addDays, getRandomAvatarUrl } from '@/lib/utils'
 
 const addSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
@@ -47,6 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     data: {
       name: parsed.data.name,
       email: placeholderEmail,
+      avatarUrl: getRandomAvatarUrl(),
       role: parsed.data.role,
       teamId: params.id,
       inviteToken: {

@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 import { Heart, User } from 'lucide-react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { cn, getInitials } from '@/lib/utils'
 
 interface ManitoTarget {
   name: string | null
   bio: string | null
+  avatarUrl: string | null
 }
 
 interface ManitoCardProps {
@@ -58,6 +59,7 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
         {/* 뒷면 */}
         <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 border-primary bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center gap-5 px-6">
           <Avatar className="h-16 w-16 shrink-0 border-4 border-primary/30">
+            {target.avatarUrl && <AvatarImage src={target.avatarUrl} />}
             <AvatarFallback className="text-lg bg-primary/10 text-primary">
               {getInitials(target.name)}
             </AvatarFallback>

@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { PraiseForm } from '@/components/praise-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { getInitials } from '@/lib/utils'
 
@@ -25,7 +25,7 @@ export default async function PraiseWritePage() {
 
   const myPair = await prisma.manitoPair.findUnique({
     where: { sprintId_manitoId: { sprintId: activeSprint.id, manitoId: session.user.id } },
-    include: { target: { select: { id: true, name: true, bio: true } } },
+    include: { target: { select: { id: true, name: true, bio: true, avatarUrl: true } } },
   })
 
   if (!myPair) {
@@ -46,6 +46,7 @@ export default async function PraiseWritePage() {
       <Card className="border-primary/30 bg-primary/5">
         <CardContent className="pt-6 flex items-center gap-4">
           <Avatar className="h-14 w-14">
+            {myPair.target.avatarUrl && <AvatarImage src={myPair.target.avatarUrl} />}
             <AvatarFallback className="text-lg bg-primary/10 text-primary">
               {getInitials(myPair.target.name)}
             </AvatarFallback>

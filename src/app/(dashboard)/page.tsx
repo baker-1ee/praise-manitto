@@ -20,7 +20,7 @@ export default async function HomePage() {
   const myPair = activeSprint
     ? await prisma.manitoPair.findUnique({
         where: { sprintId_manitoId: { sprintId: activeSprint.id, manitoId: session.user.id } },
-        include: { target: { select: { name: true, bio: true } } },
+        include: { target: { select: { name: true, bio: true, avatarUrl: true } } },
       })
     : null
 
