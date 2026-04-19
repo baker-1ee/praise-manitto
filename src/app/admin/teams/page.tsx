@@ -18,8 +18,8 @@ import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/use-toast'
 import { getInitials } from '@/lib/utils'
 
-interface SlackMember { id: string; name: string; displayName: string; email: string; avatar: string }
-interface Member { id: string; name: string | null; email: string; role: string; avatarUrl: string | null; hasPassword: boolean; slackUserId: string | null; inviteToken?: { token: string; usedAt: string | null } | null }
+interface SlackMember { id: string; name: string; displayName: string; avatar: string }
+interface Member { id: string; name: string | null; role: string; avatarUrl: string | null; hasPassword: boolean; slackUserId: string | null; inviteToken?: { token: string; usedAt: string | null } | null }
 interface Team { id: string; name: string; members: Member[] }
 
 const teamSchema = z.object({ name: z.string().min(1, '팀 이름을 입력해주세요') })

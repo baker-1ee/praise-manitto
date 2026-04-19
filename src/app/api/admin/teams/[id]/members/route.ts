@@ -53,12 +53,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 
   // 신규 유저 생성 (미가입 상태, 초대링크 발급)
-  const placeholderEmail = `invite.${Date.now()}.${Math.random().toString(36).slice(2)}@manitto.invited`
-
   const user = await prisma.user.create({
     data: {
       name: parsed.data.name,
-      email: placeholderEmail,
       avatarUrl: getRandomAvatarUrl(),
       role: parsed.data.role,
       teamId: params.id,
