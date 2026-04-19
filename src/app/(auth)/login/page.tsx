@@ -162,12 +162,12 @@ function LoginForm() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">이름</Label>
-              <Input id="name" type="text" placeholder="홍길동" {...register('name')} disabled={loading} />
+              <Input id="name" type="text" {...register('name')} disabled={loading} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">비밀번호</Label>
-              <Input id="password" type="password" placeholder="••••••••" {...register('password')} disabled={loading} />
+              <Input id="password" type="password" {...register('password')} disabled={loading} />
               {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
             </div>
 
