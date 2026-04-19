@@ -327,7 +327,7 @@ export default function AdminTeamsPage() {
                             <Badge variant={member.role === 'LEADER' ? 'default' : 'secondary'} className="text-xs">
                               {ROLE_LABEL[member.role]}
                             </Badge>
-                            {member.inviteToken?.usedAt ? (
+                            {!member.inviteToken || member.inviteToken.usedAt ? (
                               <Badge variant="outline" className="text-xs text-green-600 border-green-300">가입 완료</Badge>
                             ) : (
                               <Badge variant="outline" className="text-xs text-orange-500 border-orange-300">미가입</Badge>
@@ -368,7 +368,7 @@ export default function AdminTeamsPage() {
                               <Link2 className="h-4 w-4" />
                             </Button>
                           )}
-                          {member.inviteToken?.usedAt && (
+                          {(!member.inviteToken || member.inviteToken.usedAt) && (
                             <Button
                               size="icon"
                               variant="ghost"
