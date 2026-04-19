@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -33,6 +34,8 @@ const ROLE_LABEL: Record<string, string> = { LEADER: '리더', MEMBER: '멤버' 
 
 export default function AdminTeamsPage() {
   const { toast } = useToast()
+  const { data: session } = useSession()
+  const isAdmin = session?.user.role === 'ADMIN'
   const [teams, setTeams] = useState<Team[]>([])
   const [slackMembers, setSlackMembers] = useState<SlackMember[]>([])
   const [slackLoading, setSlackLoading] = useState(false)
@@ -135,6 +138,18 @@ export default function AdminTeamsPage() {
     toast({ title: '초대링크 복사됨', description: `${member.name}님의 링크가 클립보드에 복사되었습니다` })
   }
 
+  const deleteTeam = async (teamId: string, teamName: string) => {
+    if (!confirm(`"${teamName}" 팀을 삭제할까요? 팀원들은 팀에서 제외됩니다.`)) return
+    const res = await fetch(`/api/admin/teams/${teamId}`, { method: 'DELETE' })
+    if (res.ok) {
+      toast({ title: '팀이 삭제되었습니다' })
+      loadTeams()
+    } else {
+      const err = await res.json()
+      toast({ variant: 'destructive', title: '오류', description: err.error })
+    }
+  }
+
   const removeMember = async (teamId: string, userId: string, memberName: string | null) => {
     if (!confirm(`${memberName ?? '이 팀원'}을 팀에서 제거할까요?`)) return
     const res = await fetch(`/api/admin/teams/${teamId}/members`, {
@@ -188,24 +203,26 @@ export default function AdminTeamsPage() {
             {slackLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             Slack 동기화
           </Button>
-          <Dialog open={teamDialogOpen} onOpenChange={setTeamDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2"><Plus className="h-4 w-4" /> 팀 생성</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>새 팀 생성</DialogTitle></DialogHeader>
-              <form onSubmit={teamForm.handleSubmit(createTeam)} className="space-y-4 mt-2">
-                <div className="space-y-2">
-                  <Label>팀 이름</Label>
-                  <Input placeholder="개발팀" {...teamForm.register('name')} />
-                  {teamForm.formState.errors.name && (
-                    <p className="text-xs text-destructive">{teamForm.formState.errors.name.message}</p>
-                  )}
-                </div>
-                <Button type="submit" className="w-full">생성</Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+          {isAdmin && (
+            <Dialog open={teamDialogOpen} onOpenChange={setTeamDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="gap-2"><Plus className="h-4 w-4" /> 팀 생성</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader><DialogTitle>새 팀 생성</DialogTitle></DialogHeader>
+                <form onSubmit={teamForm.handleSubmit(createTeam)} className="space-y-4 mt-2">
+                  <div className="space-y-2">
+                    <Label>팀 이름</Label>
+                    <Input placeholder="개발팀" {...teamForm.register('name')} />
+                    {teamForm.formState.errors.name && (
+                      <p className="text-xs text-destructive">{teamForm.formState.errors.name.message}</p>
+                    )}
+                  </div>
+                  <Button type="submit" className="w-full">생성</Button>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
@@ -231,20 +248,21 @@ export default function AdminTeamsPage() {
         teams.map((team) => (
           <Card key={team.id}>
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div>
                   <CardTitle className="text-lg">{team.name}</CardTitle>
                   <p className="text-sm text-muted-foreground">{team.members.length}명</p>
                 </div>
-                <Dialog
-                  open={memberDialogTeamId === team.id}
-                  onOpenChange={(o) => { setMemberDialogTeamId(o ? team.id : null); memberForm.reset({ role: 'MEMBER' }) }}
-                >
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="gap-1">
-                      <Plus className="h-3 w-3" /> 팀원 추가
-                    </Button>
-                  </DialogTrigger>
+                <div className="flex gap-1">
+                  <Dialog
+                    open={memberDialogTeamId === team.id}
+                    onOpenChange={(o) => { setMemberDialogTeamId(o ? team.id : null); memberForm.reset({ role: 'MEMBER' }) }}
+                  >
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="outline" className="gap-1">
+                        <Plus className="h-3 w-3" /> 팀원 추가
+                      </Button>
+                    </DialogTrigger>
                   <DialogContent>
                     <DialogHeader><DialogTitle>팀원 추가 — {team.name}</DialogTitle></DialogHeader>
                     <form onSubmit={memberForm.handleSubmit(addMember)} className="space-y-4 mt-2">
@@ -271,7 +289,19 @@ export default function AdminTeamsPage() {
                       <Button type="submit" className="w-full">추가 및 초대링크 생성</Button>
                     </form>
                   </DialogContent>
-                </Dialog>
+                  </Dialog>
+                  {isAdmin && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="gap-1 text-destructive hover:text-destructive px-2"
+                      onClick={() => deleteTeam(team.id, team.name)}
+                      title="팀 삭제"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">

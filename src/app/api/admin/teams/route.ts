@@ -10,15 +10,20 @@ const schema = z.object({
 
 export async function GET() {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || !['ADMIN', 'LEADER'].includes(session.user.role)) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 
+  const where = session.user.role === 'LEADER'
+    ? { id: session.user.teamId ?? '' }
+    : {}
+
   const teams = await prisma.team.findMany({
+    where,
     orderBy: { createdAt: 'desc' },
     include: {
       members: {
-        select: { id: true, name: true, email: true, role: true, slackUserId: true },
+        select: { id: true, name: true, email: true, role: true, slackUserId: true, inviteToken: { select: { token: true, usedAt: true } } },
         orderBy: [{ role: 'asc' }, { name: 'asc' }],
       },
     },
