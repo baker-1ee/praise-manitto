@@ -11,7 +11,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-screen bg-background">
       <Nav />
-      <main className="container mx-auto px-4 py-8 max-w-5xl">{children}</main>
+      <main className="container mx-auto px-4 py-6 pb-24 md:pb-8 max-w-5xl">{children}</main>
     </div>
   )
 }

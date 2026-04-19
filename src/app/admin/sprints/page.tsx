@@ -105,10 +105,10 @@ export default function AdminSprintsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         <div>
-          <h1 className="text-2xl font-bold">스프린트 관리</h1>
-          <p className="text-muted-foreground mt-1">스프린트를 생성하면 마니또가 자동으로 배정됩니다</p>
+          <h1 className="text-xl font-bold">스프린트 관리</h1>
+          <p className="text-muted-foreground mt-1 text-sm">스프린트를 생성하면 마니또가 자동으로 배정됩니다</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>

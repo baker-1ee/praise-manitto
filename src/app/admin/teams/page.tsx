@@ -162,10 +162,10 @@ export default function AdminTeamsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="space-y-3">
         <div>
-          <h1 className="text-2xl font-bold">팀 & 멤버 관리</h1>
-          <p className="text-muted-foreground mt-1">팀을 구성하고 초대링크로 팀원을 온보딩하세요</p>
+          <h1 className="text-xl font-bold">팀 & 멤버 관리</h1>
+          <p className="text-muted-foreground mt-1 text-sm">팀을 구성하고 초대링크로 팀원을 온보딩하세요</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={syncSlack} disabled={slackLoading} className="gap-2">
@@ -265,97 +265,94 @@ export default function AdminTeamsPage() {
                 team.members.map((member, i) => (
                   <div key={member.id}>
                     {i > 0 && <Separator />}
-                    <div className="flex items-center gap-3 py-2">
-                      <Avatar className="h-9 w-9 shrink-0">
-                        <AvatarFallback className="text-sm bg-primary/10 text-primary">
-                          {getInitials(member.name)}
-                        </AvatarFallback>
-                      </Avatar>
+                    <div className="py-2 space-y-2">
+                      {/* 상단 행: 아바타 + 정보 + 액션 버튼 */}
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9 shrink-0">
+                          <AvatarFallback className="text-sm bg-primary/10 text-primary">
+                            {getInitials(member.name)}
+                          </AvatarFallback>
+                        </Avatar>
 
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm">{member.name}</span>
-                          <Badge variant={member.role === 'LEADER' ? 'default' : 'secondary'} className="text-xs">
-                            {ROLE_LABEL[member.role]}
-                          </Badge>
-                          {member.inviteToken?.usedAt ? (
-                            <Badge variant="outline" className="text-xs text-green-600 border-green-300">가입 완료</Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-xs text-orange-500 border-orange-300">미가입</Badge>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-medium text-sm">{member.name}</span>
+                            <Badge variant={member.role === 'LEADER' ? 'default' : 'secondary'} className="text-xs">
+                              {ROLE_LABEL[member.role]}
+                            </Badge>
+                            {member.inviteToken?.usedAt ? (
+                              <Badge variant="outline" className="text-xs text-green-600 border-green-300">가입 완료</Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-xs text-orange-500 border-orange-300">미가입</Badge>
+                            )}
+                          </div>
+                          {!slackMembers.length && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {member.slackUserId
+                                ? <span className="text-green-600">Slack 연결됨</span>
+                                : 'Slack 미연결'}
+                            </p>
                           )}
                         </div>
-                        {!member.email.endsWith('@manitto.invited') && (
-                          <p className="text-xs text-muted-foreground">{member.email}</p>
-                        )}
-                      </div>
 
-                      {/* Slack 매핑 */}
-                      <div className="w-36 shrink-0">
-                        {slackMembers.length > 0 ? (
-                          <Select
-                            value={member.slackUserId ?? ''}
-                            onValueChange={(v) => updateSlackId(team.id, member.id, v)}
-                          >
-                            <SelectTrigger className="h-8 text-xs">
-                              <SelectValue placeholder="Slack 계정 선택" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {slackMembers.map((sm) => (
-                                <SelectItem key={sm.id} value={sm.id} className="text-xs">
-                                  {sm.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">
-                            {member.slackUserId ? (
-                              <span className="text-green-600">Slack 연결됨</span>
-                            ) : (
-                              'Slack 미연결'
-                            )}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* 초대링크 & 비밀번호 초기화 */}
-                      <div className="flex gap-1 shrink-0">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8"
-                          onClick={() => copyInviteLink(team.id, member)}
-                          title="초대링크 복사"
-                        >
-                          {copiedId === member.id ? (
-                            <Check className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                        {member.inviteToken && !member.inviteToken.usedAt && (
+                        {/* 초대링크 & 비밀번호 초기화 */}
+                        <div className="flex gap-1 shrink-0">
                           <Button
                             size="icon"
                             variant="ghost"
                             className="h-8 w-8"
-                            onClick={() => regenerateToken(team.id, member.id)}
-                            title="초대링크 재생성"
+                            onClick={() => copyInviteLink(team.id, member)}
+                            title="초대링크 복사"
                           >
-                            <Link2 className="h-4 w-4" />
+                            {copiedId === member.id ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
                           </Button>
-                        )}
-                        {member.inviteToken?.usedAt && (
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 text-orange-500 hover:text-orange-600"
-                            onClick={() => resetPassword(team.id, member.id, member.name)}
-                            title="비밀번호 초기화 (0000)"
-                          >
-                            <KeyRound className="h-4 w-4" />
-                          </Button>
-                        )}
+                          {member.inviteToken && !member.inviteToken.usedAt && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                              onClick={() => regenerateToken(team.id, member.id)}
+                              title="초대링크 재생성"
+                            >
+                              <Link2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {member.inviteToken?.usedAt && (
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8 text-orange-500 hover:text-orange-600"
+                              onClick={() => resetPassword(team.id, member.id, member.name)}
+                              title="비밀번호 초기화 (0000)"
+                            >
+                              <KeyRound className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Slack 매핑 (동기화 후 표시) */}
+                      {slackMembers.length > 0 && (
+                        <Select
+                          value={member.slackUserId ?? ''}
+                          onValueChange={(v) => updateSlackId(team.id, member.id, v)}
+                        >
+                          <SelectTrigger className="h-8 text-xs w-full">
+                            <SelectValue placeholder="Slack 계정 선택" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {slackMembers.map((sm) => (
+                              <SelectItem key={sm.id} value={sm.id} className="text-xs">
+                                {sm.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
                     </div>
                   </div>
                 ))

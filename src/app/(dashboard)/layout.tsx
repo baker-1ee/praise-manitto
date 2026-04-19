@@ -12,7 +12,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="min-h-screen bg-background">
       <Nav />
       <PasswordChangeBanner />
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-6 pb-24 md:pb-8 max-w-4xl">
         {children}
       </main>
     </div>
