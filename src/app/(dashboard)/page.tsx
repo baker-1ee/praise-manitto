@@ -34,7 +34,7 @@ export default async function HomePage() {
   ])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div>
         <h1 className="text-2xl font-bold">안녕하세요, {session.user.name}님 👋</h1>
         <p className="text-muted-foreground mt-1 text-sm">오늘도 팀원을 칭찬해보세요!</p>
@@ -58,7 +58,7 @@ export default async function HomePage() {
           </Card>
 
           <div>
-            <h2 className="text-xl font-semibold mb-4">이번 스프린트 내 마니또</h2>
+            <h2 className="text-xl font-semibold mb-2">이번 스프린트 내 마니또</h2>
             <ManitoCard
               target={myPair?.target ?? null}
               sprintName={activeSprint.name}
