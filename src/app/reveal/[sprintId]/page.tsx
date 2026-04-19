@@ -5,8 +5,7 @@ import { useParams } from 'next/navigation'
 import { RelationGraph, type GraphPair } from '@/components/relation-graph'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { Trophy, Heart, Send } from 'lucide-react'
+import { Trophy, Heart } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 
 interface RevealData {
@@ -64,7 +63,7 @@ export default function RevealPage() {
       </div>
 
       {/* 통계 카드 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <Card className="text-center">
           <CardContent className="pt-6">
             <Heart className="h-6 w-6 text-pink-500 mx-auto mb-2" />
@@ -90,13 +89,6 @@ export default function RevealPage() {
             {data.stats.topReceiver && (
               <Badge variant="secondary" className="mt-1 text-xs">{data.stats.topReceiver.count}개</Badge>
             )}
-          </CardContent>
-        </Card>
-        <Card className="text-center">
-          <CardContent className="pt-6">
-            <Send className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-            <div className="text-sm font-bold">{data.stats.topCategory ?? '-'}</div>
-            <div className="text-xs text-muted-foreground mt-1">인기 카테고리</div>
           </CardContent>
         </Card>
       </div>
@@ -130,15 +122,8 @@ export default function RevealPage() {
               selectedPair.praises.map((praise, i) => (
                 <div key={i}>
                   {i > 0 && <Separator className="my-3" />}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-1 flex-wrap">
-                        {praise.categories.map((cat) => (
-                          <Badge key={cat} variant="secondary" className="text-xs">{cat}</Badge>
-                        ))}
-                      </div>
-                      <span className="text-xs text-muted-foreground">{formatDate(praise.createdAt)}</span>
-                    </div>
+                  <div className="space-y-1">
+                    <span className="text-xs text-muted-foreground">{formatDate(praise.createdAt)}</span>
                     <p className="text-sm leading-relaxed">{praise.content}</p>
                   </div>
                 </div>

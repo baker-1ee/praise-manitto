@@ -6,7 +6,7 @@ import { ManitoCard } from '@/components/manito-card'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Send, Inbox, Calendar } from 'lucide-react'
+import { Send, Inbox, Calendar, PartyPopper } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 
 export default async function HomePage() {
@@ -32,6 +32,16 @@ export default async function HomePage() {
       ? prisma.praise.count({ where: { sprintId: activeSprint.id, toUserId: session.user.id } })
       : 0,
   ])
+
+  const revealedSprint = !activeSprint && session.user.teamId
+    ? await prisma.sprint.findFirst({
+        where: {
+          teamId: session.user.teamId,
+          status: { in: ['REVEALED', 'CLOSED'] },
+        },
+        orderBy: { endDate: 'desc' },
+      })
+    : null
 
   return (
     <div className="space-y-3">
@@ -91,13 +101,29 @@ export default async function HomePage() {
           </div>
         </>
       ) : (
-        <Card className="text-center py-16">
-          <CardContent>
-            <p className="text-4xl mb-4">😴</p>
-            <p className="text-lg font-semibold">현재 진행 중인 스프린트가 없어요</p>
-            <p className="text-muted-foreground text-sm mt-2">팀장님이 새 스프린트를 시작하면 알려드릴게요!</p>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <Card className="text-center py-12">
+            <CardContent>
+              <p className="text-4xl mb-4">😴</p>
+              <p className="text-lg font-semibold">현재 진행 중인 스프린트가 없어요</p>
+              <p className="text-muted-foreground text-sm mt-2">팀장님이 새 스프린트를 시작하면 알려드릴게요!</p>
+            </CardContent>
+          </Card>
+
+          {revealedSprint && (
+            <Link href={`/reveal/${revealedSprint.id}`}>
+              <Card className="border-yellow-300 bg-yellow-50 hover:shadow-md transition-shadow cursor-pointer">
+                <CardContent className="pt-6 flex items-center gap-4">
+                  <PartyPopper className="h-8 w-8 text-yellow-500 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-base">🎊 마니또가 공개됐어요!</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">{revealedSprint.name} 결과 보러가기 →</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          )}
+        </div>
       )}
     </div>
   )
