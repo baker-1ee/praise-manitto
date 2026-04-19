@@ -20,7 +20,7 @@ type FormData = z.infer<typeof schema>
 
 type Step = 'loading' | 'form' | 'done' | 'error'
 
-export const AUTO_LOGIN_KEY = 'manitto_autologin'
+const AUTO_LOGIN_KEY = 'manitto_autologin'
 
 export default function RegisterPage() {
   return (
