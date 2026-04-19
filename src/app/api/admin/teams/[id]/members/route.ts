@@ -36,11 +36,23 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json(user)
   }
 
-  // 팀원 추가 (이름 + 역할만, 이메일 자동 생성)
+  // 팀원 추가
   const parsed = addSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
 
-  // 초대 전용 임시 이메일 (온보딩 시 실제 이메일로 교체됨)
+  // 동일 이름의 기존 유저가 있으면 팀에 편입 (가입완료 상태)
+  const existing = await prisma.user.findFirst({ where: { name: parsed.data.name } })
+
+  if (existing) {
+    const user = await prisma.user.update({
+      where: { id: existing.id },
+      data: { teamId: params.id, role: parsed.data.role },
+      include: { inviteToken: true },
+    })
+    return NextResponse.json(user, { status: 201 })
+  }
+
+  // 신규 유저 생성 (미가입 상태, 초대링크 발급)
   const placeholderEmail = `invite.${Date.now()}.${Math.random().toString(36).slice(2)}@manitto.invited`
 
   const user = await prisma.user.create({
