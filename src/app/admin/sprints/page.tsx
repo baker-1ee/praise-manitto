@@ -226,8 +226,8 @@ export default function AdminSprintsPage() {
             <CardContent className="pt-0">
               <div className="flex items-center justify-between">
                 <div className="flex gap-4 text-sm text-muted-foreground">
-                  <span>👥 마니또 {sprint._count.pairs}쌍</span>
-                  <span>💌 칭찬 {sprint._count.praises}개</span>
+                  <span>👥 {sprint._count.pairs}쌍</span>
+                  <span>💌 {sprint._count.praises}개</span>
                 </div>
                 <div className="flex gap-2">
                   {sprint.status === 'REVEALED' && (
