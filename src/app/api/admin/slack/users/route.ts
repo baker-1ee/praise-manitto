@@ -30,7 +30,8 @@ export async function GET() {
       .sort((a, b) => a.name.localeCompare(b.name, 'ko'))
 
     return NextResponse.json(members)
-  } catch {
-    return NextResponse.json({ error: 'Slack API 호출에 실패했습니다' }, { status: 500 })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : 'Slack API 호출에 실패했습니다'
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

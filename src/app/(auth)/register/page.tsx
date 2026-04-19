@@ -14,7 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const schema = z
   .object({
-    password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다'),
+    email: z.string().email('올바른 이메일을 입력해주세요'),
+    password: z.string().min(1, '비밀번호를 입력해주세요'),
     confirm: z.string().min(1, '비밀번호를 한 번 더 입력해주세요'),
   })
   .refine((d) => d.password === d.confirm, {
@@ -67,7 +68,7 @@ function RegisterForm() {
       const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password: data.password }),
+        body: JSON.stringify({ token, email: data.email, password: data.password }),
       })
       const result = await res.json()
       if (!res.ok) throw new Error(result.error)
@@ -122,13 +123,17 @@ function RegisterForm() {
               <div className="rounded-lg bg-muted/50 p-4 space-y-1">
                 <p className="text-xs text-muted-foreground">가입 계정</p>
                 <p className="font-bold text-lg">{userInfo.name}</p>
-                <p className="text-sm text-muted-foreground">{userInfo.email}</p>
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-2">
+                  <Label htmlFor="email">이메일 <span className="text-destructive">*</span></Label>
+                  <Input id="email" type="email" placeholder="hong@company.com" {...register('email')} />
+                  {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="password">비밀번호 설정 <span className="text-destructive">*</span></Label>
-                  <Input id="password" type="password" placeholder="8자 이상" {...register('password')} />
+                  <Input id="password" type="password" placeholder="사용할 비밀번호" {...register('password')} />
                   {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
                 </div>
                 <div className="space-y-2">

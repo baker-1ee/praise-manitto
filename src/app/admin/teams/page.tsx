@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Copy, Check, RefreshCw, Users, Loader2, Link2 } from 'lucide-react'
+import { Plus, Copy, Check, RefreshCw, Users, Loader2, Link2, KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,7 +24,6 @@ interface Team { id: string; name: string; members: Member[] }
 const teamSchema = z.object({ name: z.string().min(1, '팀 이름을 입력해주세요') })
 const memberSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
-  email: z.string().email('올바른 이메일을 입력해주세요'),
   role: z.enum(['LEADER', 'MEMBER']),
 })
 type TeamForm = z.infer<typeof teamSchema>
@@ -136,6 +135,21 @@ export default function AdminTeamsPage() {
     toast({ title: '초대링크 복사됨', description: `${member.name}님의 링크가 클립보드에 복사되었습니다` })
   }
 
+  const resetPassword = async (teamId: string, userId: string, memberName: string | null) => {
+    if (!confirm(`${memberName ?? '이 팀원'}의 비밀번호를 0000으로 초기화할까요?`)) return
+    const res = await fetch(`/api/admin/teams/${teamId}/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    })
+    if (res.ok) {
+      toast({ title: '비밀번호가 초기화되었습니다', description: '임시 비밀번호: 0000' })
+    } else {
+      const err = await res.json()
+      toast({ variant: 'destructive', title: '오류', description: err.error })
+    }
+  }
+
   const regenerateToken = async (teamId: string, userId: string) => {
     await fetch(`/api/admin/teams/${teamId}/invite`, {
       method: 'POST',
@@ -226,13 +240,6 @@ export default function AdminTeamsPage() {
                         )}
                       </div>
                       <div className="space-y-2">
-                        <Label>이메일 <span className="text-destructive">*</span></Label>
-                        <Input type="email" placeholder="hong@company.com" {...memberForm.register('email')} />
-                        {memberForm.formState.errors.email && (
-                          <p className="text-xs text-destructive">{memberForm.formState.errors.email.message}</p>
-                        )}
-                      </div>
-                      <div className="space-y-2">
                         <Label>역할</Label>
                         <Select
                           defaultValue="MEMBER"
@@ -277,7 +284,9 @@ export default function AdminTeamsPage() {
                             <Badge variant="outline" className="text-xs text-orange-500 border-orange-300">미가입</Badge>
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground">{member.email}</p>
+                        {!member.email.endsWith('@manitto.invited') && (
+                          <p className="text-xs text-muted-foreground">{member.email}</p>
+                        )}
                       </div>
 
                       {/* Slack 매핑 */}
@@ -309,7 +318,7 @@ export default function AdminTeamsPage() {
                         )}
                       </div>
 
-                      {/* 초대링크 */}
+                      {/* 초대링크 & 비밀번호 초기화 */}
                       <div className="flex gap-1 shrink-0">
                         <Button
                           size="icon"
@@ -333,6 +342,17 @@ export default function AdminTeamsPage() {
                             title="초대링크 재생성"
                           >
                             <Link2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {member.inviteToken?.usedAt && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-orange-500 hover:text-orange-600"
+                            onClick={() => resetPassword(team.id, member.id, member.name)}
+                            title="비밀번호 초기화 (0000)"
+                          >
+                            <KeyRound className="h-4 w-4" />
                           </Button>
                         )}
                       </div>

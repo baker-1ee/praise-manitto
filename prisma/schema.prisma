@@ -64,8 +64,9 @@ model User {
   avatarUrl     String?
   bio           String?
   slackUserId   String?
-  password      String?
-  role          Role      @default(MEMBER)
+  password           String?
+  mustChangePassword Boolean   @default(false)
+  role               Role      @default(MEMBER)
   teamId        String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

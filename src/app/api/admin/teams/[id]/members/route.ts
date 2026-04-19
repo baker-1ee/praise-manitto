@@ -6,10 +6,8 @@ import { z } from 'zod'
 import { addDays } from '@/lib/utils'
 
 const addSchema = z.object({
-  name: z.string().min(1),
-  email: z.string().email(),
+  name: z.string().min(1, '이름을 입력해주세요'),
   role: z.enum(['LEADER', 'MEMBER']).default('MEMBER'),
-  slackUserId: z.string().optional(),
 })
 
 const updateSlackSchema = z.object({
@@ -38,24 +36,21 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json(user)
   }
 
-  // 팀원 추가
+  // 팀원 추가 (이름 + 역할만, 이메일 자동 생성)
   const parsed = addSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: '입력값을 확인해주세요' }, { status: 400 })
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.errors[0].message }, { status: 400 })
 
-  const exists = await prisma.user.findUnique({ where: { email: parsed.data.email } })
-  if (exists) return NextResponse.json({ error: '이미 등록된 이메일입니다' }, { status: 409 })
+  // 초대 전용 임시 이메일 (온보딩 시 실제 이메일로 교체됨)
+  const placeholderEmail = `invite.${Date.now()}.${Math.random().toString(36).slice(2)}@manitto.invited`
 
   const user = await prisma.user.create({
     data: {
       name: parsed.data.name,
-      email: parsed.data.email,
+      email: placeholderEmail,
       role: parsed.data.role,
-      slackUserId: parsed.data.slackUserId,
       teamId: params.id,
       inviteToken: {
-        create: {
-          expiresAt: addDays(new Date(), 7),
-        },
+        create: { expiresAt: addDays(new Date(), 30) },
       },
     },
     include: { inviteToken: true },
@@ -71,10 +66,6 @@ export async function DELETE(req: NextRequest) {
   }
 
   const { userId } = await req.json()
-  await prisma.user.update({
-    where: { id: userId },
-    data: { teamId: null },
-  })
-
+  await prisma.user.update({ where: { id: userId }, data: { teamId: null } })
   return NextResponse.json({ ok: true })
 }

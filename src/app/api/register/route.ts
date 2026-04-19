@@ -5,7 +5,8 @@ import { z } from 'zod'
 
 const schema = z.object({
   token: z.string().min(1),
-  password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다'),
+  email: z.string().email('올바른 이메일을 입력해주세요'),
+  password: z.string().min(1, '비밀번호를 입력해주세요'),
 })
 
 export async function POST(req: NextRequest) {
@@ -25,12 +26,18 @@ export async function POST(req: NextRequest) {
   if (invite.expiresAt < new Date()) return NextResponse.json({ error: '만료된 초대링크입니다' }, { status: 410 })
   if (invite.user.password) return NextResponse.json({ error: '이미 가입된 계정입니다' }, { status: 409 })
 
+  // 실제 이메일이 이미 사용 중인지 확인
+  const emailExists = await prisma.user.findFirst({
+    where: { email: parsed.data.email, id: { not: invite.userId } },
+  })
+  if (emailExists) return NextResponse.json({ error: '이미 사용 중인 이메일입니다' }, { status: 409 })
+
   const hashed = await bcrypt.hash(parsed.data.password, 10)
 
   await prisma.$transaction([
     prisma.user.update({
       where: { id: invite.userId },
-      data: { password: hashed },
+      data: { email: parsed.data.email, password: hashed },
     }),
     prisma.inviteToken.update({
       where: { id: invite.id },
@@ -38,5 +45,5 @@ export async function POST(req: NextRequest) {
     }),
   ])
 
-  return NextResponse.json({ ok: true, email: invite.user.email })
+  return NextResponse.json({ ok: true, email: parsed.data.email })
 }
