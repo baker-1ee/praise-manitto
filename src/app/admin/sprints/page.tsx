@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
 import { formatDate } from '@/lib/utils'
 
@@ -32,8 +33,11 @@ const schema = z.object({
   name: z.string().min(1, '스프린트 이름을 입력해주세요'),
   startDate: z.string().min(1, '시작일을 선택해주세요'),
   endDate: z.string().min(1, '종료일을 선택해주세요'),
+  teamId: z.string().min(1, '팀을 선택해주세요'),
 })
 type FormData = z.infer<typeof schema>
+
+interface Team { id: string; name: string }
 
 interface Sprint {
   id: string
@@ -48,11 +52,12 @@ export default function AdminSprintsPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [sprints, setSprints] = useState<Sprint[]>([])
+  const [teams, setTeams] = useState<Team[]>([])
   const [open, setOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [revealing, setRevealing] = useState<string | null>(null)
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
 
@@ -62,7 +67,13 @@ export default function AdminSprintsPage() {
     setSprints(data)
   }
 
-  useEffect(() => { load() }, [])
+  const loadTeams = async () => {
+    const res = await fetch('/api/admin/teams')
+    const data = await res.json()
+    setTeams(Array.isArray(data) ? data : [])
+  }
+
+  useEffect(() => { load(); loadTeams() }, [])
 
   const onCreate = async (data: FormData) => {
     setSubmitting(true)
@@ -121,6 +132,20 @@ export default function AdminSprintsPage() {
               <DialogTitle>새 스프린트 생성</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(onCreate)} className="space-y-4 mt-2">
+              <div className="space-y-2">
+                <Label>팀 선택 <span className="text-destructive">*</span></Label>
+                <Select onValueChange={(v) => setValue('teamId', v)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="팀을 선택해주세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {teams.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.teamId && <p className="text-xs text-destructive">{errors.teamId.message}</p>}
+              </div>
               <div className="space-y-2">
                 <Label>스프린트 이름</Label>
                 <Input placeholder="2024 Sprint 5" {...register('name')} />

@@ -9,6 +9,7 @@ const schema = z.object({
   name: z.string().min(1),
   startDate: z.string(),
   endDate: z.string(),
+  teamId: z.string().min(1, '팀을 선택해주세요'),
 })
 
 export async function GET() {
@@ -41,12 +42,12 @@ export async function POST(req: NextRequest) {
   }
 
   const members = await prisma.user.findMany({
-    where: { role: 'MEMBER' },
+    where: { teamId: parsed.data.teamId },
     select: { id: true },
   })
 
   if (members.length < 2) {
-    return NextResponse.json({ error: '마니또 배정을 위해 최소 2명의 팀원이 필요합니다' }, { status: 400 })
+    return NextResponse.json({ error: '해당 팀에 팀원이 최소 2명 필요합니다' }, { status: 400 })
   }
 
   const pairs = assignManito(members.map((m) => m.id))
