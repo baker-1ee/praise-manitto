@@ -97,24 +97,28 @@ function LoginForm() {
       return
     }
 
-    if (prefillName) { setValue('name', prefillName); return }
-
+    // prefillName보다 자동로그인 먼저 시도
     const saved = localStorage.getItem(AUTO_LOGIN_KEY)
-    if (!saved) return
-    try {
-      const { name, password } = JSON.parse(saved)
-      setLoading(true)
-      signIn('credentials', { name, password, redirect: false }).then((result) => {
-        if (result?.error) {
-          localStorage.removeItem(AUTO_LOGIN_KEY)
-          setLoading(false)
-        } else {
-          window.location.href = '/'
-        }
-      })
-    } catch {
-      localStorage.removeItem(AUTO_LOGIN_KEY)
+    if (saved) {
+      try {
+        const { name, password } = JSON.parse(saved)
+        setLoading(true)
+        signIn('credentials', { name, password, redirect: false }).then((result) => {
+          if (result?.error) {
+            localStorage.removeItem(AUTO_LOGIN_KEY)
+            setLoading(false)
+            if (prefillName) setValue('name', prefillName)
+          } else {
+            window.location.href = '/'
+          }
+        })
+        return
+      } catch {
+        localStorage.removeItem(AUTO_LOGIN_KEY)
+      }
     }
+
+    if (prefillName) setValue('name', prefillName)
   }, [])
 
   useEffect(() => {
