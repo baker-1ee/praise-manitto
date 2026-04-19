@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -26,7 +26,6 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const prefillName = searchParams.get('name') ?? ''
   const [error, setError] = useState('')
@@ -51,8 +50,7 @@ function LoginForm() {
           localStorage.removeItem(AUTO_LOGIN_KEY)
           setLoading(false)
         } else {
-          router.push('/')
-          router.refresh()
+          window.location.href = '/'
         }
       })
     } catch {
@@ -81,8 +79,7 @@ function LoginForm() {
       } else {
         localStorage.removeItem(AUTO_LOGIN_KEY)
       }
-      router.push('/')
-      router.refresh()
+      window.location.href = '/'
     }
   }
 
@@ -99,21 +96,15 @@ function LoginForm() {
           <CardDescription>팀원에게 익명으로 칭찬을 전해보세요 💌</CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="flex flex-col items-center py-8 gap-3 text-muted-foreground">
-              <Loader2 className="h-8 w-8 animate-spin" />
-              <p className="text-sm">자동 로그인 중...</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">이름</Label>
-                <Input id="name" type="text" placeholder="홍길동" {...register('name')} />
+                <Input id="name" type="text" placeholder="홍길동" {...register('name')} disabled={loading} />
                 {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">비밀번호</Label>
-                <Input id="password" type="password" placeholder="••••••••" {...register('password')} />
+                <Input id="password" type="password" placeholder="••••••••" {...register('password')} disabled={loading} />
                 {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
               </div>
 
@@ -122,6 +113,7 @@ function LoginForm() {
                   id="autoLogin"
                   checked={autoLogin}
                   onCheckedChange={(v) => setAutoLogin(!!v)}
+                  disabled={loading}
                 />
                 <Label htmlFor="autoLogin" className="text-sm font-normal cursor-pointer text-muted-foreground">
                   다음부터 자동으로 로그인하기
@@ -135,10 +127,9 @@ function LoginForm() {
               )}
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                로그인
+                {loading ? '로그인 중...' : '로그인'}
               </Button>
             </form>
-          )}
         </CardContent>
       </Card>
     </div>
