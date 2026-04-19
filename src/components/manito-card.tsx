@@ -31,10 +31,10 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
   return (
     <div
       className="perspective-1000 cursor-pointer w-full max-w-sm mx-auto"
-      onClick={() => setFlipped(true)}
+      onClick={() => setFlipped((f) => !f)}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && setFlipped(true)}
+      onKeyDown={(e) => e.key === 'Enter' && setFlipped((f) => !f)}
     >
       <div
         className={cn(
