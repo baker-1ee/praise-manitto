@@ -53,8 +53,17 @@ function RegisterForm() {
     if (!token) { setErrorMsg('초대링크가 올바르지 않습니다'); setStep('error'); return }
 
     fetch(`/api/invite/validate?token=${token}`)
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (r.status === 409 || r.status === 410) {
+          const d = await r.json()
+          const query = d.name ? `?name=${encodeURIComponent(d.name)}` : ''
+          router.replace(`/login${query}`)
+          return null
+        }
+        return r.json()
+      })
       .then((d) => {
+        if (!d) return
         if (d.error) { setErrorMsg(d.error); setStep('error') }
         else { setUserInfo(d); setStep('form') }
       })
