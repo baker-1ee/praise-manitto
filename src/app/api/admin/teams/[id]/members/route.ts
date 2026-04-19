@@ -17,7 +17,7 @@ const updateSlackSchema = z.object({
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || !['ADMIN', 'LEADER'].includes(session.user.role)) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 
@@ -25,6 +25,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   // Slack ID 매핑 업데이트
   if (body.action === 'updateSlack') {
+    if (session.user.role === 'LEADER' && session.user.teamId !== params.id) {
+      return NextResponse.json({ error: '자신의 팀만 수정할 수 있습니다' }, { status: 403 })
+    }
+
     const parsed = updateSlackSchema.safeParse(body)
     if (!parsed.success) return NextResponse.json({ error: '잘못된 요청입니다' }, { status: 400 })
 
@@ -34,6 +38,11 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       select: { id: true, name: true, slackUserId: true },
     })
     return NextResponse.json(user)
+  }
+
+  // 팀원 추가/삭제 등 나머지 액션은 ADMIN 전용
+  if (session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 
   // 팀원 추가
