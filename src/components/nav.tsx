@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
-import { Heart, Home, Send, Inbox, Settings, LogOut } from 'lucide-react'
+import { Heart, Home, Send, Inbox, Settings, LogOut, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn, getInitials } from '@/lib/utils'
@@ -40,16 +40,20 @@ export function Nav() {
             </Link>
           ))}
           {session?.user.role === 'ADMIN' && (
-            <Link href="/admin/sprints">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn('gap-2', pathname.startsWith('/admin') && 'bg-accent text-accent-foreground')}
-              >
-                <Settings className="h-4 w-4" />
-                관리
-              </Button>
-            </Link>
+            <>
+              <Link href="/admin/teams">
+                <Button variant="ghost" size="sm" className={cn('gap-2', pathname.startsWith('/admin/teams') && 'bg-accent text-accent-foreground')}>
+                  <Users className="h-4 w-4" />
+                  팀 관리
+                </Button>
+              </Link>
+              <Link href="/admin/sprints">
+                <Button variant="ghost" size="sm" className={cn('gap-2', pathname.startsWith('/admin/sprints') && 'bg-accent text-accent-foreground')}>
+                  <Settings className="h-4 w-4" />
+                  스프린트
+                </Button>
+              </Link>
+            </>
           )}
         </nav>
 

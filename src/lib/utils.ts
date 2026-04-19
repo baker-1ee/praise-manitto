@@ -17,3 +17,9 @@ export function getInitials(name: string | null | undefined): string {
   if (!name) return '?'
   return name.slice(0, 2)
 }
+
+export function addDays(date: Date, days: number): Date {
+  const result = new Date(date)
+  result.setDate(result.getDate() + days)
+  return result
+}

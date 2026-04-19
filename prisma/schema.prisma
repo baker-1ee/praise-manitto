@@ -48,6 +48,14 @@ model VerificationToken {
 
 // ─── 서비스 모델 ──────────────────────────────────────────────────────────────
 
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  members User[]
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -58,11 +66,14 @@ model User {
   slackUserId   String?
   password      String?
   role          Role      @default(MEMBER)
+  teamId        String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  team            Team?        @relation(fields: [teamId], references: [id])
   accounts        Account[]
   sessions        Session[]
+  inviteToken     InviteToken?
   manitoOf        ManitoPair[] @relation("Manito")
   manitoTarget    ManitoPair[] @relation("Target")
   sentPraises     Praise[]     @relation("Sender")
@@ -71,7 +82,19 @@ model User {
 
 enum Role {
   ADMIN
+  LEADER
   MEMBER
+}
+
+model InviteToken {
+  id        String    @id @default(cuid())
+  token     String    @unique @default(cuid())
+  userId    String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Sprint {
