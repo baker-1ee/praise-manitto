@@ -12,7 +12,7 @@ const addSchema = z.object({
 
 const updateSlackSchema = z.object({
   userId: z.string(),
-  slackUserId: z.string(),
+  slackUserId: z.string().nullable(),
 })
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     const user = await prisma.user.update({
       where: { id: parsed.data.userId },
-      data: { slackUserId: parsed.data.slackUserId },
+      data: { slackUserId: parsed.data.slackUserId || null },
       select: { id: true, name: true, slackUserId: true },
     })
     return NextResponse.json(user)
