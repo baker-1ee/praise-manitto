@@ -108,13 +108,14 @@ export default function AdminTeamsPage() {
   }
 
   const updateSlackId = async (teamId: string, userId: string, slackUserId: string) => {
+    const isDeselect = slackUserId === '__none__'
     const res = await fetch(`/api/admin/teams/${teamId}/members`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'updateSlack', userId, slackUserId }),
+      body: JSON.stringify({ action: 'updateSlack', userId, slackUserId: isDeselect ? null : slackUserId }),
     })
     if (res.ok) {
-      toast({ title: 'Slack 계정이 연결되었습니다' })
+      toast({ title: isDeselect ? 'Slack 계정 연결이 해제되었습니다' : 'Slack 계정이 연결되었습니다' })
       loadTeams()
     }
   }
@@ -380,6 +381,11 @@ export default function AdminTeamsPage() {
                             <SelectValue placeholder="Slack 계정 선택" />
                           </SelectTrigger>
                           <SelectContent>
+                            {member.slackUserId && (
+                              <SelectItem value="__none__" className="text-xs text-muted-foreground">
+                                선택 해제
+                              </SelectItem>
+                            )}
                             {slackMembers.map((sm) => (
                               <SelectItem key={sm.id} value={sm.id} className="text-xs">
                                 {sm.name}
