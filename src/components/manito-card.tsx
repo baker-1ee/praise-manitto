@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Heart, User } from 'lucide-react'
+import { Gift, User } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { cn, getInitials } from '@/lib/utils'
@@ -22,9 +22,9 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
 
   if (!target) {
     return (
-      <div className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed text-muted-foreground gap-3">
-        <User className="h-12 w-12 opacity-30" />
-        <p className="text-sm">아직 마니또가 배정되지 않았어요</p>
+      <div className="flex flex-col items-center justify-center h-36 rounded-xl border border-[rgba(0,0,0,0.1)] text-[#a39e98] gap-3 bg-[#f6f5f4]">
+        <User className="h-10 w-10 opacity-40" />
+        <p className="text-sm font-medium">아직 마니또가 배정되지 않았어요</p>
       </div>
     )
   }
@@ -44,30 +44,29 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
         )}
       >
         {/* 앞면 */}
-        <div className="absolute inset-0 backface-hidden rounded-xl border-2 border-primary/30 bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center gap-5 px-6">
-          <div className="relative shrink-0">
-            <Heart className="h-12 w-12 text-primary/20" />
-            <span className="absolute inset-0 flex items-center justify-center text-xl">🎁</span>
+        <div className="absolute inset-0 backface-hidden rounded-xl border border-[rgba(0,0,0,0.1)] bg-[#f6f5f4] shadow-notion-card flex items-center gap-5 px-6">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white border border-[rgba(0,0,0,0.1)] shadow-notion-card">
+            <Gift className="h-7 w-7 text-[#0075de]" />
           </div>
           <div>
-            <Badge variant="secondary" className="mb-1.5">{sprintName}</Badge>
-            <p className="font-semibold">마니또가 배정되었어요!</p>
-            <p className="text-sm text-muted-foreground mt-0.5">탭해서 확인하세요</p>
+            <Badge variant="secondary" className="mb-2">{sprintName}</Badge>
+            <p className="font-semibold text-foreground">마니또가 배정되었어요!</p>
+            <p className="text-sm text-[#a39e98] mt-0.5">탭해서 확인하세요</p>
           </div>
         </div>
 
         {/* 뒷면 */}
-        <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-xl border-2 border-primary bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center gap-5 px-6">
-          <Avatar className="h-12 w-12 shrink-0 border-4 border-primary/30">
+        <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-xl border border-[#0075de]/30 bg-white shadow-notion-card flex items-center gap-5 px-6">
+          <Avatar className="h-12 w-12 shrink-0 border-2 border-[rgba(0,0,0,0.1)]">
             {target.avatarUrl && <AvatarImage src={target.avatarUrl} />}
-            <AvatarFallback className="text-lg bg-primary/10 text-primary">
+            <AvatarFallback className="text-base bg-[#f2f9ff] text-[#097fe8] font-semibold">
               {getInitials(target.name)}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-xs text-muted-foreground mb-0.5">이번 스프린트 마니또 대상</p>
-            <p className="font-bold text-xl text-primary">{target.name}</p>
-            {target.bio && <p className="text-sm text-muted-foreground mt-1">{target.bio}</p>}
+            <p className="text-xs text-[#a39e98] mb-0.5">이번 스프린트 마니또 대상</p>
+            <p className="font-bold text-xl text-[#0075de] tracking-[-0.25px]">{target.name}</p>
+            {target.bio && <p className="text-sm text-[#615d59] mt-1">{target.bio}</p>}
             <Badge className="mt-2">나만 알 수 있어요 🤫</Badge>
           </div>
         </div>

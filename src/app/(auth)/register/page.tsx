@@ -153,96 +153,106 @@ function RegisterForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#f6f5f4] p-4">
       {showKakaoBanner && <KakaoBanner />}
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="text-center space-y-3">
-          <div className="flex justify-center">
-            <Heart className="h-8 w-8 fill-primary text-primary" />
+
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-[rgba(0,0,0,0.1)] shadow-notion-card">
+              <Heart className="h-6 w-6 fill-[#0075de] text-[#0075de]" />
+            </div>
           </div>
-          <CardTitle className="text-2xl">칭찬 마니또</CardTitle>
-        </CardHeader>
+          <h1 className="text-2xl font-bold tracking-[-0.625px]">칭찬 마니또</h1>
+          <p className="text-sm text-[#615d59] mt-1.5">팀원으로 초대되었어요 👋</p>
+        </div>
 
-        <CardContent>
-          {step === 'loading' && (
-            <div className="flex flex-col items-center py-8 gap-3 text-muted-foreground">
-              <Loader2 className="h-8 w-8 animate-spin" />
-              <p className="text-sm">초대링크 확인 중...</p>
-            </div>
-          )}
-
-          {step === 'error' && (
-            <div className="text-center py-8 space-y-3">
-              <p className="text-4xl">😢</p>
-              <p className="font-semibold text-destructive">{errorMsg}</p>
-              <p className="text-sm text-muted-foreground">초대링크가 만료되었거나 이미 사용되었습니다.<br />관리자에게 새 링크를 요청해주세요.</p>
-            </div>
-          )}
-
-          {step === 'form' && userInfo && (
-            <div className="space-y-6">
-              <div className="rounded-lg bg-muted/50 p-4 space-y-1">
-                <p className="text-xs text-muted-foreground">가입 계정</p>
-                <p className="font-bold text-lg">{userInfo.name}</p>
+        <Card className="shadow-notion-deep">
+          <CardContent className="pt-6">
+            {step === 'loading' && (
+              <div className="flex flex-col items-center py-8 gap-3 text-[#615d59]">
+                <Loader2 className="h-8 w-8 animate-spin text-[#0075de]" />
+                <p className="text-sm">초대링크 확인 중...</p>
               </div>
+            )}
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="password">비밀번호 설정 <span className="text-destructive">*</span></Label>
-                  <Input id="password" type="password" placeholder="사용할 비밀번호" {...register('password')} />
-                  {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+            {step === 'error' && (
+              <div className="text-center py-8 space-y-3">
+                <p className="text-4xl">😢</p>
+                <p className="font-semibold text-destructive">{errorMsg}</p>
+                <p className="text-sm text-[#615d59]">초대링크가 만료되었거나 이미 사용되었습니다.<br />관리자에게 새 링크를 요청해주세요.</p>
+              </div>
+            )}
+
+            {step === 'form' && userInfo && (
+              <div className="space-y-6">
+                <div className="rounded-lg bg-[#f6f5f4] border border-[rgba(0,0,0,0.1)] p-4 space-y-1">
+                  <p className="text-xs text-[#a39e98] font-medium">가입 계정</p>
+                  <p className="font-bold text-lg tracking-[-0.25px]">{userInfo.name}</p>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1">
-                  <Checkbox
-                    id="autoLogin"
-                    checked={autoLogin}
-                    onCheckedChange={(v) => setAutoLogin(!!v)}
-                  />
-                  <Label htmlFor="autoLogin" className="text-sm font-normal cursor-pointer text-muted-foreground">
-                    다음부터 자동으로 로그인하기
-                  </Label>
-                </div>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-sm font-medium">비밀번호 설정 <span className="text-destructive">*</span></Label>
+                    <Input id="password" type="password" placeholder="사용할 비밀번호" {...register('password')} />
+                    {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+                  </div>
 
-                <Button type="submit" className="w-full" disabled={submitting}>
-                  {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  가입 완료
-                </Button>
-              </form>
-            </div>
-          )}
+                  <div className="flex items-center gap-2 pt-1">
+                    <Checkbox
+                      id="autoLogin"
+                      checked={autoLogin}
+                      onCheckedChange={(v) => setAutoLogin(!!v)}
+                    />
+                    <Label htmlFor="autoLogin" className="text-sm font-normal cursor-pointer text-[#615d59]">
+                      다음부터 자동으로 로그인하기
+                    </Label>
+                  </div>
 
-          {step === 'done' && (
-            <div className="text-center space-y-5 py-4">
-              <CheckCircle className="h-16 w-16 text-green-500 mx-auto" />
-              <div className="space-y-1">
-                <p className="text-xl font-bold">가입 완료! 🎉</p>
-                <p className="text-sm text-muted-foreground">
-                  {userInfo?.name}님, 환영합니다!
-                </p>
-              </div>
-
-              <Button className="w-full" onClick={() => router.push('/')}>
-                바로 시작하기 →
-              </Button>
-
-              {slackInviteUrl && (
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 space-y-3">
-                  <p className="text-sm font-medium text-blue-800">
-                    💬 칭찬 알림 받으려면
-                  </p>
-                  <Button asChild className="w-full bg-[#4A154B] hover:bg-[#3d1040] text-white">
-                    <a href={slackInviteUrl} target="_blank" rel="noopener noreferrer" className="gap-2">
-                      <ExternalLink className="h-4 w-4" />
-                      Slack 워크스페이스 입장하기
-                    </a>
+                  <Button type="submit" className="w-full" disabled={submitting}>
+                    {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    가입 완료
                   </Button>
+                </form>
+              </div>
+            )}
+
+            {step === 'done' && (
+              <div className="text-center space-y-5 py-4">
+                <div className="flex justify-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#f2f9ff] border border-[#097fe8]/20">
+                    <CheckCircle className="h-9 w-9 text-[#0075de]" />
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <div className="space-y-1">
+                  <p className="text-xl font-bold tracking-[-0.25px]">가입 완료! 🎉</p>
+                  <p className="text-sm text-[#615d59]">
+                    {userInfo?.name}님, 환영합니다!
+                  </p>
+                </div>
+
+                <Button className="w-full" onClick={() => router.push('/')}>
+                  바로 시작하기 →
+                </Button>
+
+                {slackInviteUrl && (
+                  <div className="rounded-lg border border-[rgba(0,0,0,0.1)] bg-[#f6f5f4] p-4 space-y-3">
+                    <p className="text-sm font-medium text-foreground">
+                      💬 칭찬 알림 받으려면
+                    </p>
+                    <Button asChild className="w-full bg-[#4A154B] hover:bg-[#3d1040] text-white">
+                      <a href={slackInviteUrl} target="_blank" rel="noopener noreferrer" className="gap-2">
+                        <ExternalLink className="h-4 w-4" />
+                        Slack 워크스페이스 입장하기
+                      </a>
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

@@ -62,16 +62,16 @@ export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="content">
+        <Label htmlFor="content" className="text-sm font-medium">
           칭찬 내용 <span className="text-destructive">*</span>
         </Label>
         <Textarea
           id="content"
           {...register('content')}
           placeholder={`${targetName ?? '마니또 대상'}님에게 전하고 싶은 칭찬을 적어주세요.\n익명으로 전달됩니다. 😊`}
-          className="min-h-[120px] resize-none"
+          className="min-h-[140px]"
         />
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <div className="flex justify-between text-xs text-[#a39e98]">
           {errors.content ? (
             <span className="text-destructive">{errors.content.message}</span>
           ) : (
@@ -88,7 +88,7 @@ export function PraiseForm({ targetName, onSuccess }: PraiseFormProps) {
 
       <Button
         type="button"
-        variant="outline"
+        variant="secondary"
         className="w-full gap-2"
         onClick={() => router.push('/praises/sent')}
       >

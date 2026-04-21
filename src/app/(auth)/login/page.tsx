@@ -147,54 +147,59 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#f6f5f4] p-4">
       {showKakaoBanner && <KakaoBanner />}
 
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="text-center space-y-3">
-          <div className="flex justify-center">
-            <Heart className="h-8 w-8 fill-primary text-primary" />
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-[rgba(0,0,0,0.1)] shadow-notion-card">
+              <Heart className="h-6 w-6 fill-[#0075de] text-[#0075de]" />
+            </div>
           </div>
-          <CardTitle className="text-2xl">칭찬 마니또</CardTitle>
-          <CardDescription>팀원에게 익명으로 칭찬을 전해보세요 💌</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">이름</Label>
-              <Input id="name" type="text" {...register('name')} disabled={loading} />
-              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">비밀번호</Label>
-              <Input id="password" type="password" {...register('password')} disabled={loading} />
-              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
-            </div>
+          <h1 className="text-2xl font-bold tracking-[-0.625px] text-foreground">칭찬 마니또</h1>
+          <p className="text-sm text-[#615d59] mt-1.5">팀원에게 익명으로 칭찬을 전해보세요 💌</p>
+        </div>
 
-            <div className="flex items-center gap-2 pt-1">
-              <Checkbox
-                id="autoLogin"
-                checked={autoLogin}
-                onCheckedChange={(v) => setAutoLogin(!!v)}
-                disabled={loading}
-              />
-              <Label htmlFor="autoLogin" className="text-sm font-normal cursor-pointer text-muted-foreground">
-                다음부터 자동으로 로그인하기
-              </Label>
-            </div>
-
-            {error && (
-              <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {error}
+        <Card className="shadow-notion-deep">
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium">이름</Label>
+                <Input id="name" type="text" {...register('name')} disabled={loading} />
+                {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
               </div>
-            )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? '로그인 중...' : '로그인'}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">비밀번호</Label>
+                <Input id="password" type="password" {...register('password')} disabled={loading} />
+                {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+              </div>
+
+              <div className="flex items-center gap-2 pt-1">
+                <Checkbox
+                  id="autoLogin"
+                  checked={autoLogin}
+                  onCheckedChange={(v) => setAutoLogin(!!v)}
+                  disabled={loading}
+                />
+                <Label htmlFor="autoLogin" className="text-sm font-normal cursor-pointer text-[#615d59]">
+                  다음부터 자동으로 로그인하기
+                </Label>
+              </div>
+
+              {error && (
+                <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {error}
+                </div>
+              )}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {loading ? '로그인 중...' : '로그인'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

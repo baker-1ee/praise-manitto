@@ -21,38 +21,38 @@ export default async function ReceivedPraisesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Inbox className="h-6 w-6 text-pink-500" />
+        <h1 className="text-2xl font-bold tracking-[-0.625px] flex items-center gap-2">
+          <Inbox className="h-6 w-6 text-[#0075de]" />
           받은 칭찬
         </h1>
-        <p className="text-muted-foreground mt-1">총 {praises.length}개의 칭찬을 받았어요 💌</p>
+        <p className="text-[#615d59] mt-1 text-sm">총 {praises.length}개의 칭찬을 받았어요 💌</p>
       </div>
 
       {praises.length === 0 ? (
         <Card className="text-center py-16">
           <CardContent>
             <p className="text-4xl mb-4">✉️</p>
-            <p className="text-lg font-semibold">아직 받은 칭찬이 없어요</p>
-            <p className="text-muted-foreground text-sm mt-2">팀원이 곧 칭찬을 보내줄 거예요!</p>
+            <p className="text-base font-semibold tracking-[-0.25px]">아직 받은 칭찬이 없어요</p>
+            <p className="text-[#615d59] text-sm mt-2">팀원이 곧 칭찬을 보내줄 거예요!</p>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {praises.map((praise) => (
-            <Card key={praise.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="pt-6 space-y-3">
+            <Card key={praise.id} className="hover:shadow-notion-card transition-shadow">
+              <CardContent className="pt-5 space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium text-muted-foreground">
+                    <span className="text-sm font-medium text-foreground">
                       {praise.sprint.status === 'REVEALED' ? '마니또 공개됨' : '익명의 팀원'}
                     </span>
-                    <span className="text-muted-foreground text-xs">•</span>
-                    <span className="text-xs text-muted-foreground">{formatDate(praise.createdAt)}</span>
+                    <span className="text-[#a39e98] text-xs">·</span>
+                    <span className="text-xs text-[#a39e98]">{formatDate(praise.createdAt)}</span>
                   </div>
-                  <Badge variant="outline" className="shrink-0 text-xs">{praise.sprint.name}</Badge>
+                  <Badge variant="secondary" className="shrink-0 text-xs">{praise.sprint.name}</Badge>
                 </div>
 
-                <p className="text-sm leading-relaxed">{praise.content}</p>
+                <p className="text-sm leading-relaxed text-foreground">{praise.content}</p>
               </CardContent>
             </Card>
           ))}
