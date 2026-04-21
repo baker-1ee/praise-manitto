@@ -184,13 +184,13 @@ export default function AdminTeamsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-3">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold">팀 & 멤버 관리</h1>
-          <p className="text-muted-foreground mt-1 text-sm">팀을 구성하고 초대링크로 팀원을 온보딩하세요</p>
+          <h1 className="text-2xl font-bold tracking-[-0.625px]">팀 & 멤버 관리</h1>
+          <p className="text-[#615d59] mt-1 text-sm">팀을 구성하고 초대링크로 팀원을 온보딩하세요</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={syncSlack} disabled={slackLoading} className="gap-2">
+        <div className="flex gap-2 shrink-0">
+          <Button variant="secondary" onClick={syncSlack} disabled={slackLoading} className="gap-2">
             {slackLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             Slack 동기화
           </Button>
@@ -200,10 +200,10 @@ export default function AdminTeamsPage() {
                 <Button className="gap-2"><Plus className="h-4 w-4" /> 팀 생성</Button>
               </DialogTrigger>
               <DialogContent>
-                <DialogHeader><DialogTitle>새 팀 생성</DialogTitle></DialogHeader>
+                <DialogHeader><DialogTitle className="tracking-[-0.25px]">새 팀 생성</DialogTitle></DialogHeader>
                 <form onSubmit={teamForm.handleSubmit(createTeam)} className="space-y-4 mt-2">
                   <div className="space-y-2">
-                    <Label>팀 이름</Label>
+                    <Label className="text-sm font-medium">팀 이름</Label>
                     <Input placeholder="개발팀" {...teamForm.register('name')} />
                     {teamForm.formState.errors.name && (
                       <p className="text-xs text-destructive">{teamForm.formState.errors.name.message}</p>
@@ -218,9 +218,9 @@ export default function AdminTeamsPage() {
       </div>
 
       {slackMembers.length > 0 && (
-        <Card className="border-green-200 bg-green-50">
+        <Card className="border-[rgba(0,0,0,0.1)] bg-[#f6f5f4]" style={{ boxShadow: 'none' }}>
           <CardContent className="pt-4 pb-3">
-            <p className="text-sm text-green-700 font-medium">
+            <p className="text-sm text-[#615d59] font-medium">
               ✓ Slack 멤버 {slackMembers.length}명 로드됨 — 아래 각 팀원의 Slack 계정을 선택해주세요
             </p>
           </CardContent>
@@ -230,9 +230,9 @@ export default function AdminTeamsPage() {
       {teams.length === 0 ? (
         <Card className="text-center py-16">
           <CardContent>
-            <Users className="h-12 w-12 mx-auto text-muted-foreground/30 mb-3" />
-            <p className="font-medium">아직 생성된 팀이 없어요</p>
-            <p className="text-sm text-muted-foreground mt-1">팀 생성 버튼으로 시작하세요</p>
+            <Users className="h-12 w-12 mx-auto text-[#a39e98] mb-3" />
+            <p className="font-semibold tracking-[-0.25px]">아직 생성된 팀이 없어요</p>
+            <p className="text-sm text-[#615d59] mt-1">팀 생성 버튼으로 시작하세요</p>
           </CardContent>
         </Card>
       ) : (
@@ -241,8 +241,8 @@ export default function AdminTeamsPage() {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between gap-2">
                 <div>
-                  <CardTitle className="text-lg">{team.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground">{team.members.length}명</p>
+                  <CardTitle className="text-base">{team.name}</CardTitle>
+                  <p className="text-xs text-[#a39e98] mt-0.5">{team.members.length}명</p>
                 </div>
                 <div className="flex gap-1">
                   <Dialog
@@ -250,22 +250,22 @@ export default function AdminTeamsPage() {
                     onOpenChange={(o) => { setMemberDialogTeamId(o ? team.id : null); memberForm.reset({ role: 'MEMBER' }) }}
                   >
                     <DialogTrigger asChild>
-                      <Button size="sm" variant="outline" className="gap-1">
+                      <Button size="sm" variant="secondary" className="gap-1">
                         <Plus className="h-3 w-3" /> 팀원 추가
                       </Button>
                     </DialogTrigger>
                   <DialogContent>
-                    <DialogHeader><DialogTitle>팀원 추가 — {team.name}</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="tracking-[-0.25px]">팀원 추가 — {team.name}</DialogTitle></DialogHeader>
                     <form onSubmit={memberForm.handleSubmit(addMember)} className="space-y-4 mt-2">
                       <div className="space-y-2">
-                        <Label>이름 <span className="text-destructive">*</span></Label>
+                        <Label className="text-sm font-medium">이름 <span className="text-destructive">*</span></Label>
                         <Input placeholder="홍길동" {...memberForm.register('name')} />
                         {memberForm.formState.errors.name && (
                           <p className="text-xs text-destructive">{memberForm.formState.errors.name.message}</p>
                         )}
                       </div>
                       <div className="space-y-2">
-                        <Label>역할</Label>
+                        <Label className="text-sm font-medium">역할</Label>
                         <Select
                           defaultValue="MEMBER"
                           onValueChange={(v) => memberForm.setValue('role', v as 'LEADER' | 'MEMBER')}
@@ -285,7 +285,7 @@ export default function AdminTeamsPage() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="gap-1 text-destructive hover:text-destructive px-2"
+                      className="gap-1 text-destructive hover:text-destructive hover:bg-destructive/10 px-2"
                       onClick={() => deleteTeam(team.id, team.name)}
                       title="팀 삭제"
                     >
@@ -297,17 +297,16 @@ export default function AdminTeamsPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               {team.members.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">팀원이 없어요. 팀원을 추가해주세요.</p>
+                <p className="text-sm text-[#615d59] text-center py-4">팀원이 없어요. 팀원을 추가해주세요.</p>
               ) : (
                 team.members.map((member, i) => (
                   <div key={member.id}>
                     {i > 0 && <Separator />}
                     <div className="py-2 space-y-2">
-                      {/* 상단 행: 아바타 + 정보 + 액션 버튼 */}
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9 shrink-0">
                           {member.avatarUrl && <AvatarImage src={member.avatarUrl} />}
-                          <AvatarFallback className="text-sm bg-primary/10 text-primary">
+                          <AvatarFallback className="text-sm bg-[#f2f9ff] text-[#097fe8] font-semibold">
                             {getInitials(member.name)}
                           </AvatarFallback>
                         </Avatar>
@@ -319,31 +318,30 @@ export default function AdminTeamsPage() {
                               {ROLE_LABEL[member.role]}
                             </Badge>
                             {member.hasPassword ? (
-                              <Badge variant="outline" className="text-xs text-green-600 border-green-300">가입 완료</Badge>
+                              <Badge variant="outline" className="text-xs text-[#1aae39] border-[#1aae39]/30">가입 완료</Badge>
                             ) : (
-                              <Badge variant="outline" className="text-xs text-orange-500 border-orange-300">미가입</Badge>
+                              <Badge variant="outline" className="text-xs text-[#dd5b00] border-[#dd5b00]/30">미가입</Badge>
                             )}
                           </div>
                           {!slackMembers.length && (
-                            <p className="text-xs text-muted-foreground mt-0.5">
+                            <p className="text-xs text-[#a39e98] mt-0.5">
                               {member.slackUserId
-                                ? <span className="text-green-600">Slack 연결됨</span>
+                                ? <span className="text-[#1aae39]">Slack 연결됨</span>
                                 : 'Slack 미연결'}
                             </p>
                           )}
                         </div>
 
-                        {/* 초대링크 & 비밀번호 초기화 */}
                         <div className="flex gap-1 shrink-0">
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8"
+                            className="h-8 w-8 text-[#615d59]"
                             onClick={() => copyInviteLink(team.id, member)}
                             title="초대링크 복사"
                           >
                             {copiedId === member.id ? (
-                              <Check className="h-4 w-4 text-green-500" />
+                              <Check className="h-4 w-4 text-[#1aae39]" />
                             ) : (
                               <Copy className="h-4 w-4" />
                             )}
@@ -352,7 +350,7 @@ export default function AdminTeamsPage() {
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-8 w-8 text-orange-500 hover:text-orange-600"
+                              className="h-8 w-8 text-[#dd5b00] hover:text-[#dd5b00]"
                               onClick={() => resetPassword(team.id, member.id, member.name)}
                               title="비밀번호 초기화 (0000)"
                             >
@@ -362,7 +360,7 @@ export default function AdminTeamsPage() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                             onClick={() => removeMember(team.id, member.id, member.name)}
                             title="팀에서 제거"
                           >
@@ -371,7 +369,6 @@ export default function AdminTeamsPage() {
                         </div>
                       </div>
 
-                      {/* Slack 매핑 (동기화 후 표시) */}
                       {slackMembers.length > 0 && (
                         <Select
                           value={member.slackUserId ?? ''}
@@ -382,7 +379,7 @@ export default function AdminTeamsPage() {
                           </SelectTrigger>
                           <SelectContent>
                             {member.slackUserId && (
-                              <SelectItem value="__none__" className="text-xs text-muted-foreground">
+                              <SelectItem value="__none__" className="text-xs text-[#a39e98]">
                                 선택 해제
                               </SelectItem>
                             )}

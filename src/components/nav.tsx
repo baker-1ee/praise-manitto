@@ -35,40 +35,46 @@ export function Nav() {
   return (
     <>
       {/* Top header */}
-      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-40 border-b border-[rgba(0,0,0,0.1)] bg-white">
         <div className="container mx-auto flex h-14 items-center justify-between px-4 max-w-5xl">
-          <Link href="/" className="flex items-center gap-2 font-bold text-primary">
-            <Heart className="h-5 w-5 fill-primary" />
-            <span className="text-sm">칭찬 마니또</span>
+          <Link href="/" className="flex items-center gap-2">
+            <Heart className="h-5 w-5 fill-[#0075de] text-[#0075de]" />
+            <span className="text-sm font-semibold text-foreground">칭찬 마니또</span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {allNavItems.map(({ href, label, icon: Icon, exact }) => (
-              <Link key={href} href={href}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn('gap-2', isActive(href, exact) && 'bg-accent text-accent-foreground')}
-                >
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </Button>
-              </Link>
-            ))}
+          <nav className="hidden md:flex items-center gap-0.5">
+            {allNavItems.map(({ href, label, icon: Icon, exact }) => {
+              const active = isActive(href, exact)
+              return (
+                <Link key={href} href={href}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      'gap-2 text-[#615d59] font-medium',
+                      active && 'text-[#0075de] bg-[rgba(0,0,0,0.04)]',
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </Button>
+                </Link>
+              )
+            })}
           </nav>
 
           <div className="flex items-center gap-2">
             <Avatar className="h-7 w-7">
-              <AvatarFallback className="text-xs bg-primary/10 text-primary">
+              <AvatarFallback className="text-xs bg-[#f2f9ff] text-[#097fe8] font-semibold">
                 {getInitials(session?.user.name)}
               </AvatarFallback>
             </Avatar>
-            <span className="hidden sm:block text-sm font-medium">{session?.user.name}</span>
+            <span className="hidden sm:block text-sm font-medium text-foreground">{session?.user.name}</span>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 text-[#615d59]"
               onClick={() => {
                 localStorage.removeItem('manitto_autologin')
                 signOut({ callbackUrl: '/login' })
@@ -81,7 +87,7 @@ export function Nav() {
       </header>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur border-t safe-area-pb">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[rgba(0,0,0,0.1)]">
         <div className="flex items-stretch justify-around h-16">
           {allNavItems.map(({ href, label, icon: Icon, exact }) => {
             const active = isActive(href, exact)
@@ -91,11 +97,11 @@ export function Nav() {
                 href={href}
                 className={cn(
                   'flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors',
-                  active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                  active ? 'text-[#0075de]' : 'text-[#a39e98] hover:text-[#615d59]',
                 )}
               >
                 <Icon className={cn('h-5 w-5', active && 'stroke-[2.5px]')} />
-                <span className="text-[10px] font-medium leading-tight">{label}</span>
+                <span className="text-[10px] font-semibold leading-tight">{label}</span>
               </Link>
             )
           })}

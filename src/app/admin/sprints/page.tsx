@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
-import { Plus, Eye, Loader2, Trash2 } from 'lucide-react'
+import { Plus, Eye, Loader2, Trash2, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -144,25 +144,25 @@ export default function AdminSprintsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-3">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold">스프린트 관리</h1>
-          <p className="text-muted-foreground mt-1 text-sm">스프린트를 생성하면 마니또가 자동으로 배정됩니다</p>
+          <h1 className="text-2xl font-bold tracking-[-0.625px]">스프린트 관리</h1>
+          <p className="text-[#615d59] mt-1 text-sm">스프린트를 생성하면 마니또가 자동으로 배정됩니다</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 shrink-0">
               <Plus className="h-4 w-4" /> 새 스프린트
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>새 스프린트 생성</DialogTitle>
+              <DialogTitle className="tracking-[-0.25px]">새 스프린트 생성</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(onCreate)} className="space-y-4 mt-2">
               {!isLeader && (
                 <div className="space-y-2">
-                  <Label>팀 선택 <span className="text-destructive">*</span></Label>
+                  <Label className="text-sm font-medium">팀 선택 <span className="text-destructive">*</span></Label>
                   <Select onValueChange={(v) => setValue('teamId', v)}>
                     <SelectTrigger>
                       <SelectValue placeholder="팀을 선택해주세요" />
@@ -177,18 +177,18 @@ export default function AdminSprintsPage() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label>스프린트 이름</Label>
+                <Label className="text-sm font-medium">스프린트 이름</Label>
                 <Input placeholder="2024 Sprint 5" {...register('name')} />
                 {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>시작일</Label>
+                  <Label className="text-sm font-medium">시작일</Label>
                   <Input type="date" {...register('startDate')} />
                   {errors.startDate && <p className="text-xs text-destructive">{errors.startDate.message}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label>종료일</Label>
+                  <Label className="text-sm font-medium">종료일</Label>
                   <Input type="date" {...register('endDate')} />
                   {errors.endDate && <p className="text-xs text-destructive">{errors.endDate.message}</p>}
                 </div>
@@ -202,21 +202,22 @@ export default function AdminSprintsPage() {
         </Dialog>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {sprints.length === 0 && (
           <Card className="text-center py-12">
             <CardContent>
-              <p className="text-muted-foreground">아직 생성된 스프린트가 없어요</p>
+              <Calendar className="h-10 w-10 mx-auto text-[#a39e98] mb-3" />
+              <p className="text-[#615d59] text-sm">아직 생성된 스프린트가 없어요</p>
             </CardContent>
           </Card>
         )}
         {sprints.map((sprint) => (
-          <Card key={sprint.id} className="hover:shadow-md transition-shadow">
+          <Card key={sprint.id} className="hover:shadow-notion-card transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <CardTitle className="text-lg">{sprint.name}</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <CardTitle className="text-base">{sprint.name}</CardTitle>
+                  <p className="text-xs text-[#a39e98] mt-1">
                     {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
                   </p>
                 </div>
@@ -225,7 +226,7 @@ export default function AdminSprintsPage() {
             </CardHeader>
             <CardContent className="pt-0">
               <div className="flex items-center justify-between">
-                <div className="flex gap-4 text-sm text-muted-foreground">
+                <div className="flex gap-4 text-xs text-[#615d59]">
                   <span>👥 {sprint._count.pairs}쌍</span>
                   <span>💌 {sprint._count.praises}개</span>
                 </div>
@@ -233,7 +234,7 @@ export default function AdminSprintsPage() {
                   {sprint.status === 'REVEALED' && (
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="secondary"
                       className="gap-1"
                       onClick={() => router.push(`/reveal/${sprint.id}`)}
                     >
@@ -254,7 +255,7 @@ export default function AdminSprintsPage() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="gap-1 text-destructive hover:text-destructive"
+                    className="gap-1 text-destructive hover:text-destructive hover:bg-destructive/10"
                     onClick={() => onDelete(sprint.id, sprint.name)}
                     disabled={deleting === sprint.id}
                   >
