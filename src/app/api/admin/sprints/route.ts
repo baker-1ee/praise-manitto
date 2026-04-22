@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: '입력값이 올바르지 않습니다' }, { status: 400 })
 
-  const activeExists = await prisma.sprint.findFirst({ where: { status: 'ACTIVE' } })
+  const activeExists = await prisma.sprint.findFirst({ where: { status: 'ACTIVE', teamId: parsed.data.teamId } })
   if (activeExists) {
     return NextResponse.json({ error: '이미 진행 중인 스프린트가 있습니다. 먼저 공개하거나 종료해주세요.' }, { status: 400 })
   }
