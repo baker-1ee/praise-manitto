@@ -14,6 +14,10 @@ const mainNavItems = [
   { href: '/praises/received', label: '받은 칭찬', icon: Inbox, exact: false },
 ]
 
+const bottomMainNavItems = [
+  { href: '/', label: '홈', icon: Home, exact: true },
+]
+
 const adminNavItems = [
   { href: '/admin/teams', label: '팀 관리', icon: Users, exact: false },
   { href: '/admin/sprints', label: '스프린트', icon: Settings, exact: false },
@@ -28,6 +32,12 @@ export function Nav() {
 
   const allNavItems = [
     ...mainNavItems,
+    ...(session?.user.role === 'LEADER' ? adminNavItems : []),
+    ...(session?.user.role === 'ADMIN' ? adminNavItems : []),
+  ]
+
+  const allBottomNavItems = [
+    ...bottomMainNavItems,
     ...(session?.user.role === 'LEADER' ? adminNavItems : []),
     ...(session?.user.role === 'ADMIN' ? adminNavItems : []),
   ]
@@ -89,7 +99,7 @@ export function Nav() {
       {/* Mobile bottom nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[rgba(0,0,0,0.1)]">
         <div className="flex items-stretch justify-around h-16">
-          {allNavItems.map(({ href, label, icon: Icon, exact }) => {
+          {allBottomNavItems.map(({ href, label, icon: Icon, exact }) => {
             const active = isActive(href, exact)
             return (
               <Link
