@@ -53,6 +53,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const existing = await prisma.user.findFirst({ where: { name: parsed.data.name } })
 
   if (existing) {
+    if (existing.teamId && existing.teamId !== params.id) {
+      return NextResponse.json({ error: '이미 다른 팀에 소속된 멤버입니다. 해당 팀에서 먼저 제거해주세요.' }, { status: 409 })
+    }
     const user = await prisma.user.update({
       where: { id: existing.id },
       data: { teamId: params.id, role: parsed.data.role },
