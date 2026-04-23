@@ -6,7 +6,7 @@ import { ManitoCard } from '@/components/manito-card'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Send, Calendar, PartyPopper, ExternalLink } from 'lucide-react'
+import { Send, Calendar, PartyPopper, ExternalLink, ChevronRight } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitials } from '@/lib/utils'
@@ -85,54 +85,62 @@ export default async function HomePage() {
       {activePairsWithStats.length > 0 ? (
         <div className="space-y-6">
           {activePairsWithStats.map(({ sprint, target, sentCount, receivedCount }) => (
-            <div key={sprint.id} className="space-y-4">
-              {/* 스프린트 카드 */}
-              <Card className="bg-[#f4ebe3] border-[rgba(160,100,80,0.15)]" style={{ boxShadow: 'none' }}>
-                <CardHeader className="py-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-sm flex items-center gap-2 font-semibold">
-                      <Calendar className="h-4 w-4 text-[#c27b8c]" />
-                      {sprint.name}
-                    </CardTitle>
-                    <Badge variant="default">진행 중</Badge>
-                  </div>
-                  <p className="text-xs text-[#a39e98]">
-                    {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
-                  </p>
-                </CardHeader>
-              </Card>
+            /* 스프린트 카드 - 부모 컨테이너 */
+            <Card key={sprint.id} className="bg-[#f4ebe3] border-[rgba(160,100,80,0.15)]" style={{ boxShadow: 'none' }}>
+              <CardHeader className="py-3 pb-0">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm flex items-center gap-2 font-semibold">
+                    <Calendar className="h-4 w-4 text-[#c27b8c]" />
+                    {sprint.name}
+                  </CardTitle>
+                  <Badge variant="default">진행 중</Badge>
+                </div>
+                <p className="text-xs text-[#a39e98]">
+                  {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
+                </p>
+              </CardHeader>
 
-              {/* 마니또 카드 */}
-              <div>
-                <h2 className="text-base font-semibold mb-2 tracking-[-0.25px]">이번 스프린트 내 마니또</h2>
-                <ManitoCard target={target} sprintName={sprint.name} />
-              </div>
+              <CardContent className="pt-4 pb-4 space-y-4">
+                {/* 마니또 배정 카드 */}
+                <div>
+                  <h2 className="text-sm font-semibold mb-2 tracking-[-0.25px]">이번 스프린트 내 마니또</h2>
+                  <ManitoCard target={target} sprintName={sprint.name} />
+                </div>
 
-              {/* 칭찬 통계 */}
-              <div className="grid grid-cols-2 gap-3">
-                <Card className="text-center">
-                  <CardContent className="pt-4 pb-4">
-                    <Link href="/praises/sent" className="block">
-                      <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px] hover:opacity-70 transition-opacity">{sentCount}</div>
-                    </Link>
-                    <div className="text-xs text-[#615d59] mt-1 font-medium">내가 보낸 칭찬</div>
-                    <Link href={`/praise/write?sprintId=${sprint.id}`} className="mt-3 block">
-                      <Button size="sm" className="w-full gap-2">
-                        <Send className="h-3.5 w-3.5" /> 칭찬 쓰기
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-                <Card className="text-center">
-                  <CardContent className="pt-4 pb-4">
-                    <Link href="/praises/received" className="block">
-                      <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px] hover:opacity-70 transition-opacity">{receivedCount}</div>
-                    </Link>
-                    <div className="text-xs text-[#615d59] mt-1 font-medium">내가 받은 칭찬</div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+                {/* 칭찬 통계 */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Link href="/praises/sent" className="block group">
+                    <Card className="text-center h-full transition-shadow group-hover:shadow-notion-card cursor-pointer">
+                      <CardContent className="pt-4 pb-4">
+                        <div className="flex items-center justify-center gap-0.5">
+                          <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px]">{sentCount}</div>
+                          <ChevronRight className="h-5 w-5 text-[#c27b8c] mt-0.5" />
+                        </div>
+                        <div className="text-xs text-[#615d59] mt-1 font-medium">내가 보낸 칭찬</div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                  <Link href="/praises/received" className="block group">
+                    <Card className="text-center h-full transition-shadow group-hover:shadow-notion-card cursor-pointer">
+                      <CardContent className="pt-4 pb-4">
+                        <div className="flex items-center justify-center gap-0.5">
+                          <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px]">{receivedCount}</div>
+                          <ChevronRight className="h-5 w-5 text-[#c27b8c] mt-0.5" />
+                        </div>
+                        <div className="text-xs text-[#615d59] mt-1 font-medium">내가 받은 칭찬</div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </div>
+
+                {/* 칭찬 쓰기 버튼 */}
+                <Link href={`/praise/write?sprintId=${sprint.id}`} className="block">
+                  <Button size="default" className="w-full gap-2">
+                    <Send className="h-4 w-4" /> 칭찬 쓰기
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           ))}
         </div>
       ) : (
