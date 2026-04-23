@@ -61,7 +61,7 @@ export default async function HomePage() {
       <div className="flex items-center gap-3">
         <Avatar className="h-11 w-11 shrink-0">
           {me?.avatarUrl && <AvatarImage src={me.avatarUrl} />}
-          <AvatarFallback className="bg-[#f2f9ff] text-[#097fe8] font-semibold">
+          <AvatarFallback className="bg-[#fdf0f2] text-[#c27b8c] font-semibold">
             {getInitials(session.user.name)}
           </AvatarFallback>
         </Avatar>
@@ -73,7 +73,7 @@ export default async function HomePage() {
               href={process.env.NEXT_PUBLIC_SLACK_INVITE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-[#0075de] hover:underline mt-0.5"
+              className="inline-flex items-center gap-1 text-xs text-[#c27b8c] hover:underline mt-0.5"
             >
               <ExternalLink className="h-3 w-3" />
               칭찬 알림 받으려면 Slack 입장하기
@@ -87,11 +87,11 @@ export default async function HomePage() {
           {activePairsWithStats.map(({ sprint, target, sentCount, receivedCount }) => (
             <div key={sprint.id} className="space-y-4">
               {/* 스프린트 카드 */}
-              <Card className="bg-[#f6f5f4] border-[rgba(0,0,0,0.1)]" style={{ boxShadow: 'none' }}>
+              <Card className="bg-[#f4ebe3] border-[rgba(160,100,80,0.15)]" style={{ boxShadow: 'none' }}>
                 <CardHeader className="py-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-sm flex items-center gap-2 font-semibold">
-                      <Calendar className="h-4 w-4 text-[#0075de]" />
+                      <Calendar className="h-4 w-4 text-[#c27b8c]" />
                       {sprint.name}
                     </CardTitle>
                     <Badge variant="default">진행 중</Badge>
@@ -112,7 +112,7 @@ export default async function HomePage() {
               <div className="grid grid-cols-2 gap-3">
                 <Card className="text-center">
                   <CardContent className="pt-4 pb-4">
-                    <div className="text-3xl font-bold text-[#0075de] tracking-[-1px]">{sentCount}</div>
+                    <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px]">{sentCount}</div>
                     <div className="text-xs text-[#615d59] mt-1 font-medium">내가 보낸 칭찬</div>
                     <Link href={`/praise/write?sprintId=${sprint.id}`} className="mt-3 block">
                       <Button size="sm" className="w-full gap-2">
@@ -123,7 +123,7 @@ export default async function HomePage() {
                 </Card>
                 <Card className="text-center">
                   <CardContent className="pt-4 pb-4">
-                    <div className="text-3xl font-bold text-[#0075de] tracking-[-1px]">{receivedCount}</div>
+                    <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px]">{receivedCount}</div>
                     <div className="text-xs text-[#615d59] mt-1 font-medium">내가 받은 칭찬</div>
                     <Link href="/praises/received" className="mt-3 block">
                       <Button size="sm" variant="secondary" className="w-full gap-2">
@@ -140,10 +140,10 @@ export default async function HomePage() {
         <div className="space-y-4">
           {revealedSprint ? (
             <Link href={`/reveal/${revealedSprint.id}`}>
-              <Card className="bg-[#f6f5f4] hover:shadow-notion-card transition-shadow cursor-pointer">
+              <Card className="bg-[#f4ebe3] hover:shadow-notion-card transition-shadow cursor-pointer border-[rgba(160,100,80,0.15)]">
                 <CardContent className="pt-5 pb-5 flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white border border-[rgba(0,0,0,0.1)]">
-                    <PartyPopper className="h-6 w-6 text-[#0075de]" />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-card border border-[rgba(160,100,80,0.15)]">
+                    <PartyPopper className="h-6 w-6 text-[#c27b8c]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-base tracking-[-0.25px]">마니또가 공개됐어요! 🎊</p>
