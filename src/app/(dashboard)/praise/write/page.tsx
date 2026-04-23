@@ -47,7 +47,7 @@ export default async function PraiseWritePage({
     <div className="max-w-lg mx-auto space-y-2">
       <div className="mb-4">
         <h1 className="text-xl font-bold tracking-[-0.25px]">✉️ 손편지 쓰기</h1>
-        <p className="text-[#615d59] text-sm mt-0.5">마니또에게 마음을 담아 익명으로 전달돼요</p>
+        <p className="text-[#7a6050] text-sm mt-0.5">마니또에게 마음을 담아 익명으로 전달돼요</p>
       </div>
       <PraiseForm
         targetName={myPair.target.name}

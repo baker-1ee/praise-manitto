@@ -147,14 +147,14 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f6f5f4] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       {showKakaoBanner && <KakaoBanner />}
 
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-[rgba(0,0,0,0.1)] shadow-notion-card">
-              <Heart className="h-6 w-6 fill-[#0075de] text-[#0075de]" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-card border border-[rgba(160,100,80,0.15)] shadow-notion-card">
+              <Heart className="h-6 w-6 fill-[#c27b8c] text-[#c27b8c]" />
             </div>
           </div>
           <h1 className="text-2xl font-bold tracking-[-0.625px] text-foreground">칭찬 마니또</h1>

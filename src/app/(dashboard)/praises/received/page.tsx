@@ -20,7 +20,7 @@ export default async function ReceivedPraisesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-[-0.625px] flex items-center gap-2">
-          <Inbox className="h-6 w-6 text-[#0075de]" />
+          <Inbox className="h-6 w-6 text-[#c27b8c]" />
           받은 칭찬
         </h1>
         <p className="text-[#615d59] mt-1 text-sm">총 {praises.length}개의 칭찬을 받았어요 💌</p>

@@ -45,10 +45,10 @@ export function Nav() {
   return (
     <>
       {/* Top header */}
-      <header className="sticky top-0 z-40 border-b border-[rgba(0,0,0,0.1)] bg-white">
+      <header className="sticky top-0 z-40 border-b border-[rgba(160,100,80,0.15)] bg-background">
         <div className="container mx-auto flex h-14 items-center justify-between px-4 max-w-5xl">
           <Link href="/" className="flex items-center gap-2">
-            <Heart className="h-5 w-5 fill-[#0075de] text-[#0075de]" />
+            <Heart className="h-5 w-5 fill-[#c27b8c] text-[#c27b8c]" />
             <span className="text-sm font-semibold text-foreground">칭찬 마니또</span>
           </Link>
 
@@ -62,8 +62,8 @@ export function Nav() {
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      'gap-2 text-[#615d59] font-medium',
-                      active && 'text-[#0075de] bg-[rgba(0,0,0,0.04)]',
+                      'gap-2 text-[#7a6050] font-medium',
+                      active && 'text-[#c27b8c] bg-[rgba(194,123,140,0.08)]',
                     )}
                   >
                     <Icon className="h-4 w-4" />
@@ -76,7 +76,7 @@ export function Nav() {
 
           <div className="flex items-center gap-2">
             <Avatar className="h-7 w-7">
-              <AvatarFallback className="text-xs bg-[#f2f9ff] text-[#097fe8] font-semibold">
+              <AvatarFallback className="text-xs bg-[#fdf0f2] text-[#c27b8c] font-semibold">
                 {getInitials(session?.user.name)}
               </AvatarFallback>
             </Avatar>
@@ -97,7 +97,7 @@ export function Nav() {
       </header>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[rgba(0,0,0,0.1)]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-[rgba(160,100,80,0.15)]">
         <div className="flex items-stretch justify-around h-16">
           {allBottomNavItems.map(({ href, label, icon: Icon, exact }) => {
             const active = isActive(href, exact)
@@ -107,7 +107,7 @@ export function Nav() {
                 href={href}
                 className={cn(
                   'flex flex-1 flex-col items-center justify-center gap-0.5 py-2 transition-colors',
-                  active ? 'text-[#0075de]' : 'text-[#a39e98] hover:text-[#615d59]',
+                  active ? 'text-[#c27b8c]' : 'text-[#b09880] hover:text-[#7a6050]',
                 )}
               >
                 <Icon className={cn('h-5 w-5', active && 'stroke-[2.5px]')} />

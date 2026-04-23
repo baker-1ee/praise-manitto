@@ -42,7 +42,7 @@ export default async function SentPraisesPage({
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-[-0.625px] flex items-center gap-2">
-          <SendHorizontal className="h-6 w-6 text-[#0075de]" />
+          <SendHorizontal className="h-6 w-6 text-[#c27b8c]" />
           보낸 칭찬
         </h1>
         {isFiltered ? (

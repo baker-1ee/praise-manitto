@@ -181,8 +181,8 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
         type="submit"
         className="w-full gap-2 h-12 text-base font-semibold rounded-xl"
         style={{
-          background: 'linear-gradient(135deg, #0075de 0%, #005bb5 100%)',
-          boxShadow: '0 4px 12px rgba(0,117,222,0.30)',
+          background: 'linear-gradient(135deg, #c27b8c 0%, #a86475 100%)',
+          boxShadow: '0 4px 14px rgba(194,123,140,0.40)',
         }}
         disabled={isSubmitting}
       >
