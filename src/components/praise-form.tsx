@@ -111,10 +111,10 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
         <div className="px-6 py-1">
           <textarea
             {...register('content')}
-            placeholder={`${targetName ?? '마니또 대상'}님의 좋은 점을\n솔직하게 전해보세요...\n\n진심 어린 칭찬이 큰 힘이 됩니다 💛`}
+            placeholder="진심 어린 칭찬이 큰 힘이 됩니다."
             style={{
               width: '100%',
-              minHeight: '210px',
+              minHeight: '102px',
               backgroundColor: 'transparent',
               backgroundImage:
                 'repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, rgba(180,155,100,0.22) 27px, rgba(180,155,100,0.22) 28px)',
