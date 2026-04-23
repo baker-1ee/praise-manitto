@@ -6,23 +6,27 @@ import { Badge } from '@/components/ui/badge'
 import { SendHorizontal } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 
-export default async function SentPraisesPage() {
+export default async function SentPraisesPage({
+  searchParams,
+}: {
+  searchParams: { sprintId?: string }
+}) {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
-  const activeSprint = await prisma.sprint.findFirst({
-    where: { status: 'ACTIVE' },
-  })
+  const sprint = searchParams.sprintId
+    ? await prisma.sprint.findUnique({ where: { id: searchParams.sprintId } })
+    : await prisma.sprint.findFirst({ where: { status: 'ACTIVE' } })
 
-  const myPair = activeSprint
+  const myPair = sprint
     ? await prisma.manitoPair.findUnique({
-        where: { sprintId_manitoId: { sprintId: activeSprint.id, manitoId: session.user.id } },
+        where: { sprintId_manitoId: { sprintId: sprint.id, manitoId: session.user.id } },
         include: { target: { select: { name: true } } },
       })
     : null
 
-  const where = activeSprint && myPair
-    ? { fromUserId: session.user.id, sprintId: activeSprint.id }
+  const where = sprint && myPair
+    ? { fromUserId: session.user.id, sprintId: sprint.id }
     : { fromUserId: session.user.id }
 
   const praises = await prisma.praise.findMany({
@@ -34,7 +38,7 @@ export default async function SentPraisesPage() {
     },
   })
 
-  const isFiltered = !!(activeSprint && myPair)
+  const isFiltered = !!(sprint && myPair)
 
   return (
     <div className="space-y-6">
@@ -45,7 +49,7 @@ export default async function SentPraisesPage() {
         </h1>
         {isFiltered ? (
           <p className="text-[#615d59] mt-1 text-sm">
-            {activeSprint.name} · {myPair!.target.name}님에게 보낸 칭찬 {praises.length}개 💌
+            {sprint!.name} · {myPair!.target.name}님에게 보낸 칭찬 {praises.length}개 💌
           </p>
         ) : (
           <p className="text-[#615d59] mt-1 text-sm">총 {praises.length}개의 칭찬을 보냈어요 💌</p>
