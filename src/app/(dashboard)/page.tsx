@@ -6,7 +6,7 @@ import { ManitoCard } from '@/components/manito-card'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Send, Inbox, Calendar, PartyPopper, ExternalLink } from 'lucide-react'
+import { Send, Calendar, PartyPopper, ExternalLink } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitials } from '@/lib/utils'
@@ -112,7 +112,9 @@ export default async function HomePage() {
               <div className="grid grid-cols-2 gap-3">
                 <Card className="text-center">
                   <CardContent className="pt-4 pb-4">
-                    <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px]">{sentCount}</div>
+                    <Link href="/praises/sent" className="block">
+                      <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px] hover:opacity-70 transition-opacity">{sentCount}</div>
+                    </Link>
                     <div className="text-xs text-[#615d59] mt-1 font-medium">내가 보낸 칭찬</div>
                     <Link href={`/praise/write?sprintId=${sprint.id}`} className="mt-3 block">
                       <Button size="sm" className="w-full gap-2">
@@ -123,13 +125,10 @@ export default async function HomePage() {
                 </Card>
                 <Card className="text-center">
                   <CardContent className="pt-4 pb-4">
-                    <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px]">{receivedCount}</div>
-                    <div className="text-xs text-[#615d59] mt-1 font-medium">내가 받은 칭찬</div>
-                    <Link href="/praises/received" className="mt-3 block">
-                      <Button size="sm" variant="secondary" className="w-full gap-2">
-                        <Inbox className="h-3.5 w-3.5" /> 확인하기
-                      </Button>
+                    <Link href="/praises/received" className="block">
+                      <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px] hover:opacity-70 transition-opacity">{receivedCount}</div>
                     </Link>
+                    <div className="text-xs text-[#615d59] mt-1 font-medium">내가 받은 칭찬</div>
                   </CardContent>
                 </Card>
               </div>
