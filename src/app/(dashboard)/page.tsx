@@ -114,7 +114,7 @@ export default async function HomePage() {
                   <CardContent className="pt-4 pb-4">
                     <div className="text-3xl font-bold text-[#0075de] tracking-[-1px]">{sentCount}</div>
                     <div className="text-xs text-[#615d59] mt-1 font-medium">내가 보낸 칭찬</div>
-                    <Link href="/praise/write" className="mt-3 block">
+                    <Link href={`/praise/write?sprintId=${sprint.id}`} className="mt-3 block">
                       <Button size="sm" className="w-full gap-2">
                         <Send className="h-3.5 w-3.5" /> 칭찬 쓰기
                       </Button>
