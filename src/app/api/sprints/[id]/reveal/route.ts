@@ -21,7 +21,7 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       orderBy: { createdAt: 'asc' },
     }),
     prisma.user.findMany({
-      where: { role: { not: 'ADMIN' } },
+      where: { role: { not: 'ADMIN' }, teamId: sprint.teamId },
       select: { id: true, name: true, avatarUrl: true },
     }),
   ])
