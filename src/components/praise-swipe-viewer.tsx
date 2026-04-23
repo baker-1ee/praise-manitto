@@ -47,7 +47,7 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
   const animClass = slideDir === 'left' ? 'animate-slide-in' : 'animate-slide-in-from-left'
 
   return (
-    <div>
+    <div className="overflow-hidden">
       {/* 도트 인디케이터 */}
       {cards.length > 1 && (
         <div className="flex justify-center items-center gap-1.5 mb-4">
@@ -101,7 +101,7 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
           <p
             style={{
               width: '100%',
-              minHeight: '84px',
+              minHeight: '112px',
               backgroundImage:
                 'repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, rgba(180,155,100,0.22) 27px, rgba(180,155,100,0.22) 28px)',
               backgroundPositionY: '10px',
@@ -160,7 +160,7 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
           <button
             onClick={goPrev}
             disabled={currentIndex === 0}
-            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm disabled:opacity-30 transition-opacity active:scale-95"
+            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm disabled:opacity-30 transition-opacity active:opacity-60"
             style={{ color: '#b89c6a', fontFamily: 'Georgia, serif' }}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -175,7 +175,7 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
           <button
             onClick={goNext}
             disabled={currentIndex === cards.length - 1}
-            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm disabled:opacity-30 transition-opacity active:scale-95"
+            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm disabled:opacity-30 transition-opacity active:opacity-60"
             style={{ color: '#b89c6a', fontFamily: 'Georgia, serif' }}
           >
             다음

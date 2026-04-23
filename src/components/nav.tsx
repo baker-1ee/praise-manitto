@@ -97,7 +97,7 @@ export function Nav() {
       </header>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-[rgba(160,100,80,0.15)]">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-[rgba(160,100,80,0.15)]" style={{ willChange: 'transform', transform: 'translateZ(0)' }}>
         <div className="flex items-stretch justify-around h-16">
           {allBottomNavItems.map(({ href, label, icon: Icon, exact }) => {
             const active = isActive(href, exact)
