@@ -5,17 +5,30 @@ import { Inbox } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { PraiseSwipeViewer } from '@/components/praise-swipe-viewer'
 
-export default async function ReceivedPraisesPage() {
+export default async function ReceivedPraisesPage({
+  searchParams,
+}: {
+  searchParams: { sprintId?: string }
+}) {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
+  const sprint = searchParams.sprintId
+    ? await prisma.sprint.findUnique({ where: { id: searchParams.sprintId } })
+    : null
+
   const praises = await prisma.praise.findMany({
-    where: { toUserId: session.user.id },
+    where: {
+      toUserId: session.user.id,
+      ...(sprint ? { sprintId: sprint.id } : {}),
+    },
     orderBy: { createdAt: 'desc' },
     include: {
       sprint: { select: { name: true, status: true } },
     },
   })
+
+  const isFiltered = !!sprint
 
   const cards = praises.map((praise) => ({
     id: praise.id,
@@ -24,7 +37,7 @@ export default async function ReceivedPraisesPage() {
     headerName: praise.sprint.status === 'REVEALED' ? '마니또 공개됨' : '익명의 마니또',
     footerLeftText: formatDate(praise.createdAt),
     footerRightText: '',
-    footerBadge: praise.sprint.name,
+    footerBadge: isFiltered ? undefined : praise.sprint.name,
   }))
 
   return (
@@ -34,7 +47,13 @@ export default async function ReceivedPraisesPage() {
           <Inbox className="h-6 w-6 text-[#c27b8c]" />
           받은 칭찬
         </h1>
-        <p className="text-[#615d59] mt-1 text-sm">총 {praises.length}개의 칭찬을 받았어요 💌</p>
+        {isFiltered ? (
+          <p className="text-[#615d59] mt-1 text-sm">
+            {sprint!.name} · 받은 칭찬 {praises.length}개 💌
+          </p>
+        ) : (
+          <p className="text-[#615d59] mt-1 text-sm">총 {praises.length}개의 칭찬을 받았어요 💌</p>
+        )}
       </div>
 
       {praises.length === 0 ? (
