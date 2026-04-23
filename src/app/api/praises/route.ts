@@ -8,6 +8,7 @@ import { z } from 'zod'
 const schema = z.object({
   content: z.string().min(10).max(500),
   categories: z.array(z.string()).optional().default([]),
+  sprintId: z.string().optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -18,18 +19,34 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: '입력값이 올바르지 않습니다' }, { status: 400 })
 
-  const activeSprint = await prisma.sprint.findFirst({ where: { status: 'ACTIVE' } })
-  if (!activeSprint) return NextResponse.json({ error: '진행 중인 스프린트가 없습니다' }, { status: 400 })
+  // sprintId 지정 시 해당 스프린트, 없으면 유저의 첫 번째 활성 ManitoPair 사용
+  const myPair = parsed.data.sprintId
+    ? await prisma.manitoPair.findUnique({
+        where: {
+          sprintId_manitoId: {
+            sprintId: parsed.data.sprintId,
+            manitoId: session.user.id,
+          },
+        },
+        include: {
+          target: { select: { slackUserId: true } },
+          sprint: { select: { status: true } },
+        },
+      })
+    : await prisma.manitoPair.findFirst({
+        where: { manitoId: session.user.id, sprint: { status: 'ACTIVE' } },
+        include: {
+          target: { select: { slackUserId: true } },
+          sprint: { select: { status: true } },
+        },
+      })
 
-  const myPair = await prisma.manitoPair.findUnique({
-    where: { sprintId_manitoId: { sprintId: activeSprint.id, manitoId: session.user.id } },
-    include: { target: { select: { slackUserId: true } } },
-  })
   if (!myPair) return NextResponse.json({ error: '마니또 배정 정보가 없습니다' }, { status: 400 })
+  if (myPair.sprint.status !== 'ACTIVE') return NextResponse.json({ error: '진행 중인 스프린트가 없습니다' }, { status: 400 })
 
   const praise = await prisma.praise.create({
     data: {
-      sprintId: activeSprint.id,
+      sprintId: myPair.sprintId,
       fromUserId: session.user.id,
       toUserId: myPair.targetId,
       content: parsed.data.content,
