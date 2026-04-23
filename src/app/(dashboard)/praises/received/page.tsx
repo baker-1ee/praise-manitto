@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Inbox } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
+import { PraiseSwipeViewer } from '@/components/praise-swipe-viewer'
 
 export default async function ReceivedPraisesPage() {
   const session = await getServerSession(authOptions)
@@ -15,6 +16,16 @@ export default async function ReceivedPraisesPage() {
       sprint: { select: { name: true, status: true } },
     },
   })
+
+  const cards = praises.map((praise) => ({
+    id: praise.id,
+    content: praise.content,
+    headerLabel: 'From.',
+    headerName: praise.sprint.status === 'REVEALED' ? '마니또 공개됨' : '익명의 마니또',
+    footerLeftText: formatDate(praise.createdAt),
+    footerRightText: '',
+    footerBadge: praise.sprint.name,
+  }))
 
   return (
     <div className="space-y-6">
@@ -47,85 +58,7 @@ export default async function ReceivedPraisesPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {praises.map((praise) => (
-            <div
-              key={praise.id}
-              className="rounded-2xl overflow-hidden"
-              style={{
-                background: 'linear-gradient(150deg, #fffef7 0%, #fdf8ec 100%)',
-                border: '1px solid #ddd0b0',
-                boxShadow: '0 4px 20px rgba(120,95,50,0.10), 0 1px 0 rgba(255,255,255,0.85) inset',
-              }}
-            >
-              {/* 편지 헤더 — 발신인 */}
-              <div className="px-6 pt-5 pb-4" style={{ borderBottom: '1.5px dashed #ddd0b0' }}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p
-                      className="text-xs font-medium"
-                      style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
-                    >
-                      From.
-                    </p>
-                    <p
-                      className="text-xl font-bold leading-tight"
-                      style={{ color: '#3d2b10', fontFamily: 'Georgia, serif' }}
-                    >
-                      {praise.sprint.status === 'REVEALED' ? '마니또 공개됨' : '익명의 마니또'}
-                    </p>
-                  </div>
-                  <span className="text-2xl select-none">💌</span>
-                </div>
-              </div>
-
-              {/* 편지 본문 — 줄노트 스타일 */}
-              <div className="px-6 py-1">
-                <p
-                  style={{
-                    width: '100%',
-                    minHeight: '84px',
-                    backgroundImage:
-                      'repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, rgba(180,155,100,0.22) 27px, rgba(180,155,100,0.22) 28px)',
-                    backgroundPositionY: '10px',
-                    fontFamily: 'Georgia, "Nanum Myeongjo", "Malgun Gothic", serif',
-                    fontSize: '14.5px',
-                    lineHeight: '28px',
-                    color: '#2d1e08',
-                    paddingTop: '10px',
-                    paddingBottom: '8px',
-                    whiteSpace: 'pre-wrap',
-                    display: 'block',
-                  }}
-                >
-                  {praise.content}
-                </p>
-              </div>
-
-              {/* 편지 푸터 — 날짜 & 스프린트 */}
-              <div className="px-6 pt-3 pb-5" style={{ borderTop: '1.5px dashed #ddd0b0' }}>
-                <div className="flex items-center justify-between">
-                  <p
-                    className="text-sm"
-                    style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
-                  >
-                    {formatDate(praise.createdAt)}
-                  </p>
-                  <span
-                    className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                    style={{
-                      color: '#a08050',
-                      background: 'rgba(200,170,100,0.12)',
-                      border: '1px dashed #c8a864',
-                    }}
-                  >
-                    {praise.sprint.name}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <PraiseSwipeViewer cards={cards} />
       )}
     </div>
   )
