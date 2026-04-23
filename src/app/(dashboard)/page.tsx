@@ -20,35 +20,40 @@ export default async function HomePage() {
     select: { avatarUrl: true, slackUserId: true },
   })
 
-  const activeSprint = await prisma.sprint.findFirst({
-    where: { status: 'ACTIVE' },
+  // 이 유저가 마니또로 참여 중인 모든 활성 스프린트 조회
+  const activePairs = await prisma.manitoPair.findMany({
+    where: {
+      manitoId: session.user.id,
+      sprint: { status: 'ACTIVE' },
+    },
+    include: {
+      sprint: true,
+      target: { select: { name: true, bio: true, avatarUrl: true } },
+    },
   })
 
-  const myPair = activeSprint
-    ? await prisma.manitoPair.findUnique({
-        where: { sprintId_manitoId: { sprintId: activeSprint.id, manitoId: session.user.id } },
-        include: { target: { select: { name: true, bio: true, avatarUrl: true } } },
-      })
-    : null
+  // 각 스프린트별 칭찬 통계 계산
+  const activePairsWithStats = await Promise.all(
+    activePairs.map(async (pair) => {
+      const [sentCount, receivedCount] = await Promise.all([
+        prisma.praise.count({ where: { sprintId: pair.sprintId, fromUserId: session.user.id } }),
+        prisma.praise.count({ where: { sprintId: pair.sprintId, toUserId: session.user.id } }),
+      ])
+      return { ...pair, sentCount, receivedCount }
+    })
+  )
 
-  const [sentCount, receivedCount] = await Promise.all([
-    activeSprint
-      ? prisma.praise.count({ where: { sprintId: activeSprint.id, fromUserId: session.user.id } })
-      : 0,
-    activeSprint
-      ? prisma.praise.count({ where: { sprintId: activeSprint.id, toUserId: session.user.id } })
-      : 0,
-  ])
-
-  const revealedSprint = !activeSprint && session.user.teamId
-    ? await prisma.sprint.findFirst({
-        where: {
-          teamId: session.user.teamId,
-          status: { in: ['REVEALED', 'CLOSED'] },
-        },
-        orderBy: { endDate: 'desc' },
-      })
-    : null
+  // 활성 스프린트 없을 때 가장 최근 공개된 스프린트 조회
+  const revealedSprint =
+    activePairs.length === 0
+      ? await prisma.sprint.findFirst({
+          where: {
+            pairs: { some: { manitoId: session.user.id } },
+            status: { in: ['REVEALED', 'CLOSED'] },
+          },
+          orderBy: { endDate: 'desc' },
+        })
+      : null
 
   return (
     <div className="space-y-4">
@@ -77,59 +82,60 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {activeSprint ? (
-        <>
-          {/* 스프린트 카드 */}
-          <Card className="bg-[#f6f5f4] border-[rgba(0,0,0,0.1)]" style={{ boxShadow: 'none' }}>
-            <CardHeader className="py-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm flex items-center gap-2 font-semibold">
-                  <Calendar className="h-4 w-4 text-[#0075de]" />
-                  {activeSprint.name}
-                </CardTitle>
-                <Badge variant="default">진행 중</Badge>
+      {activePairsWithStats.length > 0 ? (
+        <div className="space-y-6">
+          {activePairsWithStats.map(({ sprint, target, sentCount, receivedCount }) => (
+            <div key={sprint.id} className="space-y-4">
+              {/* 스프린트 카드 */}
+              <Card className="bg-[#f6f5f4] border-[rgba(0,0,0,0.1)]" style={{ boxShadow: 'none' }}>
+                <CardHeader className="py-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm flex items-center gap-2 font-semibold">
+                      <Calendar className="h-4 w-4 text-[#0075de]" />
+                      {sprint.name}
+                    </CardTitle>
+                    <Badge variant="default">진행 중</Badge>
+                  </div>
+                  <p className="text-xs text-[#a39e98]">
+                    {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
+                  </p>
+                </CardHeader>
+              </Card>
+
+              {/* 마니또 카드 */}
+              <div>
+                <h2 className="text-base font-semibold mb-2 tracking-[-0.25px]">이번 스프린트 내 마니또</h2>
+                <ManitoCard target={target} sprintName={sprint.name} />
               </div>
-              <p className="text-xs text-[#a39e98]">
-                {formatDate(activeSprint.startDate)} ~ {formatDate(activeSprint.endDate)}
-              </p>
-            </CardHeader>
-          </Card>
 
-          {/* 마니또 카드 */}
-          <div>
-            <h2 className="text-base font-semibold mb-2 tracking-[-0.25px]">이번 스프린트 내 마니또</h2>
-            <ManitoCard
-              target={myPair?.target ?? null}
-              sprintName={activeSprint.name}
-            />
-          </div>
-
-          {/* 칭찬 통계 */}
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="text-center">
-              <CardContent className="pt-4 pb-4">
-                <div className="text-3xl font-bold text-[#0075de] tracking-[-1px]">{sentCount}</div>
-                <div className="text-xs text-[#615d59] mt-1 font-medium">내가 보낸 칭찬</div>
-                <Link href="/praise/write" className="mt-3 block">
-                  <Button size="sm" className="w-full gap-2">
-                    <Send className="h-3.5 w-3.5" /> 칭찬 쓰기
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardContent className="pt-4 pb-4">
-                <div className="text-3xl font-bold text-[#0075de] tracking-[-1px]">{receivedCount}</div>
-                <div className="text-xs text-[#615d59] mt-1 font-medium">내가 받은 칭찬</div>
-                <Link href="/praises/received" className="mt-3 block">
-                  <Button size="sm" variant="secondary" className="w-full gap-2">
-                    <Inbox className="h-3.5 w-3.5" /> 확인하기
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </>
+              {/* 칭찬 통계 */}
+              <div className="grid grid-cols-2 gap-3">
+                <Card className="text-center">
+                  <CardContent className="pt-4 pb-4">
+                    <div className="text-3xl font-bold text-[#0075de] tracking-[-1px]">{sentCount}</div>
+                    <div className="text-xs text-[#615d59] mt-1 font-medium">내가 보낸 칭찬</div>
+                    <Link href="/praise/write" className="mt-3 block">
+                      <Button size="sm" className="w-full gap-2">
+                        <Send className="h-3.5 w-3.5" /> 칭찬 쓰기
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+                <Card className="text-center">
+                  <CardContent className="pt-4 pb-4">
+                    <div className="text-3xl font-bold text-[#0075de] tracking-[-1px]">{receivedCount}</div>
+                    <div className="text-xs text-[#615d59] mt-1 font-medium">내가 받은 칭찬</div>
+                    <Link href="/praises/received" className="mt-3 block">
+                      <Button size="sm" variant="secondary" className="w-full gap-2">
+                        <Inbox className="h-3.5 w-3.5" /> 확인하기
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="space-y-4">
           {revealedSprint ? (
