@@ -109,7 +109,7 @@ export default async function HomePage() {
 
                 {/* 칭찬 통계 */}
                 <div className="grid grid-cols-2 gap-3">
-                  <Link href="/praises/sent" className="block group">
+                  <Link href={`/praises/sent?sprintId=${sprint.id}`} className="block group">
                     <Card className="text-center h-full transition-shadow group-hover:shadow-notion-card cursor-pointer">
                       <CardContent className="pt-4 pb-4">
                         <div className="flex items-center justify-center gap-0.5">
@@ -120,7 +120,7 @@ export default async function HomePage() {
                       </CardContent>
                     </Card>
                   </Link>
-                  <Link href="/praises/received" className="block group">
+                  <Link href={`/praises/received?sprintId=${sprint.id}`} className="block group">
                     <Card className="text-center h-full transition-shadow group-hover:shadow-notion-card cursor-pointer">
                       <CardContent className="pt-4 pb-4">
                         <div className="flex items-center justify-center gap-0.5">
