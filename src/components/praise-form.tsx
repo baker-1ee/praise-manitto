@@ -53,7 +53,7 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
       toast({ title: '편지를 보냈어요! 💌', description: `${targetName}님에게 익명으로 전달됩니다.` })
       reset()
       onSuccess?.()
-      router.push('/praises/sent')
+      router.push(`/praises/sent?sprintId=${sprintId}`)
     } catch (e) {
       toast({ variant: 'destructive', title: '오류', description: (e as Error).message })
     } finally {
@@ -194,7 +194,7 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
         type="button"
         variant="ghost"
         className="w-full gap-2 text-[#a39e98]"
-        onClick={() => router.push('/praises/sent')}
+        onClick={() => router.push(`/praises/sent?sprintId=${sprintId}`)}
       >
         <MessageSquare className="h-4 w-4" />
         보낸 편지 보기
