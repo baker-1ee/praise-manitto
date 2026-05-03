@@ -8,7 +8,6 @@ import { z } from 'zod'
 const createSchema = z.object({
   name: z.string().min(1),
   password: z.string().min(8),
-  slackUserId: z.string().optional(),
   bio: z.string().optional(),
 })
 
@@ -20,7 +19,7 @@ export async function GET() {
 
   const users = await prisma.user.findMany({
     orderBy: [{ role: 'asc' }, { name: 'asc' }],
-    select: { id: true, name: true, role: true, slackUserId: true, bio: true, createdAt: true },
+    select: { id: true, name: true, role: true, bio: true, createdAt: true },
   })
 
   return NextResponse.json(users)

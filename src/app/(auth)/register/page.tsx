@@ -92,8 +92,6 @@ function RegisterForm() {
   const [showKakaoBanner, setShowKakaoBanner] = useState(false)
   const [autoLogin, setAutoLogin] = useState(true)
 
-  const slackInviteUrl = process.env.NEXT_PUBLIC_SLACK_INVITE_URL
-
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
@@ -235,19 +233,6 @@ function RegisterForm() {
                   바로 시작하기 →
                 </Button>
 
-                {slackInviteUrl && (
-                  <div className="rounded-lg border border-[rgba(0,0,0,0.1)] bg-[#f6f5f4] p-4 space-y-3">
-                    <p className="text-sm font-medium text-foreground">
-                      💬 칭찬 알림 받으려면
-                    </p>
-                    <Button asChild className="w-full bg-[#4A154B] hover:bg-[#3d1040] text-white">
-                      <a href={slackInviteUrl} target="_blank" rel="noopener noreferrer" className="gap-2">
-                        <ExternalLink className="h-4 w-4" />
-                        Slack 워크스페이스 입장하기
-                      </a>
-                    </Button>
-                  </div>
-                )}
               </div>
             )}
           </CardContent>

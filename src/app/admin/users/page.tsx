@@ -13,7 +13,7 @@ export default async function AdminUsersPage() {
 
   const users = await prisma.user.findMany({
     orderBy: [{ role: 'asc' }, { name: 'asc' }],
-    select: { id: true, name: true, role: true, slackUserId: true, bio: true },
+    select: { id: true, name: true, role: true, bio: true },
   })
 
   return (
@@ -40,11 +40,6 @@ export default async function AdminUsersPage() {
 
                 {user.bio && <p className="text-xs text-muted-foreground mt-0.5">{user.bio}</p>}
               </div>
-              {user.slackUserId ? (
-                <Badge variant="secondary" className="text-xs shrink-0">Slack 연결됨</Badge>
-              ) : (
-                <Badge variant="outline" className="text-xs shrink-0 text-muted-foreground">Slack 미설정</Badge>
-              )}
             </CardContent>
           </Card>
         ))}

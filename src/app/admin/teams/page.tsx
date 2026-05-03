@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Copy, Check, RefreshCw, Users, Loader2, KeyRound, Trash2 } from 'lucide-react'
+import { Plus, Copy, Check, Users, KeyRound, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,8 +18,7 @@ import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/use-toast'
 import { getInitials } from '@/lib/utils'
 
-interface SlackMember { id: string; name: string; displayName: string; avatar: string }
-interface Member { id: string; name: string | null; role: string; avatarUrl: string | null; hasPassword: boolean; slackUserId: string | null; inviteToken?: { token: string; usedAt: string | null } | null }
+interface Member { id: string; name: string | null; role: string; avatarUrl: string | null; hasPassword: boolean; inviteToken?: { token: string; usedAt: string | null } | null }
 interface Team { id: string; name: string; members: Member[] }
 
 const teamSchema = z.object({ name: z.string().min(1, '팀 이름을 입력해주세요') })
@@ -37,8 +36,6 @@ export default function AdminTeamsPage() {
   const { data: session } = useSession()
   const isAdmin = session?.user.role === 'ADMIN'
   const [teams, setTeams] = useState<Team[]>([])
-  const [slackMembers, setSlackMembers] = useState<SlackMember[]>([])
-  const [slackLoading, setSlackLoading] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [teamDialogOpen, setTeamDialogOpen] = useState(false)
   const [memberDialogTeamId, setMemberDialogTeamId] = useState<string | null>(null)
@@ -53,24 +50,6 @@ export default function AdminTeamsPage() {
   }, [])
 
   useEffect(() => { loadTeams() }, [loadTeams])
-
-  const syncSlack = async () => {
-    setSlackLoading(true)
-    try {
-      const res = await fetch('/api/admin/slack/users')
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error)
-      }
-      const data = await res.json()
-      setSlackMembers(data)
-      toast({ title: `Slack 멤버 ${data.length}명 불러왔습니다` })
-    } catch (e) {
-      toast({ variant: 'destructive', title: 'Slack 동기화 실패', description: (e as Error).message })
-    } finally {
-      setSlackLoading(false)
-    }
-  }
 
   const createTeam = async (data: TeamForm) => {
     const res = await fetch('/api/admin/teams', {
@@ -105,19 +84,6 @@ export default function AdminTeamsPage() {
     memberForm.reset({ role: 'MEMBER' })
     setMemberDialogTeamId(null)
     loadTeams()
-  }
-
-  const updateSlackId = async (teamId: string, userId: string, slackUserId: string) => {
-    const isDeselect = slackUserId === '__none__'
-    const res = await fetch(`/api/admin/teams/${teamId}/members`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'updateSlack', userId, slackUserId: isDeselect ? null : slackUserId }),
-    })
-    if (res.ok) {
-      toast({ title: isDeselect ? 'Slack 계정 연결이 해제되었습니다' : 'Slack 계정이 연결되었습니다' })
-      loadTeams()
-    }
   }
 
   const copyInviteLink = async (teamId: string, member: Member) => {
@@ -190,10 +156,6 @@ export default function AdminTeamsPage() {
           <p className="text-[#615d59] mt-1 text-sm">팀을 구성하고 초대링크로 팀원을 온보딩하세요</p>
         </div>
         <div className="flex gap-2 shrink-0">
-          <Button variant="secondary" onClick={syncSlack} disabled={slackLoading} className="gap-2">
-            {slackLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            Slack 동기화
-          </Button>
           {isAdmin && (
             <Dialog open={teamDialogOpen} onOpenChange={setTeamDialogOpen}>
               <DialogTrigger asChild>
@@ -216,16 +178,6 @@ export default function AdminTeamsPage() {
           )}
         </div>
       </div>
-
-      {slackMembers.length > 0 && (
-        <Card className="border-[rgba(0,0,0,0.1)] bg-[#f6f5f4]" style={{ boxShadow: 'none' }}>
-          <CardContent className="pt-4 pb-3">
-            <p className="text-sm text-[#615d59] font-medium">
-              ✓ Slack 멤버 {slackMembers.length}명 로드됨 — 아래 각 팀원의 Slack 계정을 선택해주세요
-            </p>
-          </CardContent>
-        </Card>
-      )}
 
       {teams.length === 0 ? (
         <Card className="text-center py-16">
@@ -323,13 +275,6 @@ export default function AdminTeamsPage() {
                               <Badge variant="outline" className="text-xs text-[#dd5b00] border-[#dd5b00]/30">미가입</Badge>
                             )}
                           </div>
-                          {!slackMembers.length && (
-                            <p className="text-xs text-[#a39e98] mt-0.5">
-                              {member.slackUserId
-                                ? <span className="text-[#1aae39]">Slack 연결됨</span>
-                                : 'Slack 미연결'}
-                            </p>
-                          )}
                         </div>
 
                         <div className="flex gap-1 shrink-0">
@@ -369,28 +314,6 @@ export default function AdminTeamsPage() {
                         </div>
                       </div>
 
-                      {slackMembers.length > 0 && (
-                        <Select
-                          value={member.slackUserId ?? ''}
-                          onValueChange={(v) => updateSlackId(team.id, member.id, v)}
-                        >
-                          <SelectTrigger className="h-8 text-xs w-full">
-                            <SelectValue placeholder="Slack 계정 선택" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {member.slackUserId && (
-                              <SelectItem value="__none__" className="text-xs text-[#a39e98]">
-                                선택 해제
-                              </SelectItem>
-                            )}
-                            {slackMembers.map((sm) => (
-                              <SelectItem key={sm.id} value={sm.id} className="text-xs">
-                                {sm.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
                     </div>
                   </div>
                 ))

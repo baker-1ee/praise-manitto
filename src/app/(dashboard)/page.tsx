@@ -6,7 +6,7 @@ import { ManitoCard } from '@/components/manito-card'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Send, Calendar, PartyPopper, ExternalLink, ChevronRight } from 'lucide-react'
+import { Send, Calendar, PartyPopper, ChevronRight } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitials } from '@/lib/utils'
@@ -17,7 +17,7 @@ export default async function HomePage() {
 
   const me = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { avatarUrl: true, slackUserId: true },
+    select: { avatarUrl: true },
   })
 
   // 이 유저가 마니또로 참여 중인 모든 활성 스프린트 조회
@@ -68,17 +68,6 @@ export default async function HomePage() {
         <div>
           <h1 className="text-xl font-bold tracking-[-0.25px]">안녕하세요, {session.user.name}님 👋</h1>
           <p className="text-[#615d59] mt-0.5 text-sm">오늘도 팀원을 칭찬해보세요!</p>
-          {!me?.slackUserId && process.env.NEXT_PUBLIC_SLACK_INVITE_URL && (
-            <a
-              href={process.env.NEXT_PUBLIC_SLACK_INVITE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-[#c27b8c] hover:underline mt-0.5"
-            >
-              <ExternalLink className="h-3 w-3" />
-              칭찬 알림 받으려면 Slack 입장하기
-            </a>
-          )}
         </div>
       </div>
 

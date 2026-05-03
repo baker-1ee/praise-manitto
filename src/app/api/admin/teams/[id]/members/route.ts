@@ -10,11 +10,6 @@ const addSchema = z.object({
   role: z.enum(['LEADER', 'MEMBER']).default('MEMBER'),
 })
 
-const updateSlackSchema = z.object({
-  userId: z.string(),
-  slackUserId: z.string().nullable(),
-})
-
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
   if (!session || !['ADMIN', 'LEADER'].includes(session.user.role)) {
@@ -22,23 +17,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 
   const body = await req.json()
-
-  // Slack ID 매핑 업데이트
-  if (body.action === 'updateSlack') {
-    if (session.user.role === 'LEADER' && session.user.teamId !== params.id) {
-      return NextResponse.json({ error: '자신의 팀만 수정할 수 있습니다' }, { status: 403 })
-    }
-
-    const parsed = updateSlackSchema.safeParse(body)
-    if (!parsed.success) return NextResponse.json({ error: '잘못된 요청입니다' }, { status: 400 })
-
-    const user = await prisma.user.update({
-      where: { id: parsed.data.userId },
-      data: { slackUserId: parsed.data.slackUserId || null },
-      select: { id: true, name: true, slackUserId: true },
-    })
-    return NextResponse.json(user)
-  }
 
   // LEADER는 자신의 팀만 팀원 추가 가능
   if (session.user.role === 'LEADER' && session.user.teamId !== params.id) {

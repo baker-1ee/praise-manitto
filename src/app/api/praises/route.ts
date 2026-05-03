@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { sendPraiseNotification } from '@/lib/slack'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -29,14 +28,12 @@ export async function POST(req: NextRequest) {
           },
         },
         include: {
-          target: { select: { slackUserId: true } },
           sprint: { select: { status: true } },
         },
       })
     : await prisma.manitoPair.findFirst({
         where: { manitoId: session.user.id, sprint: { status: 'ACTIVE' } },
         include: {
-          target: { select: { slackUserId: true } },
           sprint: { select: { status: true } },
         },
       })
@@ -53,18 +50,6 @@ export async function POST(req: NextRequest) {
       categories: parsed.data.categories,
     },
   })
-
-  const appUrl = process.env.NEXTAUTH_URL ?? ''
-  try {
-    await sendPraiseNotification(
-      myPair.target.slackUserId,
-      parsed.data.categories,
-      parsed.data.content,
-      appUrl,
-    )
-  } catch (e) {
-    console.error('Slack 알림 실패:', e)
-  }
 
   return NextResponse.json(praise, { status: 201 })
 }

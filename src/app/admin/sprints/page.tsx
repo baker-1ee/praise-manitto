@@ -132,7 +132,7 @@ export default function AdminSprintsPage() {
     try {
       const res = await fetch(`/api/admin/sprints/${sprintId}/reveal`, { method: 'PUT' })
       if (!res.ok) throw new Error('공개에 실패했습니다')
-      toast({ title: '공개 완료! 🎉', description: '팀원들에게 Slack 알림이 발송됩니다.' })
+      toast({ title: '공개 완료! 🎉' })
       load()
       router.push(`/reveal/${sprintId}`)
     } catch (e) {
