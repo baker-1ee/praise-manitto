@@ -24,7 +24,6 @@ model User {
   name               String?   @unique
   avatarUrl          String?
   bio                String?
-  slackUserId        String?
   password           String?
   mustChangePassword Boolean   @default(false)
   role               Role      @default(MEMBER)
