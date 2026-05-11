@@ -50,7 +50,6 @@ export async function sendSprintStartEmail(params: {
   toEmail: string
   toName: string
   sprintName: string
-  appUrl: string
 }) {
   const html = baseTemplate(`
     <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px">
@@ -60,9 +59,10 @@ export async function sendSprintStartEmail(params: {
       ${params.toName}님, <strong>${params.sprintName}</strong> 스프린트가 시작되었습니다.<br>
       당신의 마니또 대상에게 따뜻한 칭찬을 전달해주세요.
     </p>
-    <a href="${params.appUrl}" style="display:inline-block;background:#0075de;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600">
-      칭찬 작성하러 가기 →
-    </a>
+    <p style="margin:0;color:#615d59;font-size:14px;line-height:1.6">
+      아래 주소로 접속하세요:<br>
+      <span style="font-size:15px;font-weight:600;color:#1a1a1a">https://manitto.jinung.com</span>
+    </p>
   `)
   await send(params.toEmail, `[칭찬 마니또] ${params.sprintName} 스프린트 시작!`, html)
 }
@@ -71,7 +71,7 @@ export async function sendPraiseReceivedEmail(params: {
   toEmail: string
   toName: string
   sprintName: string
-  appUrl: string
+  praiseContent: string
 }) {
   const html = baseTemplate(`
     <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px">
@@ -79,12 +79,12 @@ export async function sendPraiseReceivedEmail(params: {
     </h2>
     <p style="margin:0 0 20px;color:#615d59;font-size:14px;line-height:1.6">
       ${params.toName}님, <strong>${params.sprintName}</strong> 스프린트에서<br>
-      마니또가 당신에게 몰래 칭찬을 남겼어요!<br>
-      스프린트가 공개되면 누구인지 확인할 수 있어요.
+      마니또가 당신에게 몰래 칭찬을 남겼어요!
     </p>
-    <a href="${params.appUrl}/praises/received" style="display:inline-block;background:#0075de;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600">
-      칭찬 확인하기 →
-    </a>
+    <div style="background:#f6f5f4;border-radius:8px;padding:16px 20px;border-left:4px solid #0075de">
+      <p style="margin:0;font-size:15px;color:#1a1a1a;line-height:1.7;white-space:pre-wrap">${params.praiseContent}</p>
+    </div>
+    <p style="margin:16px 0 0;color:#a39e98;font-size:12px">스프린트가 공개되면 누구인지 확인할 수 있어요.</p>
   `)
   await send(params.toEmail, `[칭찬 마니또] 마니또가 칭찬을 남겼어요!`, html)
 }
@@ -93,8 +93,6 @@ export async function sendSprintRevealEmail(params: {
   toEmail: string
   toName: string
   sprintName: string
-  sprintId: string
-  appUrl: string
 }) {
   const html = baseTemplate(`
     <h2 style="margin:0 0 8px;font-size:20px;font-weight:700;color:#1a1a1a;letter-spacing:-0.5px">
@@ -102,11 +100,11 @@ export async function sendSprintRevealEmail(params: {
     </h2>
     <p style="margin:0 0 20px;color:#615d59;font-size:14px;line-height:1.6">
       ${params.toName}님, <strong>${params.sprintName}</strong> 스프린트의 마니또가 공개되었습니다!<br>
-      누가 당신의 마니또였는지 지금 확인해보세요.
+      누가 당신의 마니또였는지 아래 주소에서 확인해보세요.
     </p>
-    <a href="${params.appUrl}/reveal/${params.sprintId}" style="display:inline-block;background:#0075de;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600">
-      결과 확인하기 →
-    </a>
+    <p style="margin:0;color:#615d59;font-size:14px;line-height:1.6">
+      <span style="font-size:15px;font-weight:600;color:#1a1a1a">https://manitto.jinung.com</span>
+    </p>
   `)
   await send(params.toEmail, `[칭찬 마니또] ${params.sprintName} 마니또 공개!`, html)
 }
