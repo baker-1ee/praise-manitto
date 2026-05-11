@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { Mail } from 'lucide-react'
 import { getInitials } from '@/lib/utils'
 
 export default async function AdminUsersPage() {
@@ -13,7 +14,7 @@ export default async function AdminUsersPage() {
 
   const users = await prisma.user.findMany({
     orderBy: [{ role: 'asc' }, { name: 'asc' }],
-    select: { id: true, name: true, role: true, bio: true },
+    select: { id: true, name: true, email: true, role: true, bio: true },
   })
 
   return (
@@ -37,7 +38,14 @@ export default async function AdminUsersPage() {
                   <span className="font-semibold">{user.name}</span>
                   {user.role === 'ADMIN' && <Badge className="text-xs">관리자</Badge>}
                 </div>
-
+                {user.email ? (
+                  <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                    <Mail className="h-3 w-3 shrink-0" />
+                    {user.email}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground/60 mt-0.5">이메일 미등록</p>
+                )}
                 {user.bio && <p className="text-xs text-muted-foreground mt-0.5">{user.bio}</p>}
               </div>
             </CardContent>

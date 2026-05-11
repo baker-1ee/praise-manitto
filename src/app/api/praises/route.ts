@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { sendPraiseReceivedEmail } from '@/lib/email'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -28,13 +29,13 @@ export async function POST(req: NextRequest) {
           },
         },
         include: {
-          sprint: { select: { status: true } },
+          sprint: { select: { status: true, name: true } },
         },
       })
     : await prisma.manitoPair.findFirst({
         where: { manitoId: session.user.id, sprint: { status: 'ACTIVE' } },
         include: {
-          sprint: { select: { status: true } },
+          sprint: { select: { status: true, name: true } },
         },
       })
 
@@ -50,6 +51,20 @@ export async function POST(req: NextRequest) {
       categories: parsed.data.categories,
     },
   })
+
+  const receiver = await prisma.user.findUnique({
+    where: { id: myPair.targetId },
+    select: { email: true, name: true },
+  })
+
+  if (receiver?.email) {
+    await sendPraiseReceivedEmail({
+      toEmail: receiver.email,
+      toName: receiver.name ?? '팀원',
+      sprintName: myPair.sprint.name,
+      appUrl: process.env.NEXTAUTH_URL ?? '',
+    }).catch(() => {})
+  }
 
   return NextResponse.json(praise, { status: 201 })
 }

@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Plus, Copy, Check, Users, KeyRound, Trash2 } from 'lucide-react'
+import { Plus, Copy, Check, Users, KeyRound, Trash2, Mail, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,16 +18,29 @@ import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/use-toast'
 import { getInitials } from '@/lib/utils'
 
-interface Member { id: string; name: string | null; role: string; avatarUrl: string | null; hasPassword: boolean; inviteToken?: { token: string; usedAt: string | null } | null }
+interface Member {
+  id: string
+  name: string | null
+  email: string | null
+  role: string
+  avatarUrl: string | null
+  hasPassword: boolean
+  inviteToken?: { token: string; usedAt: string | null } | null
+}
 interface Team { id: string; name: string; members: Member[] }
 
 const teamSchema = z.object({ name: z.string().min(1, '팀 이름을 입력해주세요') })
 const memberSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요'),
+  email: z.string().email('올바른 이메일 형식이 아닙니다').optional().or(z.literal('')),
   role: z.enum(['LEADER', 'MEMBER']),
+})
+const emailSchema = z.object({
+  email: z.string().email('올바른 이메일 형식이 아닙니다').optional().or(z.literal('')),
 })
 type TeamForm = z.infer<typeof teamSchema>
 type MemberForm = z.infer<typeof memberSchema>
+type EmailForm = z.infer<typeof emailSchema>
 
 const ROLE_LABEL: Record<string, string> = { LEADER: '리더', MEMBER: '멤버' }
 
@@ -39,9 +52,11 @@ export default function AdminTeamsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [teamDialogOpen, setTeamDialogOpen] = useState(false)
   const [memberDialogTeamId, setMemberDialogTeamId] = useState<string | null>(null)
+  const [emailEditMember, setEmailEditMember] = useState<Member | null>(null)
 
   const teamForm = useForm<TeamForm>({ resolver: zodResolver(teamSchema) })
   const memberForm = useForm<MemberForm>({ resolver: zodResolver(memberSchema), defaultValues: { role: 'MEMBER' } })
+  const emailForm = useForm<EmailForm>({ resolver: zodResolver(emailSchema) })
 
   const loadTeams = useCallback(async () => {
     const res = await fetch('/api/admin/teams')
@@ -83,6 +98,24 @@ export default function AdminTeamsPage() {
     toast({ title: '팀원이 추가되었습니다', description: '초대링크를 복사해서 공유하세요' })
     memberForm.reset({ role: 'MEMBER' })
     setMemberDialogTeamId(null)
+    loadTeams()
+  }
+
+  const updateEmail = async (data: EmailForm) => {
+    if (!emailEditMember) return
+    const res = await fetch(`/api/admin/users/${emailEditMember.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: data.email || '' }),
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      toast({ variant: 'destructive', title: '오류', description: err.error })
+      return
+    }
+    toast({ title: '이메일이 저장되었습니다' })
+    setEmailEditMember(null)
+    emailForm.reset()
     loadTeams()
   }
 
@@ -179,6 +212,44 @@ export default function AdminTeamsPage() {
         </div>
       </div>
 
+      {/* 이메일 수정 다이얼로그 */}
+      <Dialog
+        open={!!emailEditMember}
+        onOpenChange={(o) => {
+          if (!o) { setEmailEditMember(null); emailForm.reset() }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="tracking-[-0.25px]">이메일 수정 — {emailEditMember?.name}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={emailForm.handleSubmit(updateEmail)} className="space-y-4 mt-2">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">이메일</Label>
+              <Input
+                type="email"
+                placeholder="example@company.com"
+                {...emailForm.register('email')}
+              />
+              {emailForm.formState.errors.email && (
+                <p className="text-xs text-destructive">{emailForm.formState.errors.email.message}</p>
+              )}
+              <p className="text-xs text-[#a39e98]">비워두면 이메일 알림이 발송되지 않습니다.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" className="flex-1">저장</Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => { setEmailEditMember(null); emailForm.reset() }}
+              >
+                취소
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {teams.length === 0 ? (
         <Card className="text-center py-16">
           <CardContent>
@@ -215,6 +286,14 @@ export default function AdminTeamsPage() {
                         {memberForm.formState.errors.name && (
                           <p className="text-xs text-destructive">{memberForm.formState.errors.name.message}</p>
                         )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">이메일</Label>
+                        <Input type="email" placeholder="example@company.com" {...memberForm.register('email')} />
+                        {memberForm.formState.errors.email && (
+                          <p className="text-xs text-destructive">{memberForm.formState.errors.email.message}</p>
+                        )}
+                        <p className="text-xs text-[#a39e98]">입력하면 스프린트 알림 메일을 받을 수 있어요.</p>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-sm font-medium">역할</Label>
@@ -275,9 +354,29 @@ export default function AdminTeamsPage() {
                               <Badge variant="outline" className="text-xs text-[#dd5b00] border-[#dd5b00]/30">미가입</Badge>
                             )}
                           </div>
+                          {member.email ? (
+                            <p className="text-xs text-[#615d59] mt-0.5 flex items-center gap-1">
+                              <Mail className="h-3 w-3 shrink-0" />
+                              {member.email}
+                            </p>
+                          ) : (
+                            <p className="text-xs text-[#a39e98] mt-0.5">이메일 미등록</p>
+                          )}
                         </div>
 
                         <div className="flex gap-1 shrink-0">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8 text-[#615d59]"
+                            onClick={() => {
+                              setEmailEditMember(member)
+                              emailForm.reset({ email: member.email ?? '' })
+                            }}
+                            title="이메일 수정"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
                           <Button
                             size="icon"
                             variant="ghost"
