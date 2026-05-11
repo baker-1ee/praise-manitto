@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { assignManito } from '@/lib/manito'
+import { sendSprintStartEmail } from '@/lib/email'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest) {
 
   const members = await prisma.user.findMany({
     where: { teamId: parsed.data.teamId },
-    select: { id: true },
+    select: { id: true, name: true, email: true },
   })
 
   if (members.length < 2) {
@@ -71,6 +72,20 @@ export async function POST(req: NextRequest) {
       },
     },
   })
+
+  const appUrl = process.env.NEXTAUTH_URL ?? ''
+  await Promise.allSettled(
+    members
+      .filter((m) => m.email)
+      .map((m) =>
+        sendSprintStartEmail({
+          toEmail: m.email!,
+          toName: m.name ?? '팀원',
+          sprintName: sprint.name,
+          appUrl,
+        })
+      )
+  )
 
   return NextResponse.json(sprint, { status: 201 })
 }

@@ -23,7 +23,7 @@ export async function GET() {
     orderBy: { createdAt: 'desc' },
     include: {
       members: {
-        select: { id: true, name: true, role: true, avatarUrl: true, password: true, inviteToken: { select: { token: true, usedAt: true } } },
+        select: { id: true, name: true, email: true, role: true, avatarUrl: true, password: true, inviteToken: { select: { token: true, usedAt: true } } },
         orderBy: [{ role: 'asc' }, { name: 'asc' }],
       },
     },
@@ -31,8 +31,9 @@ export async function GET() {
 
   const result = teams.map((team) => ({
     ...team,
-    members: team.members.map(({ password, ...m }) => ({
+    members: team.members.map(({ password, email, ...m }) => ({
       ...m,
+      email: email ?? null,
       hasPassword: !!password,
     })),
   }))

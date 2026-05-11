@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { sendSprintRevealEmail } from '@/lib/email'
 
 export async function PUT(_req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
@@ -23,6 +24,28 @@ export async function PUT(_req: NextRequest, { params }: { params: { id: string 
     where: { id: params.id },
     data: { status: 'REVEALED' },
   })
+
+  if (sprint.teamId) {
+    const members = await prisma.user.findMany({
+      where: { teamId: sprint.teamId },
+      select: { email: true, name: true },
+    })
+
+    const appUrl = process.env.NEXTAUTH_URL ?? ''
+    await Promise.allSettled(
+      members
+        .filter((m) => m.email)
+        .map((m) =>
+          sendSprintRevealEmail({
+            toEmail: m.email!,
+            toName: m.name ?? '팀원',
+            sprintName: sprint.name,
+            sprintId: sprint.id,
+            appUrl,
+          })
+        )
+    )
+  }
 
   return NextResponse.json(updated)
 }
