@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       toEmail: receiver.email,
       toName: receiver.name ?? '팀원',
       sprintName: myPair.sprint.name,
-      appUrl: process.env.NEXTAUTH_URL ?? '',
+      praiseContent: parsed.data.content,
     }).catch(() => {})
   }
 

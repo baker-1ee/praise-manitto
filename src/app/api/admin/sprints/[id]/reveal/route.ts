@@ -31,7 +31,6 @@ export async function PUT(_req: NextRequest, { params }: { params: { id: string 
       select: { email: true, name: true },
     })
 
-    const appUrl = process.env.NEXTAUTH_URL ?? ''
     await Promise.allSettled(
       members
         .filter((m) => m.email)
@@ -40,8 +39,6 @@ export async function PUT(_req: NextRequest, { params }: { params: { id: string 
             toEmail: m.email!,
             toName: m.name ?? '팀원',
             sprintName: sprint.name,
-            sprintId: sprint.id,
-            appUrl,
           })
         )
     )

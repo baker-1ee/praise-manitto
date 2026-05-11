@@ -73,7 +73,6 @@ export async function POST(req: NextRequest) {
     },
   })
 
-  const appUrl = process.env.NEXTAUTH_URL ?? ''
   await Promise.allSettled(
     members
       .filter((m) => m.email)
@@ -82,7 +81,6 @@ export async function POST(req: NextRequest) {
           toEmail: m.email!,
           toName: m.name ?? '팀원',
           sprintName: sprint.name,
-          appUrl,
         })
       )
   )
