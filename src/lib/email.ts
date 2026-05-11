@@ -27,7 +27,7 @@ export async function sendSprintStartEmail(params: {
   sprintName: string
 }) {
   const text = [
-    `[칭찬 마니또] 새 스프린트가 시작되었어요!`,
+    `[칭찬 마니또] 새 스프린트가 시작되었어요! 🚀`,
     ``,
     `${params.toName}님, ${params.sprintName} 스프린트가 시작되었습니다.`,
     `당신의 마니또 대상에게 따뜻한 칭찬을 전달해주세요.`,
@@ -46,7 +46,7 @@ export async function sendPraiseReceivedEmail(params: {
   praiseContent: string
 }) {
   const text = [
-    `[칭찬 마니또] 익명의 마니또가 칭찬을 보냈어요`,
+    `[칭찬 마니또] 익명의 마니또가 칭찬을 보냈어요 💌`,
     ``,
     `${params.toName}님, ${params.sprintName} 스프린트에서`,
     `마니또가 당신에게 몰래 칭찬을 남겼어요!`,
@@ -69,7 +69,7 @@ export async function sendSprintRevealEmail(params: {
   sprintName: string
 }) {
   const text = [
-    `[칭찬 마니또] 마니또가 공개되었어요!`,
+    `[칭찬 마니또] 마니또가 공개되었어요! 🎉`,
     ``,
     `${params.toName}님, ${params.sprintName} 스프린트의 마니또가 공개되었습니다!`,
     `누가 당신의 마니또였는지 아래 주소에서 확인해보세요.`,
