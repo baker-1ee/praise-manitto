@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X, Download, Share, Plus } from 'lucide-react'
+import { X, Download, Share } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 function isStandalone() {
@@ -39,9 +39,13 @@ export function KakaoBanner() {
 
   const dismiss = () => setShow(false)
 
-  const openExternal = () => {
+  const openExternalAndroid = () => {
     const url = window.location.href.replace(/^https?:\/\//, '')
     window.location.href = `intent://${url}#Intent;scheme=https;package=com.android.chrome;end`
+  }
+
+  const openExternalIOS = () => {
+    window.location.href = `x-safari-${window.location.href}`
   }
 
   return (
@@ -72,19 +76,16 @@ export function KakaoBanner() {
         </div>
 
         {!ios ? (
-          <Button className="w-full gap-2" onClick={openExternal}>
+          <Button className="w-full gap-2" onClick={openExternalAndroid}>
             <Share className="h-4 w-4" />
             Chrome에서 열기
           </Button>
         ) : (
           <>
-            <div className="rounded-lg bg-muted/50 p-4 space-y-2 text-sm text-center">
-              <p className="font-medium">iPhone 사용자</p>
-              <p className="text-muted-foreground">
-                하단 <span className="font-semibold">···</span> 메뉴 →{' '}
-                <span className="font-semibold">기본 브라우저로 열기</span>를 탭해주세요
-              </p>
-            </div>
+            <Button className="w-full gap-2" onClick={openExternalIOS}>
+              <Share className="h-4 w-4" />
+              Safari에서 열기
+            </Button>
             <Button variant="outline" className="w-full" onClick={dismiss}>
               닫고 계속 이용하기
             </Button>
@@ -97,6 +98,25 @@ export function KakaoBanner() {
 
 // ─── PWA 설치 유도 팝업 ────────────────────────────────────────────────────────
 
+const PWA_DISMISSED_KEY = 'pwa_install_dismissed_at'
+const DISMISS_TTL_MS = 14 * 24 * 60 * 60 * 1000 // 14일
+
+function hasDismissedRecently(): boolean {
+  try {
+    const ts = localStorage.getItem(PWA_DISMISSED_KEY)
+    if (!ts) return false
+    return Date.now() - parseInt(ts) < DISMISS_TTL_MS
+  } catch {
+    return false
+  }
+}
+
+function saveDismiss() {
+  try {
+    localStorage.setItem(PWA_DISMISSED_KEY, Date.now().toString())
+  } catch {}
+}
+
 type PromptType = 'android' | 'ios' | null
 
 export function PwaInstallPrompt() {
@@ -107,6 +127,8 @@ export function PwaInstallPrompt() {
   useEffect(() => {
     // PWA로 이미 실행 중이거나 카카오톡 브라우저면 스킵
     if (isStandalone() || isKakaoTalkBrowser()) return
+    // 최근 14일 내에 닫은 적 있으면 스킵
+    if (hasDismissedRecently()) return
 
     if (isIOS()) {
       setPromptType('ios')
@@ -125,6 +147,7 @@ export function PwaInstallPrompt() {
   }, [])
 
   const dismiss = () => {
+    saveDismiss()
     setPromptType(null)
   }
 
@@ -133,6 +156,7 @@ export function PwaInstallPrompt() {
     deferredPrompt.prompt()
     await deferredPrompt.userChoice
     setDeferredPrompt(null)
+    saveDismiss()
     setPromptType(null)
   }
 
@@ -167,19 +191,21 @@ export function PwaInstallPrompt() {
         )}
 
         {promptType === 'ios' && (
-          <div className="mt-3 rounded-xl bg-muted/60 p-4 space-y-2 text-sm">
-            <p className="font-medium text-center">홈 화면에 추가하는 방법</p>
-            <div className="space-y-1.5 text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Share className="h-4 w-4 shrink-0 text-blue-500" />
-                <span>하단 공유 버튼을 탭하세요</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Plus className="h-4 w-4 shrink-0 text-blue-500" />
-                <span><span className="font-medium">홈 화면에 추가</span>를 선택하세요</span>
-              </div>
+          <div className="mt-3 space-y-2">
+            <div className="rounded-xl bg-muted/60 p-4 space-y-3 text-sm">
+              <p className="font-medium text-center">홈 화면에 추가하는 방법</p>
+              <ol className="space-y-2 text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">1</span>
+                  <span>하단 <Share className="inline h-3.5 w-3.5 text-blue-500 mx-0.5" /> 공유 버튼을 탭하세요</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">2</span>
+                  <span><span className="font-medium text-foreground">홈 화면에 추가</span>를 선택하세요</span>
+                </li>
+              </ol>
             </div>
-            <Button size="sm" variant="outline" className="w-full mt-1" onClick={dismiss}>
+            <Button size="sm" variant="outline" className="w-full" onClick={dismiss}>
               닫기
             </Button>
           </div>
