@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Send, MessageSquare } from 'lucide-react'
+import { Send, MessageSquare, Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -50,7 +50,7 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
         throw new Error(err.error || '오류가 발생했습니다')
       }
 
-      toast({ title: '편지를 보냈어요! 💌', description: `${targetName}님에게 익명으로 전달됩니다.` })
+      toast({ title: '칭찬을 보냈어요!', description: `${targetName}님에게 익명으로 전달됩니다.` })
       reset()
       onSuccess?.()
       router.push(`/praises/sent?sprintId=${sprintId}`)
@@ -63,141 +63,79 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-      {/* 편지지 */}
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{
-          background: 'linear-gradient(150deg, #fffef7 0%, #fdf8ec 100%)',
-          border: '1px solid #ddd0b0',
-          boxShadow: '0 4px 20px rgba(120,95,50,0.10), 0 1px 0 rgba(255,255,255,0.85) inset',
-        }}
-      >
-        {/* 편지 헤더 — 수신인 */}
-        <div
-          className="px-6 pt-5 pb-4"
-          style={{ borderBottom: '1.5px dashed #ddd0b0' }}
-        >
-          <div className="flex items-center gap-3">
-            <Avatar className="h-11 w-11 shrink-0 ring-2 ring-[#e8d9b8] ring-offset-1">
-              {targetAvatarUrl && <AvatarImage src={targetAvatarUrl} />}
-              <AvatarFallback className="bg-[#f5ecd8] text-[#8a6a30] font-semibold text-base">
-                {getInitials(targetName)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p
-                className="text-xs font-medium"
-                style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
-              >
-                To.
-              </p>
-              <p
-                className="text-xl font-bold leading-tight"
-                style={{ color: '#3d2b10', fontFamily: 'Georgia, serif' }}
-              >
-                {targetName}님에게
-              </p>
-              {targetBio && (
-                <p className="text-xs mt-0.5 truncate" style={{ color: '#a08050' }}>
-                  {targetBio}
-                </p>
-              )}
-            </div>
-            <span className="text-3xl select-none">💌</span>
+      {/* 수신인 카드 */}
+      <div className="bg-white rounded-2xl border border-[hsl(263_50%_90%)] shadow-[0_4px_18px_rgba(124,58,237,0.04),0_2px_8px_rgba(124,58,237,0.03)]">
+        {/* 수신인 */}
+        <div className="px-5 pt-5 pb-4 flex items-center gap-3 border-b border-[hsl(263_50%_90%)]">
+          <Avatar className="h-11 w-11 shrink-0 ring-2 ring-violet-200 ring-offset-1">
+            {targetAvatarUrl && <AvatarImage src={targetAvatarUrl} />}
+            <AvatarFallback className="bg-violet-50 text-violet-600 font-semibold text-base">
+              {getInitials(targetName)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-[hsl(265_18%_45%)] tracking-wide uppercase">받는 사람</p>
+            <p className="text-lg font-bold tracking-[-0.5px] text-[hsl(267_50%_10%)] leading-tight">
+              {targetName}
+            </p>
+            {targetBio && (
+              <p className="text-xs mt-0.5 truncate text-[hsl(265_18%_45%)]">{targetBio}</p>
+            )}
           </div>
         </div>
 
-        {/* 편지 본문 — 줄노트 textarea */}
-        <div className="px-6 py-1">
+        {/* 내용 입력 */}
+        <div className="px-5 py-4">
           <textarea
             {...register('content')}
-            placeholder="진심 어린 칭찬이 큰 힘이 됩니다."
-            style={{
-              width: '100%',
-              minHeight: '102px',
-              backgroundColor: 'transparent',
-              backgroundImage:
-                'repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, rgba(180,155,100,0.22) 27px, rgba(180,155,100,0.22) 28px)',
-              backgroundAttachment: 'local',
-              backgroundPositionY: '10px',
-              border: 'none',
-              outline: 'none',
-              resize: 'none',
-              fontFamily: 'Georgia, "Nanum Myeongjo", "Malgun Gothic", serif',
-              fontSize: '14.5px',
-              lineHeight: '28px',
-              color: '#2d1e08',
-              paddingTop: '10px',
-              paddingBottom: '8px',
-            }}
+            placeholder="진심 어린 칭찬을 작성해보세요."
+            className="w-full min-h-[120px] resize-none bg-transparent border-none outline-none text-[15px] leading-relaxed text-[hsl(267_50%_10%)] placeholder:text-[#9c95b8]"
           />
         </div>
 
-        {/* 편지 푸터 — 발신인 */}
-        <div
-          className="px-6 pt-3 pb-5"
-          style={{ borderTop: '1.5px dashed #ddd0b0' }}
-        >
-          <div className="flex items-end justify-between">
-            <p
-              className="text-sm"
-              style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
-            >
-              — 익명의 마니또로부터 ♥
-            </p>
-            <div className="text-right">
-              <span
-                className={cn(
-                  'text-xs font-medium tabular-nums',
-                  contentLength > 500 ? 'text-red-500' : contentLength >= 10 ? 'text-[#7a9e60]' : 'text-[#b8a888]',
-                )}
-              >
-                {contentLength} / 500
-              </span>
-              {errors.content && (
-                <p className="text-xs text-red-500 mt-0.5">{errors.content.message}</p>
-              )}
-            </div>
-          </div>
+        {/* 하단 카운터 */}
+        <div className="px-5 pb-4 flex items-center justify-end gap-2">
+          {errors.content && (
+            <p className="text-xs text-red-500 flex-1">{errors.content.message}</p>
+          )}
+          <span
+            className={cn(
+              'text-xs font-medium tabular-nums',
+              contentLength > 500 ? 'text-red-500' : contentLength >= 10 ? 'text-violet-500' : 'text-[#9c95b8]',
+            )}
+          >
+            {contentLength} / 500
+          </span>
         </div>
       </div>
 
-      {/* 도장 느낌의 익명 배지 */}
+      {/* 익명 배지 */}
       <div className="flex justify-center">
-        <span
-          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full"
-          style={{
-            color: '#a08050',
-            background: 'rgba(200,170,100,0.12)',
-            border: '1px dashed #c8a864',
-          }}
-        >
-          🔒 발신자는 스프린트 공개 전까지 알 수 없어요
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[#f0ebff] text-[#7c3aed]">
+          <Lock className="h-3 w-3" />
+          발신자는 스프린트 공개 전까지 알 수 없어요
         </span>
       </div>
 
       {/* 전송 버튼 */}
       <Button
         type="submit"
-        className="w-full gap-2 h-12 text-base font-semibold rounded-xl"
-        style={{
-          background: 'linear-gradient(135deg, #c27b8c 0%, #a86475 100%)',
-          boxShadow: '0 4px 14px rgba(194,123,140,0.40)',
-        }}
+        className="w-full gap-2 h-12 text-base font-semibold rounded-xl bg-[#7c3aed] hover:bg-[#6d28d9] text-white"
+        style={{ boxShadow: '0 4px 14px rgba(124,58,237,0.30)' }}
         disabled={isSubmitting}
       >
         <Send className="h-4 w-4" />
-        {isSubmitting ? '편지 보내는 중...' : '편지 봉투에 넣어 보내기'}
+        {isSubmitting ? '보내는 중...' : '칭찬 보내기'}
       </Button>
 
       <Button
         type="button"
         variant="ghost"
-        className="w-full gap-2 text-[#a39e98]"
+        className="w-full gap-2 text-[hsl(265_18%_45%)] hover:text-[#7c3aed] hover:bg-[rgba(124,58,237,0.06)]"
         onClick={() => router.push(`/praises/sent?sprintId=${sprintId}`)}
       >
         <MessageSquare className="h-4 w-4" />
-        보낸 편지 보기
+        보낸 칭찬 보기
       </Button>
     </form>
   )
