@@ -84,6 +84,14 @@ const config: Config = {
           from: { opacity: '0', transform: 'translateX(-20px)' },
           to: { opacity: '1', transform: 'translateX(0)' },
         },
+        'dizzy-spin': {
+          '0%': { transform: 'rotateY(180deg)' },
+          '30%': { transform: 'rotateY(540deg)' },
+          '60%': { transform: 'rotateY(840deg)' },
+          '80%': { transform: 'rotateY(895deg)' },
+          '90%': { transform: 'rotateY(875deg)' },
+          '100%': { transform: 'rotateY(900deg)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -91,6 +99,7 @@ const config: Config = {
         flip: 'flip 0.6s ease-in-out forwards',
         'slide-in': 'slide-in 0.3s ease-out',
         'slide-in-from-left': 'slide-in-from-left 0.3s ease-out',
+        'dizzy-spin': 'dizzy-spin 1.6s ease-in-out forwards',
       },
       letterSpacing: {
         'display': '-2.125px',

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Gift, User } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +19,9 @@ interface ManitoCardProps {
 
 export function ManitoCard({ target, sprintName }: ManitoCardProps) {
   const [flipped, setFlipped] = useState(false)
+  const [isDizzy, setIsDizzy] = useState(false)
+  const clickCountRef = useRef(0)
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   if (!target) {
     return (
@@ -29,19 +32,48 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
     )
   }
 
+  const handleClick = () => {
+    if (isDizzy) return
+
+    if (!flipped) {
+      setFlipped(true)
+      clickCountRef.current = 0
+      return
+    }
+
+    clickCountRef.current += 1
+
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
+    resetTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0
+    }, 1500)
+
+    if (clickCountRef.current >= 4) {
+      clickCountRef.current = 0
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current)
+      setIsDizzy(true)
+    }
+  }
+
+  const handleAnimationEnd = () => {
+    setIsDizzy(false)
+  }
+
   return (
     <div
       className="perspective-1000 cursor-pointer w-full max-w-sm mx-auto"
-      onClick={() => setFlipped((f) => !f)}
+      onClick={handleClick}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && setFlipped((f) => !f)}
+      onKeyDown={(e) => e.key === 'Enter' && handleClick()}
     >
       <div
         className={cn(
           'relative h-36 transform-style-3d transition-transform duration-700',
-          flipped && 'rotate-y-180',
+          flipped && !isDizzy && 'rotate-y-180',
+          isDizzy && 'animate-dizzy-spin',
         )}
+        onAnimationEnd={handleAnimationEnd}
       >
         {/* 앞면 */}
         <div className="absolute inset-0 backface-hidden rounded-xl border border-[rgba(160,100,80,0.15)] bg-[#f4ebe3] shadow-notion-card flex items-center gap-5 px-6">
@@ -64,10 +96,16 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-xs text-[#b09880] mb-0.5">이번 스프린트 마니또 대상</p>
-            <p className="font-bold text-xl text-[#c27b8c] tracking-[-0.25px]">{target.name}</p>
-            {target.bio && <p className="text-sm text-[#7a6050] mt-1">{target.bio}</p>}
-            <Badge className="mt-2">나만 알 수 있어요 🤫</Badge>
+            {isDizzy ? (
+              <p className="text-2xl select-none">어지러워요~ 😵‍💫</p>
+            ) : (
+              <>
+                <p className="text-xs text-[#b09880] mb-0.5">이번 스프린트 마니또 대상</p>
+                <p className="font-bold text-xl text-[#c27b8c] tracking-[-0.25px]">{target.name}</p>
+                {target.bio && <p className="text-sm text-[#7a6050] mt-1">{target.bio}</p>}
+                <Badge className="mt-2">나만 알 수 있어요 🤫</Badge>
+              </>
+            )}
           </div>
         </div>
       </div>
