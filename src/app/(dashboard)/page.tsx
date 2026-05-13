@@ -76,23 +76,19 @@ export default async function HomePage() {
           {activePairsWithStats.map(({ sprint, target, sentCount, receivedCount }) => (
             <div key={sprint.id} className="space-y-3">
               {/* 스프린트 헤더 */}
-              <div className="flex items-center justify-between px-1">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-[#7c3aed]" />
-                  <span className="text-sm font-semibold text-foreground tracking-[-0.25px]">
-                    {/^\d{4}-\d{2}-\d{2}$/.test(sprint.name)
-                      ? `${formatDate(sprint.startDate)} ~ ${formatDate(sprint.endDate)}`
-                      : sprint.name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {!/^\d{4}-\d{2}-\d{2}$/.test(sprint.name) && (
-                    <p className="text-xs text-[#9c95b8]">
-                      {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
-                    </p>
-                  )}
+              <div className="px-1 space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-[#7c3aed]" />
+                    <span className="text-sm font-semibold text-foreground tracking-[-0.25px]">
+                      {sprint.name}
+                    </span>
+                  </div>
                   <Badge variant="default" className="text-[11px]">진행 중</Badge>
                 </div>
+                <p className="text-xs text-[#9c95b8] pl-6">
+                  {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
+                </p>
               </div>
 
               {/* 마니또 카드 */}
