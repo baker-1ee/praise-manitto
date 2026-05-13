@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
-import { Heart, Home, Send, Inbox, Settings, LogOut, Users } from 'lucide-react'
+import { Heart, Home, Send, Inbox, Settings, LogOut, Users, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn, getInitials } from '@/lib/utils'
@@ -12,10 +12,12 @@ const mainNavItems = [
   { href: '/', label: '홈', icon: Home, exact: true },
   { href: '/praise/write', label: '칭찬 쓰기', icon: Send, exact: true },
   { href: '/praises/received', label: '받은 칭찬', icon: Inbox, exact: false },
+  { href: '/sprints', label: '스프린트', icon: Clock, exact: false },
 ]
 
 const bottomMainNavItems = [
   { href: '/', label: '홈', icon: Home, exact: true },
+  { href: '/sprints', label: '스프린트', icon: Clock, exact: false },
 ]
 
 const adminNavItems = [
