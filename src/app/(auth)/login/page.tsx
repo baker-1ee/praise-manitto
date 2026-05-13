@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Heart, Loader2 } from 'lucide-react'
+import { Mail, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -45,6 +45,7 @@ function LoginForm() {
   useEffect(() => {
     if (isKakaoTalkBrowser()) return
 
+    // prefillName보다 자동로그인 먼저 시도
     const saved = localStorage.getItem(AUTO_LOGIN_KEY)
     if (saved) {
       try {
@@ -99,15 +100,15 @@ function LoginForm() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary shadow-card">
-              <Heart className="h-6 w-6 text-white fill-white" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#7C3AED] shadow-notion-card">
+              <Mail className="h-6 w-6 text-white" />
             </div>
           </div>
-          <h1 className="font-serif text-3xl font-bold tracking-heading text-foreground">칭찬 마니또</h1>
-          <p className="text-sm text-muted-foreground mt-2">팀원에게 익명으로 칭찬을 전해보세요 💌</p>
+          <h1 className="text-2xl font-bold tracking-[-0.625px] text-foreground">칭찬 마니또</h1>
+          <p className="text-sm text-[#615d59] mt-1.5">팀원에게 익명으로 칭찬을 전해보세요 💌</p>
         </div>
 
-        <Card className="shadow-deep border-[rgba(28,26,23,0.15)]">
+        <Card className="shadow-notion-deep">
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
@@ -128,17 +129,17 @@ function LoginForm() {
                   onCheckedChange={(v) => setAutoLogin(!!v)}
                   disabled={loading}
                 />
-                <Label htmlFor="autoLogin" className="text-sm font-normal cursor-pointer text-muted-foreground">
+                <Label htmlFor="autoLogin" className="text-sm font-normal cursor-pointer text-[#615d59]">
                   다음부터 자동으로 로그인하기
                 </Label>
               </div>
 
               {error && (
-                <div className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
                   {error}
                 </div>
               )}
-              <Button type="submit" className="w-full h-11" disabled={loading}>
+              <Button type="submit" className="w-full" disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {loading ? '로그인 중...' : '로그인'}
               </Button>

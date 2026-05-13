@@ -185,8 +185,8 @@ export default function AdminTeamsPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl font-bold tracking-heading">팀 & 멤버 관리</h1>
-          <p className="text-muted-foreground mt-1 text-sm">팀을 구성하고 초대링크로 팀원을 온보딩하세요</p>
+          <h1 className="text-2xl font-bold tracking-[-0.625px]">팀 & 멤버 관리</h1>
+          <p className="text-[#615d59] mt-1 text-sm">팀을 구성하고 초대링크로 팀원을 온보딩하세요</p>
         </div>
         <div className="flex gap-2 shrink-0">
           {isAdmin && (
@@ -195,7 +195,7 @@ export default function AdminTeamsPage() {
                 <Button className="gap-2"><Plus className="h-4 w-4" /> 팀 생성</Button>
               </DialogTrigger>
               <DialogContent>
-                <DialogHeader><DialogTitle className="font-serif tracking-subheading">새 팀 생성</DialogTitle></DialogHeader>
+                <DialogHeader><DialogTitle className="tracking-[-0.25px]">새 팀 생성</DialogTitle></DialogHeader>
                 <form onSubmit={teamForm.handleSubmit(createTeam)} className="space-y-4 mt-2">
                   <div className="space-y-2">
                     <Label className="text-sm font-medium">팀 이름</Label>
@@ -221,7 +221,7 @@ export default function AdminTeamsPage() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-serif tracking-subheading">이메일 수정 — {emailEditMember?.name}</DialogTitle>
+            <DialogTitle className="tracking-[-0.25px]">이메일 수정 — {emailEditMember?.name}</DialogTitle>
           </DialogHeader>
           <form onSubmit={emailForm.handleSubmit(updateEmail)} className="space-y-4 mt-2">
             <div className="space-y-2">
@@ -234,7 +234,7 @@ export default function AdminTeamsPage() {
               {emailForm.formState.errors.email && (
                 <p className="text-xs text-destructive">{emailForm.formState.errors.email.message}</p>
               )}
-              <p className="text-xs text-muted-foreground">비워두면 이메일 알림이 발송되지 않습니다.</p>
+              <p className="text-xs text-[#a39e98]">비워두면 이메일 알림이 발송되지 않습니다.</p>
             </div>
             <div className="flex gap-2">
               <Button type="submit" className="flex-1">저장</Button>
@@ -253,9 +253,9 @@ export default function AdminTeamsPage() {
       {teams.length === 0 ? (
         <Card className="text-center py-16">
           <CardContent>
-            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-            <p className="font-serif font-bold tracking-subheading">아직 생성된 팀이 없어요</p>
-            <p className="text-sm text-muted-foreground mt-1">팀 생성 버튼으로 시작하세요</p>
+            <Users className="h-12 w-12 mx-auto text-[#a39e98] mb-3" />
+            <p className="font-semibold tracking-[-0.25px]">아직 생성된 팀이 없어요</p>
+            <p className="text-sm text-[#615d59] mt-1">팀 생성 버튼으로 시작하세요</p>
           </CardContent>
         </Card>
       ) : (
@@ -265,7 +265,7 @@ export default function AdminTeamsPage() {
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <CardTitle className="text-base">{team.name}</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-0.5">{team.members.length}명</p>
+                  <p className="text-xs text-[#a39e98] mt-0.5">{team.members.length}명</p>
                 </div>
                 <div className="flex gap-1">
                   <Dialog
@@ -278,7 +278,7 @@ export default function AdminTeamsPage() {
                       </Button>
                     </DialogTrigger>
                   <DialogContent>
-                    <DialogHeader><DialogTitle className="font-serif tracking-subheading">팀원 추가 — {team.name}</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle className="tracking-[-0.25px]">팀원 추가 — {team.name}</DialogTitle></DialogHeader>
                     <form onSubmit={memberForm.handleSubmit(addMember)} className="space-y-4 mt-2">
                       <div className="space-y-2">
                         <Label className="text-sm font-medium">이름 <span className="text-destructive">*</span></Label>
@@ -293,7 +293,7 @@ export default function AdminTeamsPage() {
                         {memberForm.formState.errors.email && (
                           <p className="text-xs text-destructive">{memberForm.formState.errors.email.message}</p>
                         )}
-                        <p className="text-xs text-muted-foreground">입력하면 스프린트 알림 메일을 받을 수 있어요.</p>
+                        <p className="text-xs text-[#a39e98]">입력하면 스프린트 알림 메일을 받을 수 있어요.</p>
                       </div>
                       <div className="space-y-2">
                         <Label className="text-sm font-medium">역할</Label>
@@ -328,7 +328,7 @@ export default function AdminTeamsPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               {team.members.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">팀원이 없어요. 팀원을 추가해주세요.</p>
+                <p className="text-sm text-[#615d59] text-center py-4">팀원이 없어요. 팀원을 추가해주세요.</p>
               ) : (
                 team.members.map((member, i) => (
                   <div key={member.id}>
@@ -337,7 +337,7 @@ export default function AdminTeamsPage() {
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9 shrink-0">
                           {member.avatarUrl && <AvatarImage src={member.avatarUrl} />}
-                          <AvatarFallback className="text-sm bg-[#FEF0EA] text-primary font-semibold">
+                          <AvatarFallback className="text-sm bg-[#f2f9ff] text-[#097fe8] font-semibold">
                             {getInitials(member.name)}
                           </AvatarFallback>
                         </Avatar>
@@ -349,18 +349,18 @@ export default function AdminTeamsPage() {
                               {ROLE_LABEL[member.role]}
                             </Badge>
                             {member.hasPassword ? (
-                              <Badge variant="outline" className="text-xs text-green-600 border-green-600/30">가입 완료</Badge>
+                              <Badge variant="outline" className="text-xs text-[#1aae39] border-[#1aae39]/30">가입 완료</Badge>
                             ) : (
-                              <Badge variant="outline" className="text-xs text-destructive border-destructive/30">미가입</Badge>
+                              <Badge variant="outline" className="text-xs text-[#dd5b00] border-[#dd5b00]/30">미가입</Badge>
                             )}
                           </div>
                           {member.email ? (
-                            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                            <p className="text-xs text-[#615d59] mt-0.5 flex items-center gap-1">
                               <Mail className="h-3 w-3 shrink-0" />
                               {member.email}
                             </p>
                           ) : (
-                            <p className="text-xs text-muted-foreground/60 mt-0.5">이메일 미등록</p>
+                            <p className="text-xs text-[#a39e98] mt-0.5">이메일 미등록</p>
                           )}
                         </div>
 
@@ -368,7 +368,7 @@ export default function AdminTeamsPage() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8 text-muted-foreground"
+                            className="h-8 w-8 text-[#615d59]"
                             onClick={() => {
                               setEmailEditMember(member)
                               emailForm.reset({ email: member.email ?? '' })
@@ -380,12 +380,12 @@ export default function AdminTeamsPage() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            className="h-8 w-8 text-muted-foreground"
+                            className="h-8 w-8 text-[#615d59]"
                             onClick={() => copyInviteLink(team.id, member)}
                             title="초대링크 복사"
                           >
                             {copiedId === member.id ? (
-                              <Check className="h-4 w-4 text-green-600" />
+                              <Check className="h-4 w-4 text-[#1aae39]" />
                             ) : (
                               <Copy className="h-4 w-4" />
                             )}
@@ -394,7 +394,7 @@ export default function AdminTeamsPage() {
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="h-8 w-8 text-destructive hover:text-destructive"
+                              className="h-8 w-8 text-[#dd5b00] hover:text-[#dd5b00]"
                               onClick={() => resetPassword(team.id, member.id, member.name)}
                               title="비밀번호 초기화 (0000)"
                             >

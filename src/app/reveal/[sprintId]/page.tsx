@@ -60,14 +60,15 @@ export default function RevealPage() {
     )
   }
 
-  if (!data) return <div className="text-center py-16 text-muted-foreground">데이터를 불러올 수 없습니다</div>
+  if (!data) return <div className="text-center py-16">데이터를 불러올 수 없습니다</div>
 
+  // targetId 기준으로 pair를 빠르게 찾기 위한 맵
   const pairByTarget = new Map(data.pairs.map((p) => [p.targetId, p]))
 
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="font-serif text-3xl font-bold tracking-heading">{data.sprint.name}</h1>
+        <h1 className="text-3xl font-bold">{data.sprint.name}</h1>
         <p className="text-muted-foreground text-sm">
           {formatDate(data.sprint.startDate)} ~ {formatDate(data.sprint.endDate)}
         </p>
@@ -85,17 +86,18 @@ export default function RevealPage() {
           return (
             <Card
               key={member.id}
-              className="cursor-pointer hover:shadow-card transition-shadow border-[rgba(28,26,23,0.12)]"
+              className="cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => {
                 if (!isExpanded) celebrate(member.name)
                 setExpandedId(isExpanded ? null : member.id)
               }}
             >
               <CardContent className="pt-4 pb-4">
+                {/* 헤더: 아바타 + 이름 + 토글 */}
                 <div className="flex items-center gap-3">
                   <Avatar className="h-12 w-12 shrink-0">
                     {member.avatarUrl && <AvatarImage src={member.avatarUrl} />}
-                    <AvatarFallback className="bg-[#FEF0EA] text-primary font-bold">
+                    <AvatarFallback className="bg-primary/10 text-primary font-bold">
                       {getInitials(member.name)}
                     </AvatarFallback>
                   </Avatar>
@@ -116,6 +118,7 @@ export default function RevealPage() {
                   )}
                 </div>
 
+                {/* 펼쳐진 칭찬 내용 */}
                 {isExpanded && pair && (
                   <div className="mt-4 space-y-3">
                     <Separator />
@@ -126,14 +129,14 @@ export default function RevealPage() {
                           return (
                             <>
                               {manito?.avatarUrl && <AvatarImage src={manito.avatarUrl} />}
-                              <AvatarFallback className="bg-secondary text-foreground text-xs font-bold">
+                              <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xs font-bold">
                                 {getInitials(pair.manitoName)}
                               </AvatarFallback>
                             </>
                           )
                         })()}
                       </Avatar>
-                      <p className="text-sm font-medium text-primary">
+                      <p className="text-sm font-medium text-indigo-600">
                         {pair.manitoName}
                         <span className="text-muted-foreground font-normal">님이 칭찬했어요</span>
                       </p>
@@ -143,7 +146,7 @@ export default function RevealPage() {
                       <p className="text-sm text-muted-foreground pl-1">작성된 칭찬이 없어요</p>
                     ) : (
                       pair.praises.map((praise, i) => (
-                        <div key={i} className="bg-secondary rounded-xl px-4 py-3 space-y-1">
+                        <div key={i} className="bg-muted/40 rounded-lg px-4 py-3 space-y-1">
                           <p className="text-sm leading-relaxed">&ldquo;{praise.content}&rdquo;</p>
                           <p className="text-xs text-muted-foreground">{formatDateTime(praise.createdAt)}</p>
                         </div>
