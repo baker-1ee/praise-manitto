@@ -116,6 +116,7 @@ function RegisterForm() {
         else { setUserInfo(d); setStep('form') }
       })
       .catch(() => { setErrorMsg('오류가 발생했습니다'); setStep('error') })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
 
   const onSubmit = async (data: FormData) => {
