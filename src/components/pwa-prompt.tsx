@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { X, Download, Share, Plus } from 'lucide-react'
+import { X, Download, Share } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 function isStandalone() {
