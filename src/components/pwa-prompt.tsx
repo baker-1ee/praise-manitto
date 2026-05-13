@@ -4,9 +4,6 @@ import { useEffect, useState } from 'react'
 import { X, Download, Share, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-const DISMISSED_KEY = 'pwa_prompt_dismissed'
-const DISMISS_DURATION_MS = 7 * 24 * 60 * 60 * 1000 // 7일
-
 function isStandalone() {
   if (typeof window === 'undefined') return false
   return (
@@ -30,65 +27,73 @@ function isKakaoTalkBrowser() {
   return /KAKAOTALK/i.test(navigator.userAgent)
 }
 
-function isDismissedRecently() {
-  try {
-    const ts = localStorage.getItem(DISMISSED_KEY)
-    if (!ts) return false
-    return Date.now() - parseInt(ts, 10) < DISMISS_DURATION_MS
-  } catch {
-    return false
-  }
-}
-
-function saveDismissed() {
-  try {
-    localStorage.setItem(DISMISSED_KEY, String(Date.now()))
-  } catch {}
-}
-
 // ─── 카카오톡 인앱브라우저 유도 배너 ──────────────────────────────────────────
 
 export function KakaoBanner() {
   const [show, setShow] = useState(false)
+  const [ios, setIos] = useState(false)
 
   useEffect(() => {
-    setShow(isKakaoTalkBrowser())
+    if (isKakaoTalkBrowser()) {
+      setShow(true)
+      setIos(isIOS())
+    }
   }, [])
 
   if (!show) return null
 
+  const dismiss = () => setShow(false)
+
   const openExternal = () => {
-    if (isAndroid()) {
-      const url = window.location.href.replace(/^https?:\/\//, '')
-      window.location.href = `intent://${url}#Intent;scheme=https;package=com.android.chrome;end`
-    }
+    const url = window.location.href.replace(/^https?:\/\//, '')
+    window.location.href = `intent://${url}#Intent;scheme=https;package=com.android.chrome;end`
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4 mb-4">
-        <div className="text-center space-y-2">
-          <p className="text-2xl">🌐</p>
-          <p className="font-bold text-lg">외부 브라우저에서 열어주세요</p>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            카카오톡 브라우저에서는 자동 로그인이 제한됩니다.
-            Safari 또는 Chrome에서 열면 더 편하게 이용할 수 있어요.
-          </p>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4"
+      onClick={dismiss}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4 mb-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between">
+          <div className="text-center flex-1 space-y-2">
+            <p className="text-2xl">🌐</p>
+            <p className="font-bold text-lg">외부 브라우저에서 열어주세요</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              카카오톡 브라우저에서는 자동 로그인이 제한됩니다.
+              Safari 또는 Chrome에서 열면 더 편하게 이용할 수 있어요.
+            </p>
+          </div>
+          <button
+            onClick={dismiss}
+            className="text-muted-foreground hover:text-foreground ml-2 mt-0.5 p-1"
+            aria-label="닫기"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        {isAndroid() ? (
+        {!ios ? (
           <Button className="w-full gap-2" onClick={openExternal}>
             <Share className="h-4 w-4" />
             Chrome에서 열기
           </Button>
         ) : (
-          <div className="rounded-lg bg-muted/50 p-4 space-y-2 text-sm text-center">
-            <p className="font-medium">iPhone 사용자</p>
-            <p className="text-muted-foreground">
-              하단 <span className="font-semibold">···</span> 메뉴 →{' '}
-              <span className="font-semibold">기본 브라우저로 열기</span>를 탭해주세요
-            </p>
-          </div>
+          <>
+            <div className="rounded-lg bg-muted/50 p-4 space-y-2 text-sm text-center">
+              <p className="font-medium">iPhone 사용자</p>
+              <p className="text-muted-foreground">
+                하단 <span className="font-semibold">···</span> 메뉴 →{' '}
+                <span className="font-semibold">기본 브라우저로 열기</span>를 탭해주세요
+              </p>
+            </div>
+            <Button variant="outline" className="w-full" onClick={dismiss}>
+              닫고 계속 이용하기
+            </Button>
+          </>
         )}
       </div>
     </div>
@@ -105,11 +110,10 @@ export function PwaInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
 
   useEffect(() => {
-    // PWA로 이미 실행 중이거나, 카카오톡 브라우저거나, 최근 닫은 경우 스킵
-    if (isStandalone() || isKakaoTalkBrowser() || isDismissedRecently()) return
+    // PWA로 이미 실행 중이거나 카카오톡 브라우저면 스킵
+    if (isStandalone() || isKakaoTalkBrowser()) return
 
     if (isIOS()) {
-      // iOS: beforeinstallprompt가 없으므로 직접 감지
       setPromptType('ios')
       return
     }
@@ -126,7 +130,6 @@ export function PwaInstallPrompt() {
   }, [])
 
   const dismiss = () => {
-    saveDismissed()
     setPromptType(null)
   }
 
