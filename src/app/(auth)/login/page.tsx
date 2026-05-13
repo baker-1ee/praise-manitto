@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Heart, Loader2, ExternalLink } from 'lucide-react'
+import { Heart, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,54 +26,6 @@ function isKakaoTalkBrowser() {
   return /KAKAOTALK/i.test(navigator.userAgent)
 }
 
-function isAndroid() {
-  if (typeof navigator === 'undefined') return false
-  return /android/i.test(navigator.userAgent)
-}
-
-function KakaoBanner() {
-  const currentUrl = typeof window !== 'undefined' ? window.location.href : ''
-
-  const openExternal = () => {
-    if (isAndroid()) {
-      // Android: intent scheme으로 Chrome에서 열기
-      const intentUrl = `intent://${currentUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`
-      window.location.href = intentUrl
-    }
-    // iOS는 직접 열기 불가 — 안내 텍스트로 대신함
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4 mb-4">
-        <div className="text-center space-y-2">
-          <p className="text-2xl">🌐</p>
-          <p className="font-bold text-lg">외부 브라우저에서 열어주세요</p>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            카카오톡 브라우저에서는 자동 로그인이 제한됩니다.
-            Safari 또는 Chrome에서 열면 더 편하게 이용할 수 있어요.
-          </p>
-        </div>
-
-        {isAndroid() ? (
-          <Button className="w-full gap-2" onClick={openExternal}>
-            <ExternalLink className="h-4 w-4" />
-            Chrome에서 열기
-          </Button>
-        ) : (
-          <div className="rounded-lg bg-muted/50 p-4 space-y-2 text-sm text-center">
-            <p className="font-medium">iPhone 사용자</p>
-            <p className="text-muted-foreground">
-              하단 <span className="font-semibold">···</span> 메뉴 → <span className="font-semibold">기본 브라우저로 열기</span>를 탭해주세요
-            </p>
-          </div>
-        )}
-
-      </div>
-    </div>
-  )
-}
-
 export default function LoginPage() {
   return <Suspense><LoginForm /></Suspense>
 }
@@ -84,7 +36,6 @@ function LoginForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [autoLogin, setAutoLogin] = useState(true)
-  const [showKakaoBanner, setShowKakaoBanner] = useState(false)
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -92,10 +43,7 @@ function LoginForm() {
   })
 
   useEffect(() => {
-    if (isKakaoTalkBrowser()) {
-      setShowKakaoBanner(true)
-      return
-    }
+    if (isKakaoTalkBrowser()) return
 
     // prefillName보다 자동로그인 먼저 시도
     const saved = localStorage.getItem(AUTO_LOGIN_KEY)
@@ -148,8 +96,6 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      {showKakaoBanner && <KakaoBanner />}
-
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">

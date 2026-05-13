@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: '칭찬 마니또',
+    startupImage: '/apple-touch-icon.png',
   },
   openGraph: {
     title: '칭찬 마니또',
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <head>
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="theme-color" content="#7C3AED" />
+        <meta name="theme-color" content="#fdf7f1" />
       </head>
       <body className={inter.className}>
         <Providers>{children}</Providers>
