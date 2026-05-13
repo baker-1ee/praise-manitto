@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { signIn } from 'next-auth/react'
-import { Heart, Loader2, CheckCircle, ExternalLink } from 'lucide-react'
+import { Mail, Loader2, CheckCircle, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -158,8 +158,8 @@ function RegisterForm() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-[rgba(0,0,0,0.1)] shadow-notion-card">
-              <Heart className="h-6 w-6 fill-[#0075de] text-[#0075de]" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#7C3AED] shadow-notion-card">
+              <Mail className="h-6 w-6 text-white" />
             </div>
           </div>
           <h1 className="text-2xl font-bold tracking-[-0.625px]">칭찬 마니또</h1>
