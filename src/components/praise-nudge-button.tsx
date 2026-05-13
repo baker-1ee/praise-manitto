@@ -65,12 +65,13 @@ export function PraiseNudgeButton({ sprintId }: PraiseNudgeButtonProps) {
       <Button
         variant="outline"
         size="default"
-        className="w-full gap-2"
+        className="w-full gap-2 border-[#c27b8c]/40 text-[#c27b8c] hover:bg-[#fdf0f2] hover:text-[#c27b8c]"
         onClick={handleClick}
       >
         <Bell className="h-4 w-4" /> 칭찬 조르기
       </Button>
 
+      {/* 조르기 확인 */}
       <Dialog open={dialog === 'confirm'} onOpenChange={(o) => !o && setDialog('idle')}>
         <DialogContent>
           <DialogHeader>
@@ -88,6 +89,7 @@ export function PraiseNudgeButton({ sprintId }: PraiseNudgeButtonProps) {
         </DialogContent>
       </Dialog>
 
+      {/* 전송 중 */}
       <Dialog open={dialog === 'sending'} onOpenChange={() => {}}>
         <DialogContent>
           <DialogHeader>
@@ -97,6 +99,7 @@ export function PraiseNudgeButton({ sprintId }: PraiseNudgeButtonProps) {
         </DialogContent>
       </Dialog>
 
+      {/* 완료 */}
       <Dialog open={dialog === 'done'} onOpenChange={(o) => !o && setDialog('idle')}>
         <DialogContent>
           <DialogHeader>
@@ -111,6 +114,7 @@ export function PraiseNudgeButton({ sprintId }: PraiseNudgeButtonProps) {
         </DialogContent>
       </Dialog>
 
+      {/* 오늘 이미 조름 */}
       <Dialog open={dialog === 'already'} onOpenChange={(o) => !o && setDialog('idle')}>
         <DialogContent>
           <DialogHeader>
@@ -127,6 +131,7 @@ export function PraiseNudgeButton({ sprintId }: PraiseNudgeButtonProps) {
         </DialogContent>
       </Dialog>
 
+      {/* 오류 */}
       <Dialog open={dialog === 'error'} onOpenChange={(o) => !o && setDialog('idle')}>
         <DialogContent>
           <DialogHeader>

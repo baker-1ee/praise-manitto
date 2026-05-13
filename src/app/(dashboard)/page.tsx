@@ -21,6 +21,7 @@ export default async function HomePage() {
     select: { avatarUrl: true },
   })
 
+  // 이 유저가 마니또로 참여 중인 모든 활성 스프린트 조회
   const activePairs = await prisma.manitoPair.findMany({
     where: {
       manitoId: session.user.id,
@@ -32,6 +33,7 @@ export default async function HomePage() {
     },
   })
 
+  // 각 스프린트별 칭찬 통계 계산
   const activePairsWithStats = await Promise.all(
     activePairs.map(async (pair) => {
       const [sentCount, receivedCount] = await Promise.all([
@@ -42,6 +44,7 @@ export default async function HomePage() {
     })
   )
 
+  // 활성 스프린트 없을 때 가장 최근 공개된 스프린트 조회
   const revealedSprint =
     activePairs.length === 0
       ? await prisma.sprint.findFirst({
@@ -54,34 +57,35 @@ export default async function HomePage() {
       : null
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* 인사 헤더 */}
       <div className="flex items-center gap-3">
         <Avatar className="h-11 w-11 shrink-0">
           {me?.avatarUrl && <AvatarImage src={me.avatarUrl} />}
-          <AvatarFallback className="bg-[#FEF0EA] text-primary font-semibold">
+          <AvatarFallback className="bg-[#fdf0f2] text-[#c27b8c] font-semibold">
             {getInitials(session.user.name)}
           </AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="font-serif text-xl font-bold tracking-subheading">안녕하세요, {session.user.name}님 👋</h1>
-          <p className="text-muted-foreground mt-0.5 text-sm">오늘도 팀원을 칭찬해보세요!</p>
+          <h1 className="text-xl font-bold tracking-[-0.25px]">안녕하세요, {session.user.name}님 👋</h1>
+          <p className="text-[#615d59] mt-0.5 text-sm">오늘도 팀원을 칭찬해보세요!</p>
         </div>
       </div>
 
       {activePairsWithStats.length > 0 ? (
         <div className="space-y-6">
           {activePairsWithStats.map(({ sprint, target, sentCount, receivedCount }) => (
-            <Card key={sprint.id} className="border-[rgba(28,26,23,0.15)] bg-secondary" style={{ boxShadow: 'none' }}>
+            /* 스프린트 카드 - 부모 컨테이너 */
+            <Card key={sprint.id} className="bg-[#f4ebe3] border-[rgba(160,100,80,0.15)]" style={{ boxShadow: 'none' }}>
               <CardHeader className="py-3 pb-0">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm flex items-center gap-2 font-semibold">
-                    <Calendar className="h-4 w-4 text-primary" />
+                    <Calendar className="h-4 w-4 text-[#c27b8c]" />
                     {sprint.name}
                   </CardTitle>
                   <Badge variant="default">진행 중</Badge>
                 </div>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[#a39e98]">
                   {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
                 </p>
               </CardHeader>
@@ -89,31 +93,31 @@ export default async function HomePage() {
               <CardContent className="pt-4 pb-4 space-y-4">
                 {/* 마니또 배정 카드 */}
                 <div>
-                  <h2 className="text-sm font-semibold mb-2 tracking-subheading">이번 스프린트 내 마니또</h2>
+                  <h2 className="text-sm font-semibold mb-2 tracking-[-0.25px]">이번 스프린트 내 마니또</h2>
                   <ManitoCard target={target} sprintName={sprint.name} />
                 </div>
 
                 {/* 칭찬 통계 */}
                 <div className="grid grid-cols-2 gap-3">
                   <Link href={`/praises/sent?sprintId=${sprint.id}`} className="block group">
-                    <Card className="text-center h-full transition-shadow group-hover:shadow-card cursor-pointer">
+                    <Card className="text-center h-full transition-shadow group-hover:shadow-notion-card cursor-pointer">
                       <CardContent className="pt-4 pb-4">
                         <div className="flex items-center justify-center gap-0.5">
-                          <div className="text-3xl font-bold text-primary tracking-heading">{sentCount}</div>
-                          <ChevronRight className="h-5 w-5 text-primary mt-0.5" />
+                          <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px]">{sentCount}</div>
+                          <ChevronRight className="h-5 w-5 text-[#c27b8c] mt-0.5" />
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1 font-medium">내가 보낸 칭찬</div>
+                        <div className="text-xs text-[#615d59] mt-1 font-medium">내가 보낸 칭찬</div>
                       </CardContent>
                     </Card>
                   </Link>
                   <Link href={`/praises/received?sprintId=${sprint.id}`} className="block group">
-                    <Card className="text-center h-full transition-shadow group-hover:shadow-card cursor-pointer">
+                    <Card className="text-center h-full transition-shadow group-hover:shadow-notion-card cursor-pointer">
                       <CardContent className="pt-4 pb-4">
                         <div className="flex items-center justify-center gap-0.5">
-                          <div className="text-3xl font-bold text-primary tracking-heading">{receivedCount}</div>
-                          <ChevronRight className="h-5 w-5 text-primary mt-0.5" />
+                          <div className="text-3xl font-bold text-[#c27b8c] tracking-[-1px]">{receivedCount}</div>
+                          <ChevronRight className="h-5 w-5 text-[#c27b8c] mt-0.5" />
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1 font-medium">내가 받은 칭찬</div>
+                        <div className="text-xs text-[#615d59] mt-1 font-medium">내가 받은 칭찬</div>
                       </CardContent>
                     </Card>
                   </Link>
@@ -136,14 +140,14 @@ export default async function HomePage() {
         <div className="space-y-4">
           {revealedSprint ? (
             <Link href={`/reveal/${revealedSprint.id}`}>
-              <Card className="bg-secondary hover:shadow-card transition-shadow cursor-pointer border-[rgba(28,26,23,0.15)]">
+              <Card className="bg-[#f4ebe3] hover:shadow-notion-card transition-shadow cursor-pointer border-[rgba(160,100,80,0.15)]">
                 <CardContent className="pt-5 pb-5 flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-card border border-[rgba(28,26,23,0.12)]">
-                    <PartyPopper className="h-6 w-6 text-primary" />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-card border border-[rgba(160,100,80,0.15)]">
+                    <PartyPopper className="h-6 w-6 text-[#c27b8c]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-base tracking-subheading">마니또가 공개됐어요! 🎊</p>
-                    <p className="text-sm text-muted-foreground mt-0.5">{revealedSprint.name} 결과 보러가기 →</p>
+                    <p className="font-bold text-base tracking-[-0.25px]">마니또가 공개됐어요! 🎊</p>
+                    <p className="text-sm text-[#615d59] mt-0.5">{revealedSprint.name} 결과 보러가기 →</p>
                   </div>
                 </CardContent>
               </Card>
@@ -152,8 +156,8 @@ export default async function HomePage() {
             <Card className="text-center py-12">
               <CardContent>
                 <p className="text-4xl mb-4">😴</p>
-                <p className="font-serif text-base font-bold tracking-subheading">현재 진행 중인 스프린트가 없어요</p>
-                <p className="text-muted-foreground text-sm mt-2">팀장님이 새 스프린트를 시작하면 알려드릴게요!</p>
+                <p className="text-base font-semibold tracking-[-0.25px]">현재 진행 중인 스프린트가 없어요</p>
+                <p className="text-[#615d59] text-sm mt-2">팀장님이 새 스프린트를 시작하면 알려드릴게요!</p>
               </CardContent>
             </Card>
           )}

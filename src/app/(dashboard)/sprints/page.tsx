@@ -52,19 +52,19 @@ export default async function SprintsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="font-serif text-2xl font-bold tracking-heading flex items-center gap-2">
-          <Clock className="h-6 w-6 text-primary" />
+        <h1 className="text-2xl font-bold tracking-[-0.625px] flex items-center gap-2">
+          <Clock className="h-6 w-6 text-[#c27b8c]" />
           스프린트
         </h1>
-        <p className="text-muted-foreground mt-1 text-sm">참여한 스프린트 목록이에요</p>
+        <p className="text-[#615d59] mt-1 text-sm">참여한 스프린트 목록이에요</p>
       </div>
 
       {sprints.length === 0 ? (
         <Card className="text-center py-12">
           <CardContent>
             <p className="text-4xl mb-4">📋</p>
-            <p className="font-serif text-base font-bold tracking-subheading">참여한 스프린트가 없어요</p>
-            <p className="text-muted-foreground text-sm mt-2">팀장님이 스프린트를 시작하면 여기에 표시돼요!</p>
+            <p className="text-base font-semibold tracking-[-0.25px]">참여한 스프린트가 없어요</p>
+            <p className="text-[#615d59] text-sm mt-2">팀장님이 스프린트를 시작하면 여기에 표시돼요!</p>
           </CardContent>
         </Card>
       ) : (
@@ -76,28 +76,28 @@ export default async function SprintsPage() {
 
             const inner = (
               <Card
-                className={`border-[rgba(28,26,23,0.12)] transition-shadow ${isEnded ? 'hover:shadow-card cursor-pointer' : ''}`}
+                className={`border-[rgba(160,100,80,0.15)] transition-shadow ${isEnded ? 'hover:shadow-notion-card cursor-pointer' : ''}`}
                 style={{ boxShadow: 'none' }}
               >
                 <CardContent className="py-4 px-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FEF0EA] border border-primary/20">
-                    <Calendar className="h-5 w-5 text-primary" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fdf0f2] border border-[rgba(194,123,140,0.2)]">
+                    <Calendar className="h-5 w-5 text-[#c27b8c]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-sm tracking-subheading truncate">{sprint.name}</span>
+                      <span className="font-semibold text-sm tracking-[-0.25px] truncate">{sprint.name}</span>
                       <Badge variant={statusVariant[sprint.status]}>{statusLabel[sprint.status]}</Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-xs text-[#a39e98] mt-0.5">
                       {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
                     </p>
                     {isEnded && (
-                      <p className="text-xs text-primary mt-1 font-medium">
+                      <p className="text-xs text-[#c27b8c] mt-1 font-medium">
                         받은 칭찬 {receivedCount}개 · 마니또: {myTarget?.target.name ?? '?'}님
                       </p>
                     )}
                   </div>
-                  {isEnded && <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />}
+                  {isEnded && <ChevronRight className="h-4 w-4 text-[#a39e98] shrink-0" />}
                 </CardContent>
               </Card>
             )

@@ -56,7 +56,7 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
               key={i}
               onClick={() => navigate(i, i > currentIndex ? 'left' : 'right')}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === currentIndex ? 'w-6 bg-primary' : 'w-1.5 bg-[rgba(28,26,23,0.15)] hover:bg-[rgba(28,26,23,0.3)]'
+                i === currentIndex ? 'w-6 bg-[#c27b8c]' : 'w-1.5 bg-[#ddd0b0] hover:bg-[#b89c6a]'
               }`}
             />
           ))}
@@ -70,24 +70,24 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         style={{
-          background: 'linear-gradient(150deg, #FFFDF8 0%, #FAF7EE 100%)',
-          border: '1px solid #D4C9A8',
-          boxShadow: '0 4px 20px rgba(28,26,23,0.08), 0 1px 0 rgba(255,255,255,0.9) inset',
+          background: 'linear-gradient(150deg, #fffef7 0%, #fdf8ec 100%)',
+          border: '1px solid #ddd0b0',
+          boxShadow: '0 4px 20px rgba(120,95,50,0.10), 0 1px 0 rgba(255,255,255,0.85) inset',
         }}
       >
         {/* 편지 헤더 */}
-        <div className="px-6 pt-5 pb-4" style={{ borderBottom: '1.5px dashed #D4C9A8' }}>
+        <div className="px-6 pt-5 pb-4" style={{ borderBottom: '1.5px dashed #ddd0b0' }}>
           <div className="flex items-center justify-between">
             <div>
               <p
                 className="text-xs font-medium"
-                style={{ color: '#9A8B6A', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
+                style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
               >
                 {card.headerLabel}
               </p>
               <p
                 className="text-xl font-bold leading-tight"
-                style={{ color: '#2C2318', fontFamily: 'Georgia, serif' }}
+                style={{ color: '#3d2b10', fontFamily: 'Georgia, serif' }}
               >
                 {card.headerName}
               </p>
@@ -108,7 +108,7 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
               fontFamily: 'Georgia, "Nanum Myeongjo", "Malgun Gothic", serif',
               fontSize: '14.5px',
               lineHeight: '28px',
-              color: '#2C2318',
+              color: '#2d1e08',
               paddingTop: '10px',
               paddingBottom: '8px',
               whiteSpace: 'pre-wrap',
@@ -120,11 +120,11 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
         </div>
 
         {/* 편지 푸터 */}
-        <div className="px-6 pt-3 pb-5" style={{ borderTop: '1.5px dashed #D4C9A8' }}>
+        <div className="px-6 pt-3 pb-5" style={{ borderTop: '1.5px dashed #ddd0b0' }}>
           <div className="flex items-center justify-between">
             <p
               className="text-sm"
-              style={{ color: '#9A8B6A', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
+              style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
             >
               {card.footerLeftText}
             </p>
@@ -132,7 +132,7 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
               {card.footerRightText && (
                 <span
                   className="text-xs"
-                  style={{ color: '#9A8B6A', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
+                  style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
                 >
                   {card.footerRightText}
                 </span>
@@ -141,9 +141,9 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
                 <span
                   className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
                   style={{
-                    color: '#9A8B6A',
-                    background: 'rgba(180,155,100,0.1)',
-                    border: '1px dashed #D4C9A8',
+                    color: '#a08050',
+                    background: 'rgba(200,170,100,0.12)',
+                    border: '1px dashed #c8a864',
                   }}
                 >
                   {card.footerBadge}
@@ -161,14 +161,14 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
             onClick={goPrev}
             disabled={currentIndex === 0}
             className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm disabled:opacity-30 transition-opacity active:opacity-60"
-            style={{ color: '#9A8B6A', fontFamily: 'Georgia, serif' }}
+            style={{ color: '#b89c6a', fontFamily: 'Georgia, serif' }}
           >
             <ChevronLeft className="h-4 w-4" />
             이전
           </button>
           <span
             className="text-sm"
-            style={{ color: '#9A8B6A', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
+            style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
           >
             {currentIndex + 1} / {cards.length}
           </span>
@@ -176,7 +176,7 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
             onClick={goNext}
             disabled={currentIndex === cards.length - 1}
             className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm disabled:opacity-30 transition-opacity active:opacity-60"
-            style={{ color: '#9A8B6A', fontFamily: 'Georgia, serif' }}
+            style={{ color: '#b89c6a', fontFamily: 'Georgia, serif' }}
           >
             다음
             <ChevronRight className="h-4 w-4" />

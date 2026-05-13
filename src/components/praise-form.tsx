@@ -67,38 +67,38 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
       <div
         className="rounded-2xl overflow-hidden"
         style={{
-          background: 'linear-gradient(150deg, #FFFDF8 0%, #FAF7EE 100%)',
-          border: '1px solid #D4C9A8',
-          boxShadow: '0 4px 20px rgba(28,26,23,0.08), 0 1px 0 rgba(255,255,255,0.9) inset',
+          background: 'linear-gradient(150deg, #fffef7 0%, #fdf8ec 100%)',
+          border: '1px solid #ddd0b0',
+          boxShadow: '0 4px 20px rgba(120,95,50,0.10), 0 1px 0 rgba(255,255,255,0.85) inset',
         }}
       >
         {/* 편지 헤더 — 수신인 */}
         <div
           className="px-6 pt-5 pb-4"
-          style={{ borderBottom: '1.5px dashed #D4C9A8' }}
+          style={{ borderBottom: '1.5px dashed #ddd0b0' }}
         >
           <div className="flex items-center gap-3">
-            <Avatar className="h-11 w-11 shrink-0 ring-2 ring-[#D4C9A8] ring-offset-1">
+            <Avatar className="h-11 w-11 shrink-0 ring-2 ring-[#e8d9b8] ring-offset-1">
               {targetAvatarUrl && <AvatarImage src={targetAvatarUrl} />}
-              <AvatarFallback className="bg-[#FEF0EA] text-primary font-semibold text-base">
+              <AvatarFallback className="bg-[#f5ecd8] text-[#8a6a30] font-semibold text-base">
                 {getInitials(targetName)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <p
                 className="text-xs font-medium"
-                style={{ color: '#9A8B6A', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
+                style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
               >
                 To.
               </p>
               <p
                 className="text-xl font-bold leading-tight"
-                style={{ color: '#2C2318', fontFamily: 'Georgia, serif' }}
+                style={{ color: '#3d2b10', fontFamily: 'Georgia, serif' }}
               >
                 {targetName}님에게
               </p>
               {targetBio && (
-                <p className="text-xs mt-0.5 truncate" style={{ color: '#9A8B6A' }}>
+                <p className="text-xs mt-0.5 truncate" style={{ color: '#a08050' }}>
                   {targetBio}
                 </p>
               )}
@@ -126,7 +126,7 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
               fontFamily: 'Georgia, "Nanum Myeongjo", "Malgun Gothic", serif',
               fontSize: '14.5px',
               lineHeight: '28px',
-              color: '#2C2318',
+              color: '#2d1e08',
               paddingTop: '10px',
               paddingBottom: '8px',
             }}
@@ -136,12 +136,12 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
         {/* 편지 푸터 — 발신인 */}
         <div
           className="px-6 pt-3 pb-5"
-          style={{ borderTop: '1.5px dashed #D4C9A8' }}
+          style={{ borderTop: '1.5px dashed #ddd0b0' }}
         >
           <div className="flex items-end justify-between">
             <p
               className="text-sm"
-              style={{ color: '#9A8B6A', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
+              style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
             >
               — 익명의 마니또로부터 ♥
             </p>
@@ -149,27 +149,27 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
               <span
                 className={cn(
                   'text-xs font-medium tabular-nums',
-                  contentLength > 500 ? 'text-destructive' : contentLength >= 10 ? 'text-[#4CAF50]' : 'text-muted-foreground',
+                  contentLength > 500 ? 'text-red-500' : contentLength >= 10 ? 'text-[#7a9e60]' : 'text-[#b8a888]',
                 )}
               >
                 {contentLength} / 500
               </span>
               {errors.content && (
-                <p className="text-xs text-destructive mt-0.5">{errors.content.message}</p>
+                <p className="text-xs text-red-500 mt-0.5">{errors.content.message}</p>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* 익명 안내 배지 */}
+      {/* 도장 느낌의 익명 배지 */}
       <div className="flex justify-center">
         <span
           className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full"
           style={{
-            color: '#9A8B6A',
-            background: 'rgba(180,155,100,0.1)',
-            border: '1px dashed #D4C9A8',
+            color: '#a08050',
+            background: 'rgba(200,170,100,0.12)',
+            border: '1px dashed #c8a864',
           }}
         >
           🔒 발신자는 스프린트 공개 전까지 알 수 없어요
@@ -180,6 +180,10 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
       <Button
         type="submit"
         className="w-full gap-2 h-12 text-base font-semibold rounded-xl"
+        style={{
+          background: 'linear-gradient(135deg, #c27b8c 0%, #a86475 100%)',
+          boxShadow: '0 4px 14px rgba(194,123,140,0.40)',
+        }}
         disabled={isSubmitting}
       >
         <Send className="h-4 w-4" />
@@ -189,7 +193,7 @@ export function PraiseForm({ targetName, targetBio, targetAvatarUrl, sprintId, o
       <Button
         type="button"
         variant="ghost"
-        className="w-full gap-2 text-muted-foreground"
+        className="w-full gap-2 text-[#a39e98]"
         onClick={() => router.push(`/praises/sent?sprintId=${sprintId}`)}
       >
         <MessageSquare className="h-4 w-4" />
