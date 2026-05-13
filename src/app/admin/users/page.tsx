@@ -20,7 +20,7 @@ export default async function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">팀원 관리</h1>
+        <h1 className="font-serif text-2xl font-bold tracking-heading">팀원 관리</h1>
         <p className="text-muted-foreground mt-1">총 {users.length}명</p>
       </div>
 
@@ -29,7 +29,7 @@ export default async function AdminUsersPage() {
           <Card key={user.id} className="hover:shadow-sm transition-shadow">
             <CardContent className="pt-4 pb-4 flex items-center gap-4">
               <Avatar>
-                <AvatarFallback className="bg-primary/10 text-primary">
+                <AvatarFallback className="bg-[#FEF0EA] text-primary">
                   {getInitials(user.name)}
                 </AvatarFallback>
               </Avatar>
