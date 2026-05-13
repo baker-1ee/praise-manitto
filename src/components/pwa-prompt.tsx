@@ -17,11 +17,6 @@ function isIOS() {
   return /iphone|ipad|ipod/i.test(navigator.userAgent)
 }
 
-function isAndroid() {
-  if (typeof navigator === 'undefined') return false
-  return /android/i.test(navigator.userAgent)
-}
-
 function isKakaoTalkBrowser() {
   if (typeof navigator === 'undefined') return false
   return /KAKAOTALK/i.test(navigator.userAgent)
