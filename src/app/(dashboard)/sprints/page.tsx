@@ -68,7 +68,7 @@ export default async function SprintsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {sprints.map((sprint) => {
             const myTarget = sprint.pairs[0]
             const isEnded = sprint.status === 'REVEALED' || sprint.status === 'CLOSED'
