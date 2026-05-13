@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { formatDate, formatDateTime, getInitials } from '@/lib/utils'
-import { celebrate } from '@/lib/celebration'
+import { fireConfetti } from '@/lib/celebration'
 
 interface Praise {
   content: string
@@ -41,12 +41,17 @@ export default function RevealPage() {
   const { sprintId } = useParams<{ sprintId: string }>()
   const [data, setData] = useState<RevealData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetch(`/api/sprints/${sprintId}/reveal`)
       .then((r) => r.json())
-      .then((d) => { setData(d); setLoading(false) })
+      .then((d: RevealData) => {
+        setData(d)
+        setLoading(false)
+        setExpandedIds(new Set(d.pairs.map((p) => p.targetId)))
+        setTimeout(() => fireConfetti(), 300)
+      })
   }, [sprintId])
 
   if (loading) {
@@ -81,15 +86,19 @@ export default function RevealPage() {
       <div className="space-y-3">
         {data.members.map((member) => {
           const pair = pairByTarget.get(member.id)
-          const isExpanded = expandedId === member.id
+          const isExpanded = expandedIds.has(member.id)
 
           return (
             <Card
               key={member.id}
               className="cursor-pointer hover:shadow-md transition-shadow"
               onClick={() => {
-                if (!isExpanded) celebrate(member.name)
-                setExpandedId(isExpanded ? null : member.id)
+                setExpandedIds((prev) => {
+                  const next = new Set(prev)
+                  if (next.has(member.id)) next.delete(member.id)
+                  else next.add(member.id)
+                  return next
+                })
               }}
             >
               <CardContent className="pt-4 pb-4">
