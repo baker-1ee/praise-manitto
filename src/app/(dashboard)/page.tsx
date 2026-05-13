@@ -80,13 +80,17 @@ export default async function HomePage() {
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-[#7c3aed]" />
                   <span className="text-sm font-semibold text-foreground tracking-[-0.25px]">
-                    {sprint.name}
+                    {/^\d{4}-\d{2}-\d{2}$/.test(sprint.name)
+                      ? `${formatDate(sprint.startDate)} ~ ${formatDate(sprint.endDate)}`
+                      : sprint.name}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <p className="text-xs text-[#9c95b8]">
-                    {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
-                  </p>
+                  {!/^\d{4}-\d{2}-\d{2}$/.test(sprint.name) && (
+                    <p className="text-xs text-[#9c95b8]">
+                      {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
+                    </p>
+                  )}
                   <Badge variant="default" className="text-[11px]">진행 중</Badge>
                 </div>
               </div>
