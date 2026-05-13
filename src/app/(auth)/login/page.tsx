@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Heart, Loader2 } from 'lucide-react'
+import { Mail, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -100,8 +100,8 @@ function LoginForm() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-card border border-[rgba(160,100,80,0.15)] shadow-notion-card">
-              <Heart className="h-6 w-6 fill-[#c27b8c] text-[#c27b8c]" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#7C3AED] shadow-notion-card">
+              <Mail className="h-6 w-6 text-white" />
             </div>
           </div>
           <h1 className="text-2xl font-bold tracking-[-0.625px] text-foreground">칭찬 마니또</h1>
