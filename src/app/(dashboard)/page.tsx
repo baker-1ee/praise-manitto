@@ -10,6 +10,7 @@ import { Send, Calendar, PartyPopper, ChevronRight } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getInitials } from '@/lib/utils'
+import { PraiseNudgeButton } from '@/components/praise-nudge-button'
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions)
@@ -122,12 +123,15 @@ export default async function HomePage() {
                   </Link>
                 </div>
 
-                {/* 칭찬 쓰기 버튼 */}
-                <Link href={`/praise/write?sprintId=${sprint.id}`} className="block">
-                  <Button size="default" className="w-full gap-2">
-                    <Send className="h-4 w-4" /> 칭찬 쓰기
-                  </Button>
-                </Link>
+                {/* 칭찬 쓰기 / 조르기 버튼 */}
+                <div className="space-y-2">
+                  <Link href={`/praise/write?sprintId=${sprint.id}`} className="block">
+                    <Button size="default" className="w-full gap-2">
+                      <Send className="h-4 w-4" /> 칭찬 쓰기
+                    </Button>
+                  </Link>
+                  <PraiseNudgeButton sprintId={sprint.id} />
+                </div>
               </CardContent>
             </Card>
           ))}
