@@ -35,11 +35,7 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
   const handleClick = () => {
     if (isDizzy) return
 
-    if (!flipped) {
-      setFlipped(true)
-      clickCountRef.current = 0
-      return
-    }
+    setFlipped(prev => !prev)
 
     clickCountRef.current += 1
 
