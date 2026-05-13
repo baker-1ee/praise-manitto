@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <head>
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="theme-color" content="#fdf7f1" />
+        <meta name="theme-color" content="#fdfaff" />
       </head>
       <body className={inter.className}>
         <Providers>{children}</Providers>
