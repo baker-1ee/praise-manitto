@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
 
 export interface PraiseCardData {
   id: string
@@ -56,100 +56,57 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
               key={i}
               onClick={() => navigate(i, i > currentIndex ? 'left' : 'right')}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === currentIndex ? 'w-6 bg-[#c27b8c]' : 'w-1.5 bg-[#ddd0b0] hover:bg-[#b89c6a]'
+                i === currentIndex ? 'w-6 bg-[#7c3aed]' : 'w-1.5 bg-[hsl(263_50%_90%)] hover:bg-violet-300'
               }`}
             />
           ))}
         </div>
       )}
 
-      {/* 편지 카드 */}
+      {/* 칭찬 카드 */}
       <div
         key={currentIndex}
-        className={`rounded-2xl overflow-hidden ${animClass}`}
+        className={`bg-white rounded-2xl border border-[hsl(263_50%_90%)] shadow-[0_4px_18px_rgba(124,58,237,0.04),0_2px_8px_rgba(124,58,237,0.03)] overflow-hidden ${animClass}`}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        style={{
-          background: 'linear-gradient(150deg, #fffef7 0%, #fdf8ec 100%)',
-          border: '1px solid #ddd0b0',
-          boxShadow: '0 4px 20px rgba(120,95,50,0.10), 0 1px 0 rgba(255,255,255,0.85) inset',
-        }}
       >
-        {/* 편지 헤더 */}
-        <div className="px-6 pt-5 pb-4" style={{ borderBottom: '1.5px dashed #ddd0b0' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p
-                className="text-xs font-medium"
-                style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
-              >
-                {card.headerLabel}
-              </p>
-              <p
-                className="text-xl font-bold leading-tight"
-                style={{ color: '#3d2b10', fontFamily: 'Georgia, serif' }}
-              >
-                {card.headerName}
-              </p>
-            </div>
-            <span className="text-2xl select-none">💌</span>
+        {/* 카드 헤더 */}
+        <div className="px-5 pt-5 pb-4 border-b border-[hsl(263_50%_90%)] flex items-center justify-between">
+          <div>
+            <p className="text-xs font-medium text-[hsl(265_18%_45%)] tracking-wide uppercase">
+              {card.headerLabel}
+            </p>
+            <p className="text-lg font-bold tracking-[-0.5px] text-[hsl(267_50%_10%)] leading-tight">
+              {card.headerName}
+            </p>
+          </div>
+          <div className="h-9 w-9 rounded-full bg-[#f0ebff] flex items-center justify-center">
+            <Sparkles className="h-4 w-4 text-[#7c3aed]" />
           </div>
         </div>
 
-        {/* 편지 본문 — 줄노트 스타일 */}
-        <div className="px-6 py-1">
+        {/* 카드 본문 */}
+        <div className="px-5 py-5">
           <p
-            style={{
-              width: '100%',
-              minHeight: '112px',
-              backgroundImage:
-                'repeating-linear-gradient(to bottom, transparent 0px, transparent 27px, rgba(180,155,100,0.22) 27px, rgba(180,155,100,0.22) 28px)',
-              backgroundPositionY: '10px',
-              fontFamily: 'Georgia, "Nanum Myeongjo", "Malgun Gothic", serif',
-              fontSize: '14.5px',
-              lineHeight: '28px',
-              color: '#2d1e08',
-              paddingTop: '10px',
-              paddingBottom: '8px',
-              whiteSpace: 'pre-wrap',
-              display: 'block',
-            }}
+            className="text-[15px] leading-relaxed text-[hsl(267_50%_10%)] whitespace-pre-wrap"
+            style={{ minHeight: '80px' }}
           >
             {card.content}
           </p>
         </div>
 
-        {/* 편지 푸터 */}
-        <div className="px-6 pt-3 pb-5" style={{ borderTop: '1.5px dashed #ddd0b0' }}>
-          <div className="flex items-center justify-between">
-            <p
-              className="text-sm"
-              style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
-            >
-              {card.footerLeftText}
-            </p>
-            <div className="flex items-center gap-2">
-              {card.footerRightText && (
-                <span
-                  className="text-xs"
-                  style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
-                >
-                  {card.footerRightText}
-                </span>
-              )}
-              {card.footerBadge && (
-                <span
-                  className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                  style={{
-                    color: '#a08050',
-                    background: 'rgba(200,170,100,0.12)',
-                    border: '1px dashed #c8a864',
-                  }}
-                >
-                  {card.footerBadge}
-                </span>
-              )}
-            </div>
+        {/* 카드 푸터 */}
+        <div className="px-5 pb-5 flex items-center justify-between">
+          <p className="text-xs text-[hsl(265_18%_45%)]">{card.footerLeftText}</p>
+          <div className="flex items-center gap-2">
+            {card.footerRightText && (
+              <span className="text-xs text-[hsl(265_18%_45%)]">{card.footerRightText}</span>
+            )}
+            {card.footerBadge && (
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#f0ebff] text-[#7c3aed]">
+                {card.footerBadge}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -160,23 +117,18 @@ export function PraiseSwipeViewer({ cards }: { cards: PraiseCardData[] }) {
           <button
             onClick={goPrev}
             disabled={currentIndex === 0}
-            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm disabled:opacity-30 transition-opacity active:opacity-60"
-            style={{ color: '#b89c6a', fontFamily: 'Georgia, serif' }}
+            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-[hsl(265_18%_45%)] disabled:opacity-30 hover:bg-[rgba(124,58,237,0.06)] hover:text-[#7c3aed] transition-all active:opacity-60"
           >
             <ChevronLeft className="h-4 w-4" />
             이전
           </button>
-          <span
-            className="text-sm"
-            style={{ color: '#b89c6a', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}
-          >
+          <span className="text-sm font-medium text-[hsl(265_18%_45%)]">
             {currentIndex + 1} / {cards.length}
           </span>
           <button
             onClick={goNext}
             disabled={currentIndex === cards.length - 1}
-            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm disabled:opacity-30 transition-opacity active:opacity-60"
-            style={{ color: '#b89c6a', fontFamily: 'Georgia, serif' }}
+            className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-[hsl(265_18%_45%)] disabled:opacity-30 hover:bg-[rgba(124,58,237,0.06)] hover:text-[#7c3aed] transition-all active:opacity-60"
           >
             다음
             <ChevronRight className="h-4 w-4" />

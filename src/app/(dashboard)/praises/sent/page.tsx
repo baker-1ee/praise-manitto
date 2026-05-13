@@ -53,35 +53,27 @@ export default async function SentPraisesPage({
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-[-0.625px] flex items-center gap-2">
-          <SendHorizontal className="h-6 w-6 text-[#c27b8c]" />
+          <SendHorizontal className="h-6 w-6 text-[#7c3aed]" />
           보낸 칭찬
         </h1>
         {isFiltered ? (
-          <p className="text-[#615d59] mt-1 text-sm">
-            {sprint!.name} · {myPair!.target.name}님에게 보낸 칭찬 {praises.length}개 💌
+          <p className="text-[hsl(265_18%_45%)] mt-1 text-sm">
+            {sprint!.name} · {myPair!.target.name}님에게 보낸 칭찬 {praises.length}개
           </p>
         ) : (
-          <p className="text-[#615d59] mt-1 text-sm">총 {praises.length}개의 칭찬을 보냈어요 💌</p>
+          <p className="text-[hsl(265_18%_45%)] mt-1 text-sm">총 {praises.length}개의 칭찬을 보냈어요</p>
         )}
       </div>
 
       {praises.length === 0 ? (
-        <div
-          className="rounded-2xl text-center py-16"
-          style={{
-            background: 'linear-gradient(150deg, #fffef7 0%, #fdf8ec 100%)',
-            border: '1px solid #ddd0b0',
-            boxShadow: '0 4px 20px rgba(120,95,50,0.10), 0 1px 0 rgba(255,255,255,0.85) inset',
-          }}
-        >
-          <p className="text-4xl mb-4">✉️</p>
-          <p
-            className="text-base font-semibold tracking-[-0.25px]"
-            style={{ color: '#3d2b10', fontFamily: 'Georgia, serif' }}
-          >
+        <div className="bg-white rounded-2xl border border-[hsl(263_50%_90%)] shadow-[0_4px_18px_rgba(124,58,237,0.04)] text-center py-16">
+          <div className="h-12 w-12 rounded-full bg-[#f0ebff] flex items-center justify-center mx-auto mb-4">
+            <SendHorizontal className="h-6 w-6 text-[#7c3aed]" />
+          </div>
+          <p className="text-base font-semibold tracking-[-0.25px] text-[hsl(267_50%_10%)]">
             아직 보낸 칭찬이 없어요
           </p>
-          <p className="text-sm mt-2" style={{ color: '#a08050' }}>
+          <p className="text-sm mt-2 text-[hsl(265_18%_45%)]">
             마니또 대상에게 따뜻한 칭찬을 보내보세요!
           </p>
         </div>
