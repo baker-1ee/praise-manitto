@@ -39,9 +39,13 @@ export function KakaoBanner() {
 
   const dismiss = () => setShow(false)
 
-  const openExternal = () => {
+  const openExternalAndroid = () => {
     const url = window.location.href.replace(/^https?:\/\//, '')
     window.location.href = `intent://${url}#Intent;scheme=https;package=com.android.chrome;end`
+  }
+
+  const openExternalIOS = () => {
+    window.location.href = `x-safari-${window.location.href}`
   }
 
   return (
@@ -72,19 +76,16 @@ export function KakaoBanner() {
         </div>
 
         {!ios ? (
-          <Button className="w-full gap-2" onClick={openExternal}>
+          <Button className="w-full gap-2" onClick={openExternalAndroid}>
             <Share className="h-4 w-4" />
             Chrome에서 열기
           </Button>
         ) : (
           <>
-            <div className="rounded-lg bg-muted/50 p-4 space-y-2 text-sm text-center">
-              <p className="font-medium">iPhone 사용자</p>
-              <p className="text-muted-foreground">
-                하단 <span className="font-semibold">···</span> 메뉴 →{' '}
-                <span className="font-semibold">기본 브라우저로 열기</span>를 탭해주세요
-              </p>
-            </div>
+            <Button className="w-full gap-2" onClick={openExternalIOS}>
+              <Share className="h-4 w-4" />
+              Safari에서 열기
+            </Button>
             <Button variant="outline" className="w-full" onClick={dismiss}>
               닫고 계속 이용하기
             </Button>
