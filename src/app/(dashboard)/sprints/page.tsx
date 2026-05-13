@@ -103,7 +103,7 @@ export default async function SprintsPage() {
             )
 
             return isEnded ? (
-              <Link key={sprint.id} href={`/sprints/${sprint.id}`}>
+              <Link key={sprint.id} href={`/reveal/${sprint.id}`}>
                 {inner}
               </Link>
             ) : (
