@@ -63,6 +63,29 @@ export async function sendPraiseReceivedEmail(params: {
   await send(params.toEmail, `[칭찬 마니또] 마니또가 칭찬을 남겼어요!`, text)
 }
 
+export async function sendPraiseNudgeEmail(params: {
+  toEmail: string
+  toName: string
+  targetName: string
+  sprintName: string
+}) {
+  const text = [
+    `[칭찬 마니또] ${params.targetName}님이 칭찬을 기다리고 있어요 🥺`,
+    ``,
+    `${params.toName}님, 안녕하세요!`,
+    ``,
+    `이번 ${params.sprintName} 스프린트에서 마니또 대상 ${params.targetName}님이`,
+    `칭찬을 기다리고 있답니다.`,
+    ``,
+    `아직 칭찬을 전달하지 않으셨다면, 따뜻한 말 한 마디가 팀원에게 큰 힘이 될 수 있어요.`,
+    ``,
+    `칭찬 쓰러 가기: https://manitto.jinung.com`,
+    ``,
+    `이 메일은 칭찬 마니또 서비스에서 자동 발송되었습니다.`,
+  ].join('\n')
+  await send(params.toEmail, `[칭찬 마니또] ${params.targetName}님이 칭찬을 기다리고 있어요 🥺`, text)
+}
+
 export async function sendSprintRevealEmail(params: {
   toEmail: string
   toName: string
