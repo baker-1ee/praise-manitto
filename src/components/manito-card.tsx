@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { Gift, User } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { cn, getInitials } from '@/lib/utils'
+import { cn, getInitials, formatDate } from '@/lib/utils'
 
 interface ManitoTarget {
   name: string | null
@@ -77,7 +77,9 @@ export function ManitoCard({ target, sprintName }: ManitoCardProps) {
             <Gift className="h-7 w-7 text-[#7c3aed]" />
           </div>
           <div>
-            <Badge variant="secondary" className="mb-2">{sprintName}</Badge>
+            <Badge variant="secondary" className="mb-2">
+              {/^\d{4}-\d{2}-\d{2}$/.test(sprintName) ? formatDate(sprintName) : sprintName}
+            </Badge>
             <p className="font-semibold text-foreground">마니또가 배정되었어요!</p>
             <p className="text-sm text-[#9c95b8] mt-0.5">탭해서 확인하세요</p>
           </div>
