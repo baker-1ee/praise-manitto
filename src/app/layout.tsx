@@ -1,9 +1,19 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Fraunces } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 
-const inter = Inter({ subsets: ['latin'], weight: ['400', '500', '600', '700'] })
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
+})
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  weight: ['700', '800', '900'],
+  variable: '--font-serif',
+})
 
 export const metadata: Metadata = {
   title: '칭찬 마니또',
@@ -31,9 +41,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <head>
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="theme-color" content="#fdf7f1" />
+        <meta name="theme-color" content="#F0EBE1" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${fraunces.variable} ${inter.className}`}>
         <Providers>{children}</Providers>
       </body>
     </html>

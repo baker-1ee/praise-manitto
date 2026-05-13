@@ -12,7 +12,6 @@ export default async function PraiseWritePage({
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
 
-  // sprintId 지정 시 해당 스프린트, 없으면 유저의 첫 번째 활성 ManitoPair 사용
   const myPair = searchParams.sprintId
     ? await prisma.manitoPair.findUnique({
         where: {
@@ -38,7 +37,7 @@ export default async function PraiseWritePage({
     return (
       <div className="text-center py-16">
         <p className="text-4xl mb-4">😴</p>
-        <p className="text-base font-semibold tracking-[-0.25px]">진행 중인 스프린트가 없어요</p>
+        <p className="font-serif text-base font-bold tracking-subheading">진행 중인 스프린트가 없어요</p>
       </div>
     )
   }
@@ -46,8 +45,8 @@ export default async function PraiseWritePage({
   return (
     <div className="max-w-lg mx-auto space-y-2">
       <div className="mb-4">
-        <h1 className="text-xl font-bold tracking-[-0.25px]">✉️ 손편지 쓰기</h1>
-        <p className="text-[#7a6050] text-sm mt-0.5">마니또에게 마음을 담아 익명으로 전달돼요</p>
+        <h1 className="font-serif text-xl font-bold tracking-subheading">✉️ 손편지 쓰기</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">마니또에게 마음을 담아 익명으로 전달돼요</p>
       </div>
       <PraiseForm
         targetName={myPair.target.name}

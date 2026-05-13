@@ -146,8 +146,8 @@ export default function AdminSprintsPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-[-0.625px]">스프린트 관리</h1>
-          <p className="text-[#615d59] mt-1 text-sm">스프린트를 생성하면 마니또가 자동으로 배정됩니다</p>
+          <h1 className="font-serif text-2xl font-bold tracking-heading">스프린트 관리</h1>
+          <p className="text-muted-foreground mt-1 text-sm">스프린트를 생성하면 마니또가 자동으로 배정됩니다</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -157,7 +157,7 @@ export default function AdminSprintsPage() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="tracking-[-0.25px]">새 스프린트 생성</DialogTitle>
+              <DialogTitle className="font-serif tracking-subheading">새 스프린트 생성</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(onCreate)} className="space-y-4 mt-2">
               {!isLeader && (
@@ -206,18 +206,18 @@ export default function AdminSprintsPage() {
         {sprints.length === 0 && (
           <Card className="text-center py-12">
             <CardContent>
-              <Calendar className="h-10 w-10 mx-auto text-[#a39e98] mb-3" />
-              <p className="text-[#615d59] text-sm">아직 생성된 스프린트가 없어요</p>
+              <Calendar className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+              <p className="text-muted-foreground text-sm">아직 생성된 스프린트가 없어요</p>
             </CardContent>
           </Card>
         )}
         {sprints.map((sprint) => (
-          <Card key={sprint.id} className="hover:shadow-notion-card transition-shadow">
+          <Card key={sprint.id} className="hover:shadow-card transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <CardTitle className="text-base">{sprint.name}</CardTitle>
-                  <p className="text-xs text-[#a39e98] mt-1">
+                  <CardTitle className="text-base font-serif">{sprint.name}</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">
                     {formatDate(sprint.startDate)} ~ {formatDate(sprint.endDate)}
                   </p>
                 </div>
@@ -226,7 +226,7 @@ export default function AdminSprintsPage() {
             </CardHeader>
             <CardContent className="pt-0">
               <div className="flex items-center justify-between">
-                <div className="flex gap-4 text-xs text-[#615d59]">
+                <div className="flex gap-4 text-xs text-muted-foreground">
                   <span>👥 {sprint._count.pairs}쌍</span>
                   <span>💌 {sprint._count.praises}개</span>
                 </div>

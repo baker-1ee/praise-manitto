@@ -52,16 +52,16 @@ export default async function SentPraisesPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-[-0.625px] flex items-center gap-2">
-          <SendHorizontal className="h-6 w-6 text-[#c27b8c]" />
+        <h1 className="font-serif text-2xl font-bold tracking-heading flex items-center gap-2">
+          <SendHorizontal className="h-6 w-6 text-primary" />
           보낸 칭찬
         </h1>
         {isFiltered ? (
-          <p className="text-[#615d59] mt-1 text-sm">
+          <p className="text-muted-foreground mt-1 text-sm">
             {sprint!.name} · {myPair!.target.name}님에게 보낸 칭찬 {praises.length}개 💌
           </p>
         ) : (
-          <p className="text-[#615d59] mt-1 text-sm">총 {praises.length}개의 칭찬을 보냈어요 💌</p>
+          <p className="text-muted-foreground mt-1 text-sm">총 {praises.length}개의 칭찬을 보냈어요 💌</p>
         )}
       </div>
 
@@ -69,19 +69,19 @@ export default async function SentPraisesPage({
         <div
           className="rounded-2xl text-center py-16"
           style={{
-            background: 'linear-gradient(150deg, #fffef7 0%, #fdf8ec 100%)',
-            border: '1px solid #ddd0b0',
-            boxShadow: '0 4px 20px rgba(120,95,50,0.10), 0 1px 0 rgba(255,255,255,0.85) inset',
+            background: 'linear-gradient(150deg, #FFFDF8 0%, #FAF7EE 100%)',
+            border: '1px solid #D4C9A8',
+            boxShadow: '0 4px 20px rgba(28,26,23,0.08)',
           }}
         >
           <p className="text-4xl mb-4">✉️</p>
           <p
-            className="text-base font-semibold tracking-[-0.25px]"
-            style={{ color: '#3d2b10', fontFamily: 'Georgia, serif' }}
+            className="text-base font-bold tracking-subheading"
+            style={{ color: '#2C2318', fontFamily: 'Georgia, serif' }}
           >
             아직 보낸 칭찬이 없어요
           </p>
-          <p className="text-sm mt-2" style={{ color: '#a08050' }}>
+          <p className="text-sm mt-2" style={{ color: '#9A8B6A' }}>
             마니또 대상에게 따뜻한 칭찬을 보내보세요!
           </p>
         </div>

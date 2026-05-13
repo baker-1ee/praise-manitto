@@ -57,12 +57,14 @@ export default function ChangePasswordPage() {
 
   return (
     <div className="flex justify-center pt-8">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md border-[rgba(28,26,23,0.15)]">
         <CardHeader className="text-center space-y-2">
           <div className="flex justify-center">
-            <KeyRound className="h-8 w-8 text-orange-500" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FEF0EA]">
+              <KeyRound className="h-5 w-5 text-primary" />
+            </div>
           </div>
-          <CardTitle>비밀번호 변경</CardTitle>
+          <CardTitle className="font-serif">비밀번호 변경</CardTitle>
           <CardDescription>임시 비밀번호(0000)로 초기화되었습니다. 새 비밀번호를 설정해주세요.</CardDescription>
         </CardHeader>
         <CardContent>

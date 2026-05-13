@@ -12,9 +12,9 @@ export function PasswordChangeBanner() {
   if (!session?.user?.mustChangePassword) return null
 
   return (
-    <div className="bg-orange-50 border-b border-orange-200 px-4 py-3">
+    <div className="bg-[#FEF0EA] border-b border-primary/20 px-4 py-3">
       <div className="container mx-auto max-w-4xl flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-orange-700">
+        <div className="flex items-center gap-2 text-primary">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <p className="text-sm font-medium">
             관리자가 비밀번호를 초기화했습니다. 지금 바로 비밀번호를 변경해주세요.
@@ -23,7 +23,7 @@ export function PasswordChangeBanner() {
         <Button
           size="sm"
           variant="outline"
-          className="shrink-0 border-orange-300 text-orange-700 hover:bg-orange-100"
+          className="shrink-0"
           onClick={() => router.push('/change-password')}
         >
           비밀번호 변경
