@@ -86,7 +86,7 @@ export async function fetchNewMessages(historyId: string) {
     const headers = msg.data.payload?.headers ?? []
     const fromHeader = headers.find((h) => h.name?.toLowerCase() === 'from')?.value ?? ''
     const subject = headers.find((h) => h.name?.toLowerCase() === 'subject')?.value ?? ''
-    const rawBody = extractPlainTextBody(msg.data.payload)
+    const rawBody = extractPlainTextBody(msg.data.payload ?? {})
     const body = stripQuotedReply(rawBody)
     results.push({ from: extractEmail(fromHeader), subject, body, messageId: id })
   }
