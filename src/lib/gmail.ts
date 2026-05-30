@@ -49,6 +49,13 @@ function stripQuotedReply(text: string): string {
     if (line.startsWith('>')) break
     if (/^--- /.test(line)) break
     if (/^On .+ wrote:$/.test(line.trim())) break
+    // Outlook: 언더스코어 구분선
+    if (/^_{5,}/.test(line.trim())) break
+    // Outlook 한국어: "보낸 사람:", "From:" 헤더
+    if (/^보낸 사람\s*:/i.test(line.trim())) break
+    if (/^From\s*:/i.test(line.trim())) break
+    // 표준 서명 구분자 (RFC 3676): "-- " 또는 "--"만 있는 줄
+    if (/^--\s*$/.test(line)) break
     result.push(line)
   }
 
