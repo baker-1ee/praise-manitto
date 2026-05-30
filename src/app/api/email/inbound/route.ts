@@ -57,6 +57,9 @@ export async function POST(req: NextRequest) {
         continue
       }
 
+      // 읽음 처리를 먼저 해서 동시 요청 시 중복 처리 방지
+      await markAsRead(msg.messageId)
+
       await prisma.praise.create({
         data: {
           sprintId: pair.sprintId,
@@ -80,7 +83,6 @@ export async function POST(req: NextRequest) {
         })
       }
 
-      await markAsRead(msg.messageId)
     }
 
     return NextResponse.json({ ok: true })
