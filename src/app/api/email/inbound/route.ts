@@ -60,6 +60,20 @@ export async function POST(req: NextRequest) {
       // 읽음 처리를 먼저 해서 동시 요청 시 중복 처리 방지
       await markAsRead(msg.messageId)
 
+      // 동일 내용의 칭찬이 최근 1분 내 이미 생성됐으면 중복 방지
+      const recentDuplicate = await prisma.praise.findFirst({
+        where: {
+          sprintId: pair.sprintId,
+          fromUserId: user.id,
+          content: msg.body,
+          createdAt: { gte: new Date(Date.now() - 60_000) },
+        },
+      })
+      if (recentDuplicate) {
+        console.log('[inbound] duplicate detected, skipping')
+        continue
+      }
+
       await prisma.praise.create({
         data: {
           sprintId: pair.sprintId,
