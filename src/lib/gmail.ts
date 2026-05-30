@@ -86,6 +86,18 @@ export async function fetchNewMessages(historyId: string) {
     }
   }
 
+  // history에서 못 찾은 경우 미읽음 메시지 직접 조회
+  if (messageIds.size === 0) {
+    const unreadRes = await gmail.users.messages.list({
+      userId: 'me',
+      q: 'is:unread in:inbox',
+      maxResults: 20,
+    })
+    for (const m of unreadRes.data.messages ?? []) {
+      if (m.id) messageIds.add(m.id)
+    }
+  }
+
   const results: { from: string; subject: string; body: string; messageId: string }[] = []
 
   for (const id of messageIds) {
