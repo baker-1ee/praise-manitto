@@ -54,6 +54,8 @@ function stripQuotedReply(text: string): string {
     // Outlook 한국어: "보낸 사람:", "From:" 헤더
     if (/^보낸 사람\s*:/i.test(line.trim())) break
     if (/^From\s*:/i.test(line.trim())) break
+    // 표준 서명 구분자 (RFC 3676): "-- " 또는 "--"만 있는 줄
+    if (/^--\s*$/.test(line)) break
     result.push(line)
   }
 
