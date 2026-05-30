@@ -32,6 +32,8 @@ export async function sendSprintStartEmail(params: {
     `${params.toName}님, ${params.sprintName} 스프린트가 시작되었습니다.`,
     `당신의 마니또 대상에게 따뜻한 칭찬을 전달해주세요.`,
     ``,
+    `💌 praise.manitto@gmail.com 으로 이메일을 보내시면 앱에 접속하지 않아도 칭찬이 전달됩니다!`,
+    ``,
     `접속 주소: https://manitto.jinung.com`,
     ``,
     `이 메일은 칭찬 마니또 서비스에서 자동 발송되었습니다.`,
