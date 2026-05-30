@@ -18,7 +18,13 @@ export function getGmailClient() {
   return { auth, gmail }
 }
 
-function extractPlainTextBody(payload: any): string {
+type GmailPayload = {
+  mimeType?: string | null
+  body?: { data?: string | null } | null
+  parts?: GmailPayload[] | null
+}
+
+function extractPlainTextBody(payload: GmailPayload): string {
   if (!payload) return ''
 
   if (payload.mimeType === 'text/plain' && payload.body?.data) {
