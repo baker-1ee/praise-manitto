@@ -79,6 +79,8 @@ export async function sendPraiseNudgeEmail(params: {
     ``,
     `아직 칭찬을 전달하지 않으셨다면, 따뜻한 말 한 마디가 팀원에게 큰 힘이 될 수 있어요.`,
     ``,
+    `💌 이 메일에 바로 회신하시면 칭찬이 전달됩니다! (앱에 접속하지 않아도 됩니다)`,
+    ``,
     `칭찬 쓰러 가기: https://manitto.jinung.com`,
     ``,
     `이 메일은 칭찬 마니또 서비스에서 자동 발송되었습니다.`,
