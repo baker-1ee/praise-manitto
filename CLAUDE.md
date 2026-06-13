@@ -2,7 +2,7 @@
 
 익명 팀 칭찬 교환 웹앱. 스프린트 단위로 마니또를 배정하고, 공개 전까지 발신자를 숨긴다.
 
-**스택:** Next.js 14 App Router · TypeScript · Prisma + PostgreSQL(Supabase) · NextAuth.js · Tailwind + shadcn/ui · Slack API
+**스택:** Next.js 14 App Router · TypeScript · Prisma + PostgreSQL(Supabase) · NextAuth.js · Tailwind + shadcn/ui · Nodemailer + Gmail API
 
 ## 작업 전 필독
 

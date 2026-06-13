@@ -8,7 +8,7 @@
 - **UI**: shadcn/ui + Tailwind CSS
 - **DB**: Supabase (PostgreSQL) + Prisma ORM
 - **Auth**: NextAuth.js (Credentials Provider)
-- **알림**: Slack Incoming Webhook
+- **알림**: 이메일 (Nodemailer) + Gmail API (이메일 회신으로 칭찬 작성/수집)
 - **배포**: Vercel
 
 ---
@@ -37,7 +37,9 @@ cp .env.example .env.local
 | `DIRECT_URL` | Supabase Direct Connection URL (포트 5432) |
 | `NEXTAUTH_SECRET` | `openssl rand -base64 32` 으로 생성 |
 | `NEXTAUTH_URL` | 로컬: `http://localhost:3000` |
-| `SLACK_WEBHOOK_URL` | Slack Webhook URL (선택) |
+| `EMAIL_HOST` 등 | 이메일 알림용 SMTP 계정 (선택, 미설정 시 알림 없이 동작) |
+| `GMAIL_*` | 이메일 회신 칭찬 수집용 Gmail API 연동 (선택) |
+| `CRON_SECRET` | Vercel Cron 인증용 시크릿 (선택) |
 
 ### 3. DB 마이그레이션 실행
 
@@ -121,7 +123,9 @@ Vercel Dashboard → 프로젝트 → **Settings** → **Environment Variables**
 | `DIRECT_URL` | Supabase Direct (5432) |
 | `NEXTAUTH_SECRET` | 랜덤 시크릿 (prod용으로 새로 생성) |
 | `NEXTAUTH_URL` | `https://your-domain.com` |
-| `SLACK_WEBHOOK_URL` | Slack Webhook URL |
+| `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_SECURE` / `EMAIL_USER` / `EMAIL_PASS` / `EMAIL_FROM` | 이메일 알림용 SMTP 계정 (선택) |
+| `GMAIL_CLIENT_ID` / `GMAIL_CLIENT_SECRET` / `GMAIL_REDIRECT_URI` / `GMAIL_REFRESH_TOKEN` / `GMAIL_PUBSUB_TOPIC` | 이메일 회신 칭찬 수집용 Gmail 연동 (선택) |
+| `CRON_SECRET` | Vercel Cron Job 인증용 시크릿 (선택) |
 
 ### 3. 커스텀 도메인 연결
 
@@ -131,12 +135,22 @@ Vercel Dashboard → 프로젝트 → **Settings** → **Environment Variables**
 
 ---
 
-## Slack 알림 설정
+## 이메일 / Gmail 연동 설정 (선택)
 
-1. [api.slack.com/apps](https://api.slack.com/apps) → Create New App
-2. **Incoming Webhooks** 활성화
-3. 워크스페이스 추가 → Webhook URL 복사 → `SLACK_WEBHOOK_URL`에 입력
-4. 팀원 개인 DM 알림: 각 팀원의 Slack User ID를 프로필에 등록 (관리자 → 팀원 관리 페이지)
+### 1. 이메일 알림 (SMTP)
+
+칭찬 수신·공개·독려 메일을 보내려면 `EMAIL_HOST`, `EMAIL_USER`, `EMAIL_PASS` 등을 설정합니다.
+미설정 시 알림 없이 정상 동작합니다(`lib/email.ts`가 자동으로 no-op 처리).
+
+### 2. Gmail 회신으로 칭찬 작성/수집
+
+팀원이 앱에 접속하지 않고 메일 회신만으로 칭찬을 남길 수 있게 하는 기능입니다.
+
+1. Google Cloud Console에서 OAuth2 클라이언트 생성 후 [OAuth Playground](https://developers.google.com/oauthplayground)에서 `GMAIL_REFRESH_TOKEN` 발급 (`gmail.modify` 스코프)
+2. Pub/Sub 토픽 생성 후 `GMAIL_PUBSUB_TOPIC`에 입력, `/api/email/inbound`를 push 구독 엔드포인트로 등록
+3. `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REDIRECT_URI`, `GMAIL_REFRESH_TOKEN`, `GMAIL_PUBSUB_TOPIC` 환경변수 등록
+4. `vercel.json`의 `cron/watch-renew`가 6시간마다 Gmail watch를 갱신 (watch는 7일 후 만료)
+5. 멤버의 `email`이 등록되어 있어야 발신자를 식별할 수 있음 (`/admin/teams`, `/admin/users`에서 설정)
 
 ---
 
@@ -147,17 +161,20 @@ Vercel Dashboard → 프로젝트 → **Settings** → **Environment Variables**
 | `/login` | 로그인 | Public |
 | `/` | 홈 (내 마니또 확인) | Auth |
 | `/praise/write` | 칭찬 작성 | Auth |
+| `/praises/sent` | 내가 보낸 칭찬 목록 | Auth |
 | `/praises/received` | 받은 칭찬 목록 | Auth |
-| `/reveal/{id}` | 스프린트 공개 결과 | Auth |
-| `/admin/sprints` | 스프린트 관리 | Admin |
-| `/admin/users` | 팀원 관리 | Admin |
+| `/sprints` | 스프린트 목록 | Auth |
+| `/reveal/{id}` | 스프린트 공개 결과 | Public |
+| `/admin/sprints` | 스프린트 관리 | Leader/Admin |
+| `/admin/teams` | 팀/멤버 관리 | Leader/Admin |
+| `/admin/users` | 전체 유저 관리 | Admin |
 
 ---
 
 ## 스프린트 운영 순서
 
-1. **관리자** `/admin/sprints` → "새 스프린트" 생성 → 마니또 자동 배정
+1. **관리자** `/admin/sprints` → "새 스프린트" 생성 → 마니또 자동 배정 (배정 시 이메일 안내 발송)
 2. **팀원** 로그인 → 홈에서 마니또 카드 클릭으로 대상 확인
-3. **2주 동안** `/praise/write` 에서 칭찬 작성 (대상에게 Slack 알림 발송)
-4. **스프린트 마지막 날** 관리자가 "공개하기" 버튼 클릭
+3. **2주 동안** `/praise/write` 에서 칭찬 작성 (또는 독려 메일에 회신만 해도 칭찬 작성됨) — 대상에게 이메일 알림 발송
+4. **스프린트 마지막 날** 관리자가 "공개하기" 버튼 클릭 (공개 알림 이메일 발송)
 5. **전체 팀원** `/reveal/{id}` 에서 마니또 관계도 + 칭찬 내역 확인

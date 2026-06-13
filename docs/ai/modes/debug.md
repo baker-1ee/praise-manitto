@@ -45,5 +45,6 @@ UI 이상
 | 마니또 배정 | 완전 순열 실패 시 무한루프 가능 (userIds < 2) |
 | 세션 | `session.user.teamId`가 null일 때 Prisma 조건 오류 |
 | 스프린트 상태 | ACTIVE ↔ REVEALED 전환 시 페이지 캐시 미갱신 |
-| Slack DM | `slackUserId` 없는 유저에게 발송 시 에러 (선택 필드) |
+| 이메일 발송 | `email` 없는 유저에게는 발송 스킵 (선택 필드, `lib/email.ts`가 미설정 시 no-op) |
+| Gmail 연동 | `/api/email/inbound`는 Pub/Sub watch가 6시간마다 만료되므로 `cron/watch-renew` 동작 여부 확인 |
 | DB 연결 | 마이그레이션 후 반드시 Direct Connection(5432) 사용 확인 |

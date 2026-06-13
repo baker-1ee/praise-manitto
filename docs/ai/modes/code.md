@@ -29,12 +29,12 @@
 - `any` 금지, Zod `z.infer<typeof schema>` 또는 명시적 타입
 - NextAuth 세션 타입은 `src/types/next-auth.d.ts` 기준 사용
 
-**Slack 알림 추가 시:**
+**이메일 알림 추가 시:**
 ```ts
 try {
-  await sendSomeSlackNotification(...);
+  await sendSomeEmail(...);
 } catch (e) {
-  console.error("Slack notification failed:", e);
+  console.error("Email notification failed:", e);
   // 메인 로직은 계속 진행
 }
 ```
