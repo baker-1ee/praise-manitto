@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useEffect, useRef, useState } from 'react'
 
 export const LOADING_QUOTES = [
   '칭찬은 고래도 춤추게 한다 🐳',
@@ -26,10 +26,6 @@ export const LOADING_QUOTES = [
 ]
 
 const LoadingContext = createContext({ pending: 0, inc: () => {}, dec: () => {} })
-
-export function useApiLoading() {
-  return useContext(LoadingContext)
-}
 
 export function ApiLoadingProvider({ children }: { children: React.ReactNode }) {
   const [pending, setPending] = useState(0)
