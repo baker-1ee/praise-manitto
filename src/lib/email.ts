@@ -72,7 +72,7 @@ export async function sendPraiseNudgeEmail(params: {
   sprintName: string
 }) {
   const text = [
-    `[칭찬 마니또] ${params.targetName}님이 칭찬을 기다리고 있어요 🥺`,
+    `[칭찬 마니또] 당신의 마니또 대상이 칭찬을 기다리고 있어요 🥺`,
     ``,
     `${params.toName}님, 안녕하세요!`,
     ``,
@@ -87,7 +87,7 @@ export async function sendPraiseNudgeEmail(params: {
     ``,
     `이 메일은 칭찬 마니또 서비스에서 자동 발송되었습니다.`,
   ].join('\n')
-  await send(params.toEmail, `[칭찬 마니또] ${params.targetName}님이 칭찬을 기다리고 있어요 🥺`, text)
+  await send(params.toEmail, `[칭찬 마니또] 당신의 마니또 대상이 칭찬을 기다리고 있어요 🥺`, text)
 }
 
 export async function sendSprintRevealEmail(params: {
