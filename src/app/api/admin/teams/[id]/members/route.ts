@@ -66,13 +66,24 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   return NextResponse.json(user, { status: 201 })
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || !['ADMIN', 'LEADER'].includes(session.user.role)) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 
+  // LEADER는 자신의 팀만 팀원 삭제 가능
+  if (session.user.role === 'LEADER' && session.user.teamId !== params.id) {
+    return NextResponse.json({ error: '자신의 팀만 수정할 수 있습니다' }, { status: 403 })
+  }
+
   const { userId } = await req.json()
+
+  const target = await prisma.user.findUnique({ where: { id: userId } })
+  if (!target || target.teamId !== params.id) {
+    return NextResponse.json({ error: '해당 팀의 팀원이 아닙니다' }, { status: 400 })
+  }
+
   await prisma.user.update({ where: { id: userId }, data: { teamId: null } })
   return NextResponse.json({ ok: true })
 }
