@@ -26,7 +26,7 @@
 | Backend | Next.js API Routes |
 | DB | PostgreSQL (Prisma ORM) |
 | 인증 | NextAuth.js (Credentials Provider — 사용자명/비밀번호) |
-| 알림 | Slack Incoming Webhook + Bot Token DM |
+| 알림 | 이메일 (Nodemailer SMTP) + Gmail API (이메일 회신으로 칭찬 작성/수집) |
 | 배포 | Vercel (Frontend + API) ← **확정** |
 | DB/Auth 호스팅 | Supabase (PostgreSQL) ← **확정** |
 
@@ -101,20 +101,20 @@
 - 스프린트 기간 중 내 마니또 대상에게 칭찬을 작성할 수 있다
 - 1 스프린트 당 최소 1회, 최대 무제한 (가이드: 주 1~2회 권장)
 - 칭찬 내용은 **발신자 익명** 처리
-- 작성 즉시 대상에게 알림 발송 (Slack)
+- 작성 즉시 대상에게 이메일 알림 발송 (수신자에게 `email`이 등록된 경우)
 - 칭찬 카테고리 태그 선택 (선택): `기술력`, `협업`, `커뮤니케이션`, `리더십`, `성장`, `기타`
+- **이메일 회신으로 칭찬 작성** (선택, Gmail 연동 시): 앱에 접속하지 않고도 독려 메일에 회신만 하면 칭찬이 등록됨 (`3.6` 참조)
 
 #### 칭찬 데이터 구조
 ```
 Praise {
   id: string
   sprintId: string
-  fromUserId: string      // 작성자 (마니또)
+  fromUserId: string      // 작성자 (마니또) — 공개 전 API 응답에서 제외
   toUserId: string        // 수신자 (마니또 대상)
-  content: string         // 칭찬 내용 (최대 500자)
-  category: string[]      // 태그
+  content: string         // 칭찬 내용 (10~500자)
+  categories: string[]    // 태그
   createdAt: DateTime
-  isAnonymous: true       // 항상 익명
 }
 ```
 
@@ -141,27 +141,34 @@ Praise {
 
 ### 3.6 알림 발송
 
+모든 이메일 발송은 `lib/email.ts`(Nodemailer)를 통하며, `EMAIL_HOST`/`EMAIL_USER`/`EMAIL_PASS` 등이 설정되지 않으면 조용히 no-op 처리된다 (선택 기능). 수신자에게 `email`이 등록되어 있지 않으면 발송하지 않는다.
+
 #### 구현 완료
 
-**칭찬 수신 알림 (Slack DM)**
-- Bot Token(`SLACK_BOT_TOKEN`)으로 수신자에게 DM 발송
-- 수신자의 `slackUserId`가 설정된 경우에만 발송
-- 발송 내용:
-  ```
-  💌 익명의 팀원이 칭찬을 보냈어요!
-  [태그: 기술력, 협업]
-  "오늘 코드 리뷰에서 정말 꼼꼼하게 봐줘서 감사했어요!"
-  👉 칭찬 확인하기: {서비스 URL}
-  ```
+**스프린트 시작 알림** (`sendSprintStartEmail`)
+- 스프린트 생성(=마니또 배정) 즉시 전체 멤버에게 발송
+- "마니또가 배정되었습니다, 칭찬을 전달해주세요" 안내 + 서비스 접속 링크
 
-**스프린트 공개 알림 (Slack 채널)**
-- Incoming Webhook(`SLACK_WEBHOOK_URL`)으로 팀 채널에 발송
-- 발송 내용: `🎉 *{스프린트명}* 칭찬 마니또가 공개되었습니다!`
+**칭찬 수신 알림** (`sendPraiseReceivedEmail`)
+- 칭찬 작성(앱 또는 이메일 회신) 즉시 수신자에게 발송
+- "익명의 마니또가 칭찬을 남겼어요" + 칭찬 본문 미리보기
 
-**Slack 사용자 연동 (관리자)**
-- `/admin/teams` 에서 Slack 워크스페이스 멤버 목록 동기화
-- 앱 유저와 Slack 유저 매핑 (드롭다운 선택)
-- `/api/admin/slack/users` — Slack API로 워크스페이스 멤버 조회
+**칭찬 독려 알림** (`sendPraiseNudgeEmail`, `cron/nudge`)
+- 스프린트 진행 중 칭찬을 아직 작성하지 않은 마니또에게 정기 발송 (vercel.json 스케줄)
+- "이 메일에 회신하면 칭찬이 전달됩니다" 안내 포함
+
+**스프린트 공개 알림** (`sendSprintRevealEmail`)
+- 공개 시 전체 멤버에게 발송, `/reveal/{sprintId}` 링크 안내
+
+#### 이메일 회신으로 칭찬 작성 (Gmail 연동)
+
+- `cron/nudge`/공개 안내 메일에 **회신**하면, 본문이 그대로 칭찬 내용으로 등록됨
+- Gmail Pub/Sub push → `/api/email/inbound`에서 처리:
+  1. 발신자 이메일로 `User` 조회
+  2. 해당 유저의 활성 `ManitoPair` 조회 (없으면 무시)
+  3. 메일 본문에서 인용/서명 제거 후 `Praise` 생성 (1분 내 동일 내용 중복 방지)
+  4. 대상자에게 `sendPraiseReceivedEmail` 발송
+- `cron/watch-renew`가 6시간마다 Gmail watch를 갱신 (Gmail watch는 7일 후 만료)
 
 ---
 
@@ -171,6 +178,7 @@ Praise {
 - ADMIN: 팀 생성/삭제, 전체 팀 조회
 - LEADER/ADMIN: 소속 팀 멤버 추가/삭제, 역할(LEADER/MEMBER) 지정
   - LEADER는 자신의 팀(`session.user.teamId === params.id`)에만 멤버 추가 가능
+- 멤버 추가 시 `email`(선택) 입력 가능 — 등록 시 이메일 알림 + Gmail 회신 칭찬 작성 대상이 됨
 - 멤버 추가 시 초대 토큰 자동 생성 → 초대 링크 복사 버튼
 - 멤버 상태 표시: `미가입` (비밀번호 없음) / `가입 완료`
 - 관리자가 멤버 비밀번호를 `0000`으로 초기화 가능
@@ -178,7 +186,8 @@ Praise {
 - 모바일 다이얼로그: 키보드 노출 시 상단 정렬(`top-[5%]`)로 입력 필드 가림 방지
 
 #### 화면
-- `/admin/teams` — 팀 목록, 멤버 관리, Slack 연동
+- `/admin/teams` — 팀 목록, 멤버 관리 (이름/이메일/역할)
+- `/admin/users` — 전체 유저 관리, 이메일 등록/수정
 
 ---
 
@@ -197,8 +206,8 @@ Praise {
 
 #### 구현 완료
 - LEADER/ADMIN이 "공개" 버튼 클릭 → 스프린트 상태 `REVEALED`
-- 공개 후 팀 전체가 마니또 관계도 + 칭찬 내역 조회 가능
-- 공개 시 Slack 채널 알림 자동 발송 (`3.6` 참조)
+- 공개 후 팀 전체(+비로그인 사용자)가 마니또 관계 + 칭찬 내역 조회 가능
+- 공개 시 전체 멤버에게 이메일 알림 자동 발송 (`3.6` 참조)
 
 #### 화면
 - `/reveal/{sprintId}` — 스프린트 공개 결과 (상세 3.10)
@@ -209,22 +218,34 @@ Praise {
 
 #### 구현 완료
 ```
-[상단] 스프린트 이름 + 기간
+[상단] 스프린트 이름 + 기간 + 총 칭찬 개수
+       페이지 진입 시 Confetti 효과 (lib/celebration.ts)
 
-[중앙] 마니또 관계도 (커스텀 SVG 원형 배치)
-  - 팀원 아바타 원형 배치 (팀원 수에 따라 반지름 자동 조정)
-  - 화살표: A → B (A가 B의 마니또), 화살표에 칭찬 개수 배지
-  - 화살표 순차 등장 애니메이션 (350ms 간격)
-  - 팀원 클릭 시 마니또 관계 + 칭찬 내역 패널 표시
-  - 팀원 클릭 시 Confetti + 박수 음향 + 이름 TTS 축하 이벤트
-
-[통계] API 반환값 (topSender, topReceiver, topCategory, totalPraises)
+[목록] 멤버별 카드 (기본 전체 펼침)
+  - 각 카드: 멤버 정보 + "○○님의 마니또는 △△님" + 받은 칭찬 목록
+  - 카드 클릭 시 펼침/접힘 토글
+  - 칭찬 카드 4회 연속 클릭 시 이스터에그(빙그르르 애니메이션)
 ```
 
 #### 관련 파일
-- `/src/components/relation-graph.tsx` — 커스텀 SVG 관계도
-- `/src/lib/celebration.ts` — Confetti + Web Audio + Speech Synthesis
+- `/src/app/reveal/[sprintId]/page.tsx` — 공개 결과 화면
+- `/src/lib/celebration.ts` — `fireConfetti()` (Confetti 효과)
 - `/reveal/{sprintId}` — 비로그인 상태에서도 접근 가능 (auth 불필요)
+
+---
+
+### 3.11 칭찬 조르기
+
+#### 구현 완료
+- 진행 중인 스프린트에서, 내 마니또(나에게 칭찬을 줘야 하는 사람)에게 "칭찬을 기다리고 있어요" 독려 메일을 보낼 수 있음
+- 하루 1회로 제한 (`localStorage` 기반)
+- 마니또에게 `email`이 없으면 전송 실패 처리
+
+#### 화면
+- `PraiseNudgeButton` 컴포넌트 — 홈/스프린트 화면에 노출
+
+#### 관련 API
+- `POST /api/praises/nudge` — `sendPraiseNudgeEmail` 발송
 
 ---
 
@@ -232,23 +253,26 @@ Praise {
 
 ```prisma
 model Team {
-  id      String   @id @default(cuid())
-  name    String
-  members User[]
-  sprints Sprint[]
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  members   User[]
+  sprints   Sprint[]
 }
 
 model User {
-  id                 String   @id @default(cuid())
-  name               String   @unique  // 로그인 ID로 사용 (이메일 없음)
+  id                 String    @id @default(cuid())
+  name               String?   @unique  // 로그인 ID로 사용
+  email              String?            // 선택: 이메일 알림 + Gmail 회신 칭찬 작성용
   avatarUrl          String?
   bio                String?
-  slackUserId        String?
-  password           String?           // bcrypt 해시, 초대 전 null
-  mustChangePassword Boolean  @default(false)
-  role               Role     @default(MEMBER)
+  password           String?            // bcrypt 해시, 초대 전 null
+  mustChangePassword Boolean   @default(false)
+  role               Role      @default(MEMBER)
   teamId             String?
-  team               Team?    @relation(fields: [teamId], references: [id])
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  team               Team?     @relation(fields: [teamId], references: [id])
   inviteToken        InviteToken?
 
   manitoOf        ManitoPair[] @relation("Manito")
@@ -265,10 +289,11 @@ enum Role {
 
 model InviteToken {
   id        String    @id @default(cuid())
-  token     String    @unique
+  token     String    @unique @default(cuid())
   userId    String    @unique
   expiresAt DateTime
   usedAt    DateTime?
+  createdAt DateTime  @default(now())
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -279,6 +304,7 @@ model Sprint {
   startDate DateTime
   endDate   DateTime
   status    SprintStatus @default(PENDING)
+  createdAt DateTime     @default(now())
   team      Team?        @relation(fields: [teamId], references: [id])
   pairs     ManitoPair[]
   praises   Praise[]
@@ -335,13 +361,14 @@ model Praise {
 ### 칭찬
 | Method | Path | 설명 | 권한 |
 |--------|------|------|------|
-| POST | `/api/praises` | 칭찬 작성 + Slack DM 발송 | Auth |
+| POST | `/api/praises` | 칭찬 작성 + 수신자 이메일 알림 발송 | Auth |
 | GET | `/api/praises/received` | 받은 칭찬 목록 | Auth |
+| POST | `/api/praises/nudge` | 내 마니또에게 독려 메일 발송 (하루 1회) | Auth |
 
 ### 스프린트 (사용자)
 | Method | Path | 설명 | 권한 |
 |--------|------|------|------|
-| GET | `/api/sprints/{id}/reveal` | 공개 데이터 조회 (REVEALED/CLOSED만) | Auth |
+| GET | `/api/sprints/{id}/reveal` | 공개 데이터 조회 (REVEALED/CLOSED만) | Public |
 
 ### 관리자 — 스프린트
 | Method | Path | 설명 | 권한 |
@@ -366,7 +393,14 @@ model Praise {
 | Method | Path | 설명 | 권한 |
 |--------|------|------|------|
 | GET | `/api/admin/users` | 전체 유저 목록 | Admin |
-| GET | `/api/admin/slack/users` | Slack 워크스페이스 멤버 조회 | Leader/Admin |
+| PATCH | `/api/admin/users/{id}` | 유저 정보 수정 (이메일 등) | Admin |
+
+### Cron / Webhook
+| Method | Path | 설명 | 인증 |
+|--------|------|------|------|
+| GET | `/api/cron/nudge` | 칭찬 미작성 마니또에게 독려 메일 발송 (vercel.json 스케줄) | `Authorization: Bearer {CRON_SECRET}` |
+| GET | `/api/cron/watch-renew` | Gmail Pub/Sub watch 갱신 (6시간 주기) | `Authorization: Bearer {CRON_SECRET}` |
+| POST | `/api/email/inbound` | Gmail push 알림 수신 → 이메일 회신을 칭찬으로 등록 | Pub/Sub push (인증 없음, 항상 `{ ok: true }` 반환) |
 
 ---
 
@@ -376,14 +410,15 @@ model Praise {
 |------|------|----------|
 | `/login` | 로그인 | Public |
 | `/register` | 회원가입 (초대 토큰 필요) | Public |
-| `/` | 홈 — 현재 스프린트 + 마니또 카드 + 칭찬 통계 | Auth |
+| `/` | 홈 — 현재 스프린트 + 마니또 카드 + 칭찬 조르기 | Auth |
+| `/sprints` | 스프린트 목록 | Auth |
 | `/praise/write` | 칭찬 작성 (마니또 대상 자동 지정) | Auth |
 | `/praises/sent` | 내가 보낸 칭찬 목록 | Auth |
 | `/praises/received` | 받은 칭찬 목록 (공개 전 익명) | Auth |
 | `/change-password` | 비밀번호 변경 | Auth |
-| `/reveal/{sprintId}` | 스프린트 공개 결과 — 관계도 + 칭찬 | Auth + REVEALED |
+| `/reveal/{sprintId}` | 스프린트 공개 결과 — 멤버별 마니또 관계 + 칭찬 | Public (REVEALED/CLOSED만) |
 | `/admin/sprints` | 스프린트 관리 (생성/공개/삭제) | Leader/Admin |
-| `/admin/teams` | 팀 및 멤버 관리, Slack 연동 | Leader/Admin |
+| `/admin/teams` | 팀 및 멤버 관리 (이메일 등록 포함) | Leader/Admin |
 | `/admin/users` | 전체 유저 관리 | Admin |
 
 ---
@@ -414,13 +449,11 @@ model Praise {
 - [x] 내 마니또 확인 화면 (플립 카드 애니메이션)
 - [x] 칭찬 작성 (10~500자), 전송 후 보낸 칭찬 목록으로 자동 이동
 - [x] 받은 칭찬 / 보낸 칭찬 목록 (진행 중 스프린트 기준 필터링)
-- [x] 스프린트 공개 + 커스텀 SVG 관계도 시각화 (비로그인 접근 허용)
-- [x] 공개 화면 축하 이벤트 (Confetti + 음향 + TTS)
+- [x] 스프린트 공개 + 멤버별 마니또 관계·칭찬 카드 (비로그인 접근 허용)
+- [x] 공개 화면 진입 시 Confetti 효과
 
 ### 완료 (Phase 2 — 알림 & UX)
-- [x] Slack DM 알림 (칭찬 수신 시)
-- [x] Slack 채널 알림 (스프린트 공개 시)
-- [x] 관리자 패널에서 Slack 유저 연동
+- [x] 이메일 알림 (스프린트 시작/칭찬 수신/공개) — Nodemailer, 미설정 시 no-op
 - [x] 자동 로그인 (localStorage, 기본 체크)
 - [x] 카카오톡 인앱 브라우저 감지 → 외부 브라우저 유도 배너
 - [x] OpenGraph 썸네일 — 루트 페이지 기본 OG + 초대 링크 개인화 OG
@@ -428,8 +461,16 @@ model Praise {
 - [x] 홈 화면 — 직전 공개 스프린트 카드 표시 (진행 중 스프린트 없을 때)
 - [x] 모바일 다이얼로그 키보드 UX 개선
 
-### 미구현 (Phase 3 — 개선)
-- [ ] 공개 화면 통계 카드 UI (API는 구현됨, 화면 미표시)
+### 완료 (Phase 3 — 이메일 기반 칭찬 & 디자인)
+- [x] Purple/Violet 디자인 시스템 리브랜드
+- [x] 칭찬 조르기 (마니또에게 독려 메일, 하루 1회)
+- [x] 칭찬 독려 cron (`cron/nudge`) — 정기적으로 미작성자에게 독려 메일
+- [x] Gmail 연동 — 이메일 회신으로 칭찬 작성/수집 (`/api/email/inbound`, `cron/watch-renew`)
+- [x] 스프린트 목록 페이지 (`/sprints`)
+- [x] 공개 화면 칭찬 카드 4연속 클릭 이스터에그
+
+### 미구현 (Phase 4 — 개선)
+- [ ] 공개 화면 통계 카드 UI (topSender/topReceiver 등, API는 일부만 구현)
 - [ ] 스프린트 아카이브 / 히스토리 페이지
 - [ ] 팀원 초대 이메일 자동 발송 (현재: 링크 수동 공유)
 
@@ -497,7 +538,10 @@ vercel env add DATABASE_URL
 vercel env add DIRECT_URL
 vercel env add NEXTAUTH_SECRET
 vercel env add NEXTAUTH_URL       # 예: https://manitto.yourdomain.com
-vercel env add SLACK_WEBHOOK_URL
+vercel env add EMAIL_HOST
+vercel env add EMAIL_USER
+vercel env add EMAIL_PASS
+vercel env add CRON_SECRET
 
 # 3. 배포
 vercel --prod
@@ -527,8 +571,21 @@ DIRECT_URL=postgresql://...pooler.supabase.com:5432/...    # 마이그레이션 
 NEXTAUTH_SECRET=<random-base64-32>
 NEXTAUTH_URL=https://your-domain.vercel.app
 
-# Slack (선택)
-SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...  # 채널 알림
-SLACK_BOT_TOKEN=xoxb-...                                # DM 알림
-NEXT_PUBLIC_SLACK_INVITE_URL=                           # Slack 워크스페이스 초대 링크
+# 이메일 발송 (선택, 미설정 시 알림 없이 동작)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=app-password
+EMAIL_FROM="칭찬 마니또 <noreply@praise-manitto.app>"
+
+# Gmail 연동 (선택, 이메일 회신으로 칭찬 작성/수집)
+GMAIL_CLIENT_ID=xxx.apps.googleusercontent.com
+GMAIL_CLIENT_SECRET=xxx
+GMAIL_REDIRECT_URI=https://developers.google.com/oauthplayground
+GMAIL_REFRESH_TOKEN=xxx
+GMAIL_PUBSUB_TOPIC=projects/your-project/topics/gmail-inbound
+
+# Cron (선택)
+CRON_SECRET=random-secret-for-cron-auth
 ```

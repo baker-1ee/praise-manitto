@@ -63,7 +63,8 @@ return NextResponse.json(result);
 return NextResponse.json({ error: "설명 문자열" }, { status: 4xx });
 ```
 
-## Slack 알림 규칙
+## 이메일 알림 규칙
 
-- Slack 호출 실패가 메인 로직을 중단하면 안 된다.
-- try/catch로 감싸고, 실패 시 `console.error`만 기록.
+- 이메일 발송 실패가 메인 로직을 중단하면 안 된다.
+- `lib/email.ts`의 발송 함수는 `EMAIL_HOST`/`EMAIL_USER`/`EMAIL_PASS` 미설정 시 조용히 no-op 처리된다 (선택적 기능).
+- Gmail 수신 웹훅(`/api/email/inbound`)은 항상 `{ ok: true }`를 반환한다 — Pub/Sub 재시도 폭주를 막기 위해 내부 에러를 노출하지 않고 `console.error`로만 기록.
