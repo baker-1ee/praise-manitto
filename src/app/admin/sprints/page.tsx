@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useRouter } from 'next/navigation'
-import { Plus, Eye, Loader2, Trash2, Calendar } from 'lucide-react'
+import { Plus, Eye, Loader2, Trash2, Calendar, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -60,6 +60,7 @@ export default function AdminSprintsPage() {
   const [submitting, setSubmitting] = useState(false)
   const [revealing, setRevealing] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [pendingDialog, setPendingDialog] = useState<{ sprintId: string; names: string[] } | null>(null)
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -127,7 +128,27 @@ export default function AdminSprintsPage() {
   }
 
   const onReveal = async (sprintId: string) => {
-    if (!confirm('스프린트를 공개하면 모든 팀원이 마니또 관계를 볼 수 있습니다. 공개하시겠어요?')) return
+    setRevealing(sprintId)
+    try {
+      const checkRes = await fetch(`/api/admin/sprints/${sprintId}/pending-praises`)
+      if (!checkRes.ok) throw new Error('칭찬 현황을 확인하는 데 실패했습니다')
+      const { pending } = await checkRes.json() as { pending: { id: string; name: string }[] }
+
+      if (pending.length > 0) {
+        setPendingDialog({ sprintId, names: pending.map((u) => u.name) })
+        return
+      }
+
+      if (!confirm('스프린트를 공개하면 모든 팀원이 마니또 관계를 볼 수 있습니다. 공개하시겠어요?')) return
+      await doReveal(sprintId)
+    } catch (e) {
+      toast({ variant: 'destructive', title: '오류', description: (e as Error).message })
+    } finally {
+      setRevealing(null)
+    }
+  }
+
+  const doReveal = async (sprintId: string) => {
     setRevealing(sprintId)
     try {
       const res = await fetch(`/api/admin/sprints/${sprintId}/reveal`, { method: 'PUT' })
@@ -143,6 +164,34 @@ export default function AdminSprintsPage() {
   }
 
   return (
+    <>
+    {pendingDialog && (
+      <Dialog open onOpenChange={() => setPendingDialog(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              칭찬 미작성 팀원이 있어요
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 mt-1">
+            <p className="text-sm text-[#615d59]">
+              아래 팀원이 아직 칭찬을 작성하지 않았습니다. 모두 작성한 뒤 공개해주세요.
+            </p>
+            <ul className="rounded-lg border border-destructive/30 bg-destructive/5 divide-y divide-destructive/10">
+              {pendingDialog.names.map((name) => (
+                <li key={name} className="px-4 py-2 text-sm font-medium text-destructive">
+                  {name}
+                </li>
+              ))}
+            </ul>
+            <Button className="w-full" variant="outline" onClick={() => setPendingDialog(null)}>
+              확인
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )}
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -270,5 +319,6 @@ export default function AdminSprintsPage() {
         ))}
       </div>
     </div>
+    </>
   )
 }
