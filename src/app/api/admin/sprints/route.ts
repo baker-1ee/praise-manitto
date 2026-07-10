@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { assignManito, manitoPairKey } from '@/lib/manito'
+import { assignManito, manitoPairKey, recentSprintLookback } from '@/lib/manito'
 import { sendSprintStartEmail } from '@/lib/email'
 import { z } from 'zod'
 
@@ -56,14 +56,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '해당 팀에 팀원이 최소 2명 필요합니다' }, { status: 400 })
   }
 
-  const previousSprint = await prisma.sprint.findFirst({
+  const lookback = recentSprintLookback(members.length)
+
+  const recentSprints = await prisma.sprint.findMany({
     where: { teamId: parsed.data.teamId },
     orderBy: { createdAt: 'desc' },
+    take: lookback,
     include: { pairs: true },
   })
 
   const excludePairs = new Set(
-    (previousSprint?.pairs ?? []).map((p) => manitoPairKey(p.manitoId, p.targetId))
+    recentSprints.flatMap((s) => s.pairs.map((p) => manitoPairKey(p.manitoId, p.targetId)))
   )
 
   const pairs = assignManito(members.map((m) => m.id), excludePairs)

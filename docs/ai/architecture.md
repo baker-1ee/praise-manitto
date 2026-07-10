@@ -34,11 +34,17 @@ JWT 콜백에서 `role`, `teamId`, `mustChangePassword`, `name`을 세션에 주
 Prisma 싱글톤. `globalThis.__prisma`에 캐싱해 개발 환경 핫리로드 시 연결 폭발 방지.
 
 ### lib/manito.ts
-`assignManito(userIds: string[], excludePairs?: Set<string>)` — Fisher-Yates 셔플 기반 완전 순열(Derangement) 알고리즘.
+`assignManito(userIds: string[], excludePairs?: Set<string>)` — 랜덤 순서 백트래킹 기반 완전 순열(Derangement) 알고리즘.
 반환값은 `{ manitoId, targetId }[]`. 자기 자신에게 배정되지 않도록 보장.
-`excludePairs`(직전 스프린트의 `manitoPairKey(manitoId, targetId)` 조합)를 함께 회피하되,
-인원이 적어 둘 다 만족 불가능한 경우(예: 2인 팀) self-match 회피만 만족하는 배정으로 대체한다.
-호출부(`api/admin/sprints`)에서 직전 스프린트의 `ManitoPair`를 조회해 `excludePairs`로 전달.
+`excludePairs`(최근 n개 스프린트의 `manitoPairKey(manitoId, targetId)` 조합)도 함께 회피하되,
+조건을 동시에 만족하는 배정이 존재하면 반드시 찾는다(전수 백트래킹). 인원이 적어 둘 다
+만족 불가능한 경우(예: 2인 팀) self-match 회피만 만족하는 배정으로 대체한다.
+`recentSprintLookback(teamSize)` — 팀 인원 수 N에 따라 회피할 과거 스프린트 개수를
+`max(1, N-2)`로 계산한다. 비둘기집 원리상 자기 자신을 제외한 N-1명의 후보 중 최근
+N-2회 배정을 회피해도 항상 최소 1명의 후보가 남도록 하는 값이며, 이보다 크게 잡으면
+배정 불가 상황(폴백)만 늘어난다.
+호출부(`api/admin/sprints`)에서 `recentSprintLookback`으로 조회할 스프린트 개수를 정하고,
+해당 기간의 `ManitoPair`를 모두 모아 `excludePairs`로 전달해 최대한 골고루 배정되게 한다.
 스프린트 생성 시 **1회만** 호출.
 
 ### lib/celebration.ts
