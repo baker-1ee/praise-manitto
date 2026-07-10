@@ -34,8 +34,11 @@ JWT 콜백에서 `role`, `teamId`, `mustChangePassword`, `name`을 세션에 주
 Prisma 싱글톤. `globalThis.__prisma`에 캐싱해 개발 환경 핫리로드 시 연결 폭발 방지.
 
 ### lib/manito.ts
-`assignManito(userIds: string[])` — Fisher-Yates 셔플 기반 완전 순열(Derangement) 알고리즘.
+`assignManito(userIds: string[], excludePairs?: Set<string>)` — Fisher-Yates 셔플 기반 완전 순열(Derangement) 알고리즘.
 반환값은 `{ manitoId, targetId }[]`. 자기 자신에게 배정되지 않도록 보장.
+`excludePairs`(직전 스프린트의 `manitoPairKey(manitoId, targetId)` 조합)를 함께 회피하되,
+인원이 적어 둘 다 만족 불가능한 경우(예: 2인 팀) self-match 회피만 만족하는 배정으로 대체한다.
+호출부(`api/admin/sprints`)에서 직전 스프린트의 `ManitoPair`를 조회해 `excludePairs`로 전달.
 스프린트 생성 시 **1회만** 호출.
 
 ### lib/celebration.ts
