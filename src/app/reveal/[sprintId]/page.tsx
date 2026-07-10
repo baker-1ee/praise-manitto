@@ -49,7 +49,7 @@ export default function RevealPage() {
       .then((d: RevealData) => {
         setData(d)
         setLoading(false)
-        setExpandedIds(new Set(d.pairs.map((p) => p.targetId)))
+        setExpandedIds(new Set(d.pairs.map((p) => p.manitoId)))
         setTimeout(() => fireConfetti(), 300)
       })
   }, [sprintId])
@@ -67,8 +67,9 @@ export default function RevealPage() {
 
   if (!data) return <div className="text-center py-16">데이터를 불러올 수 없습니다</div>
 
-  // targetId 기준으로 pair를 빠르게 찾기 위한 맵
-  const pairByTarget = new Map(data.pairs.map((p) => [p.targetId, p]))
+  // manitoId(칭찬한 사람) 기준으로 pair를 빠르게 찾기 위한 맵
+  const pairByManito = new Map(data.pairs.map((p) => [p.manitoId, p]))
+  const memberById = new Map(data.members.map((m) => [m.id, m]))
 
   return (
     <div className="space-y-6">
@@ -85,13 +86,14 @@ export default function RevealPage() {
 
       <div className="space-y-3">
         {data.members.map((member, index) => {
-          const pair = pairByTarget.get(member.id)
+          const pair = pairByManito.get(member.id)
           const isExpanded = expandedIds.has(member.id)
 
-          // 이전 카드의 대상(target)이 이 카드의 마니또(manito)와 같으면
+          // 이전 카드(칭찬한 사람)가 칭찬한 대상(target)이 이 카드의 주인(manito)과 같으면
           // "A가 B를 칭찬 → B가 C를 칭찬"으로 체인이 이어지는 것 — 화살표로 연결 표시
           const prevMember = index > 0 ? data.members[index - 1] : null
-          const continuesChain = !!(prevMember && pair && pair.manitoId === prevMember.id)
+          const prevPair = prevMember ? pairByManito.get(prevMember.id) : null
+          const continuesChain = !!(prevPair && prevPair.targetId === member.id)
 
           return (
             <div key={member.id}>
@@ -124,7 +126,7 @@ export default function RevealPage() {
                       <p className="font-semibold text-base">{member.name}</p>
                       {pair ? (
                         <p className="text-xs text-muted-foreground">
-                          💌 {pair.praiseCount > 0 ? `${pair.praiseCount}개의 칭찬` : '칭찬 없음'}
+                          💌 {pair.praiseCount > 0 ? `${pair.praiseCount}개의 칭찬을 보냄` : '보낸 칭찬 없음'}
                         </p>
                       ) : (
                         <p className="text-xs text-muted-foreground">마니또 배정 없음</p>
@@ -142,22 +144,23 @@ export default function RevealPage() {
                     <div className="mt-4 space-y-3">
                       <Separator />
                       <div className="flex items-center gap-2 pt-1">
+                        <span className="text-xs text-muted-foreground shrink-0">To.</span>
                         <Avatar className="h-8 w-8 shrink-0">
                           {(() => {
-                            const manito = data.members.find(m => m.id === pair.manitoId)
+                            const target = memberById.get(pair.targetId)
                             return (
                               <>
-                                {manito?.avatarUrl && <AvatarImage src={manito.avatarUrl} />}
+                                {target?.avatarUrl && <AvatarImage src={target.avatarUrl} />}
                                 <AvatarFallback className="bg-indigo-100 text-indigo-600 text-xs font-bold">
-                                  {getInitials(pair.manitoName)}
+                                  {getInitials(pair.targetName)}
                                 </AvatarFallback>
                               </>
                             )
                           })()}
                         </Avatar>
                         <p className="text-sm font-medium text-indigo-600">
-                          {pair.manitoName}
-                          <span className="text-muted-foreground font-normal">님이 칭찬했어요</span>
+                          {pair.targetName}
+                          <span className="text-muted-foreground font-normal">님을 칭찬했어요</span>
                         </p>
                       </div>
 
