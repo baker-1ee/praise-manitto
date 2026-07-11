@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { assignManito, manitoPairKey, recentSprintLookback } from '@/lib/manito'
+import { assignManito, computePairWeights, recentSprintLookback } from '@/lib/manito'
 import { sendSprintStartEmail } from '@/lib/email'
 import { z } from 'zod'
 
@@ -65,11 +65,12 @@ export async function POST(req: NextRequest) {
     include: { pairs: true },
   })
 
-  const excludePairs = new Set(
-    recentSprints.flatMap((s) => s.pairs.map((p) => manitoPairKey(p.manitoId, p.targetId)))
+  const pairWeights = computePairWeights(
+    recentSprints,
+    members.map((m) => m.id)
   )
 
-  const pairs = assignManito(members.map((m) => m.id), excludePairs)
+  const pairs = assignManito(members.map((m) => m.id), pairWeights)
 
   const sprint = await prisma.sprint.create({
     data: {
