@@ -34,18 +34,29 @@ JWT 콜백에서 `role`, `teamId`, `mustChangePassword`, `name`을 세션에 주
 Prisma 싱글톤. `globalThis.__prisma`에 캐싱해 개발 환경 핫리로드 시 연결 폭발 방지.
 
 ### lib/manito.ts
-`assignManito(userIds: string[], excludePairs?: Set<string>)` — 랜덤 순서 백트래킹 기반 완전 순열(Derangement) 알고리즘.
-반환값은 `{ manitoId, targetId }[]`. 자기 자신에게 배정되지 않도록 보장.
-`excludePairs`(최근 n개 스프린트의 `manitoPairKey(manitoId, targetId)` 조합)도 함께 회피하되,
-조건을 동시에 만족하는 배정이 존재하면 반드시 찾는다(전수 백트래킹). 인원이 적어 둘 다
-만족 불가능한 경우(예: 2인 팀) self-match 회피만 만족하는 배정으로 대체한다.
-`recentSprintLookback(teamSize)` — 팀 인원 수 N에 따라 회피할 과거 스프린트 개수를
-`max(1, N-2)`로 계산한다. 비둘기집 원리상 자기 자신을 제외한 N-1명의 후보 중 최근
-N-2회 배정을 회피해도 항상 최소 1명의 후보가 남도록 하는 값이며, 이보다 크게 잡으면
-배정 불가 상황(폴백)만 늘어난다.
+`assignManito(userIds: string[], pairWeights?: Map<string, number>)` — 팀 전체가 하나의
+순환(Hamiltonian cycle)을 이루도록 강제하는 최소 비용 순환 탐색 알고리즘.
+반환값은 `{ manitoId, targetId }[]`. 순환 구조상 인접 원소가 모두 서로 달라
+자기 자신 배정 불가(derangement)를 구조적으로 만족하며, 2인 상호 배정(A→B, B→A 동시 발생)도
+발생하지 않는다(단, 팀원이 2명뿐이면 구조적으로 불가피).
+`N ≤ 8`은 `(N-1)!` 전수 탐색으로 완전 최적해, `N > 8`은 무작위 시작점 최대 10개에서
+그리디 최근접 이웃 구성 + 2-opt 로컬서치를 거쳐 최저 비용 결과를 채택한다(N=100까지 0.3초 이내).
+
+`computePairWeights(recentSprintsMostRecentFirst, currentMemberIds, halfLifeSprints=2)` —
+최근 스프린트(최신순)의 manito↔target 조합에 지수 감쇠 가중치를 누적한다.
+`weight = 0.5 ^ ((몇 스프린트 전인가 - 1) / halfLifeSprints)`로 최근일수록 무겁게,
+오래될수록 부드럽게 잊혀진다. 하드 컷오프가 없어 배정 불가 상황(폴백) 자체가 생기지 않는다.
+현재 팀원 목록에 둘 다 남아있는 쌍만 반영하므로 탈퇴자는 자동 제외되고, 신규 합류자는
+이력이 없어 가중치 0(최우선 배정 후보)이 된다.
+
+`recentSprintLookback(teamSize)` — 가중치 계산에 반영할 과거 스프린트 개수를
+`clamp(⌈(N-1)/2⌉, 3, 20)`으로 계산한다. 지수 감쇠로 이 창 밖의 이력은 가중치가
+사실상 0에 수렴하므로, 이 값은 배정 가능 여부를 좌우하지 않고 조회 쿼리 비용의
+상한을 두는 역할만 한다.
+
 호출부(`api/admin/sprints`)에서 `recentSprintLookback`으로 조회할 스프린트 개수를 정하고,
-해당 기간의 `ManitoPair`를 모두 모아 `excludePairs`로 전달해 최대한 골고루 배정되게 한다.
-스프린트 생성 시 **1회만** 호출.
+해당 기간의 `ManitoPair`를 `computePairWeights`로 넘겨 가중치를 만든 뒤 `assignManito`에
+전달한다. 스프린트 생성 시 **1회만** 호출.
 
 ### lib/celebration.ts
 `canvas-confetti` 래퍼. `fireConfetti()` — 스프린트 공개 화면 진입 시 폭죽 효과.
