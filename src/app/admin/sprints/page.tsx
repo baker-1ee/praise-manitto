@@ -176,7 +176,7 @@ export default function AdminSprintsPage() {
           </DialogHeader>
           <div className="space-y-3 mt-1">
             <p className="text-sm text-[#615d59]">
-              아래 팀원이 아직 칭찬을 작성하지 않았습니다. 모두 작성한 뒤 공개해주세요.
+              아래 팀원이 아직 칭찬을 작성하지 않았습니다. 그래도 공개하시겠어요?
             </p>
             <ul className="rounded-lg border border-destructive/30 bg-destructive/5 divide-y divide-destructive/10">
               {pendingDialog.names.map((name) => (
@@ -185,9 +185,21 @@ export default function AdminSprintsPage() {
                 </li>
               ))}
             </ul>
-            <Button className="w-full" variant="outline" onClick={() => setPendingDialog(null)}>
-              확인
-            </Button>
+            <div className="flex gap-2">
+              <Button className="flex-1" variant="outline" onClick={() => setPendingDialog(null)}>
+                닫기
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={() => {
+                  const sprintId = pendingDialog.sprintId
+                  setPendingDialog(null)
+                  doReveal(sprintId)
+                }}
+              >
+                공개하기
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
